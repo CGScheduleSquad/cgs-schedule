@@ -95,6 +95,14 @@ class ScheduleManager {
     }
 }
 
+class CacheManager {
+
+}
+
+class ScheduleRenderer {
+
+}
+
 window.addEventListener('load', () => {
     let calendarUUID = ScheduleManager.getCalendarUUID();
     let seedDate = ScheduleManager.getSeedDate();
