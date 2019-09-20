@@ -50,6 +50,10 @@
                         form.classList.add('was-validated');
                     }, false);
                 });
+
+                $(".generate-link").click(() => {
+                    generateScheduleLink();
+                });
             }, false);
         })();
 
@@ -131,7 +135,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="generateScheduleLink()">Agree</button>
+                <button type="button" class="btn btn-primary generate-link">Agree</button>
             </div>
         </div>
     </div>
