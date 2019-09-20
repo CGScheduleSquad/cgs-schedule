@@ -1,4 +1,15 @@
 {
+  "name": "ts-cgs-schedule",
+  "description": "Recreating the old CG Schedule with TypeScript",
+  "version": "0.0.1",
+  "contributors": [
+    "Tristan Peng <pengt@catlin.edu> (https://kizjkre.github.io)",
+    "Liam Wang <wangl@catlin.edu>"
+  ],
+  "bugs": "https://github.com/CGScheduleSquad/ts-cgs-schedule/issues",
+  "homepage": "https://cgschedulesquad.github.io/ts-cgs-schedule/",
+  "repository": "https://github.com/CGScheduleSquad/ts-cgs-schedule",
+  "license": "MIT",
   "files": [
     "src/"
   ],
