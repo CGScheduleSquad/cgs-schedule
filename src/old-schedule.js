@@ -189,6 +189,8 @@ function loadSchedule() {
     if (newRange === null) newRange = "week"; // TODO: different default for thin screens (phones)
     const isWeekView = newRange !== "day";
 
+    // TS is up to here
+
     $("#schedarea .sched").addClass(isWeekView ? "week" : "today");
 
     let startDate;
