@@ -200,19 +200,36 @@ class ScheduleRange {
 }
 
 class ICalUtils {
+    static getVeracrossCalendarFromUUID(calendarUUID: string): Promise<any> {
+        return ICalUtils.corsGetPromise(`http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics`).then(icsFile => {
+            // @ts-ignore
+            return ICAL.parse(icsFile);
+        });
+    }
 
+    private static corsGetPromise(url: string) {
+        return new Promise((resolve, reject) => {
+            $.get("https://cors-anywhere.herokuapp.com/" + url, function(raw) {
+                resolve(raw);
+            }).fail(() => {
+                reject();
+            });
+        });
+    }
 }
 
 class ScheduleFactory {
-    private calendarUUID: string; // todo uuid type
+    private id: string; // unique id of schedule
     private blocks: Block[];
 
-    constructor(calendarUUID: string) {
-        this.calendarUUID = calendarUUID;
+    constructor(id: string) {
+        this.id = id;
     }
 
-    addBlocksICS(ics: string) {
-
+    addBlocksICS(calendarUUID: string): Promise<void> {
+        return ICalUtils.getVeracrossCalendarFromUUID(calendarUUID).then(parsedCalendar => {
+            console.log(parsedCalendar);
+        });
     }
 }
 
@@ -242,6 +259,7 @@ window.addEventListener("load", () => {
     let seedDate = ScheduleManager.getSeedDate();
     let viewMode = ScheduleManager.getViewMode();
     let range = new ScheduleRange(seedDate, viewMode);
+    let scheduleFactory = new ScheduleFactory(calendarUUID).addBlocksICS(calendarUUID);
     ScheduleRenderer.updateLinks(calendarUUID, range);
 });
 
