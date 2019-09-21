@@ -22,25 +22,10 @@
   "devDependencies": {
     "cross-env": "^5.2.0",
     "gh-pages": "^1.2.0",
-    "husky": ">=1",
-    "lint-staged": ">=8",
     "parcel-bundler": "^1.9.7",
-    "prettier": "1.18.2",
     "typescript": "^2.9.2"
   },
   "dependencies": {
     "@types/jquery": "^3.3.31"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,json,ts}": [
-      "prettier --write",
-      "git add"
-    ],
-    "ignore": ["node_modules", "dist", "package-lock.json", "tsconfig.json"]
   }
 }
