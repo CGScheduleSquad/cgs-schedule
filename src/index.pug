@@ -11,32 +11,43 @@ html
     script(src = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js')
     script.
       const generateScheduleLink = () => {
-        localStorage.removeItem("scheduleEvents");
-        let url = "./schedule.html?cal=" + uuidFromWebcalLink($("#allClassesUrl").val());
+        localStorage.removeItem('scheduleEvents');
+        let url =
+          './schedule.html?cal=' + uuidFromWebcalLink($('#allClassesUrl').val());
         window.open(url, '_blank');
       };
       const uuidFromWebcalLink = link => {
-        return link.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?=\.ics)/g)
-      }
+        return link.match(
+          /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?=\.ics)/g
+        );
+      };
       (() => {
-        window.addEventListener('load', function () {
-          let forms = document.getElementsByClassName('needs-validation');
-          let validation = Array.prototype.filter.call(forms, function (form) {
-            form.addEventListener('submit', function (event) {
-              if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-              } else {
-                event.preventDefault();
-                event.stopPropagation();
-                $("#disclaimerModal").modal();
-              }
-              form.classList.add('was-validated');
-            }, false);
-          });
-        }, false);
+        window.addEventListener(
+          'load',
+          function() {
+            let forms = document.getElementsByClassName('needs-validation');
+            let validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener(
+                'submit',
+                function(event) {
+                  if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  } else {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $('#disclaimerModal').modal();
+                  }
+                  form.classList.add('was-validated');
+                },
+                false
+              );
+            });
+          },
+          false
+        );
       })();
-      $(".generate-link").click(() => {
+      $('.generate-link').click(() => {
         generateScheduleLink();
       });
     title Setup
