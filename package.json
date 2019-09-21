@@ -34,9 +34,10 @@
     }
   },
   "lint-staged": {
-    "*.{js,css,json,md}": [
+    "*.{js,json,ts}": [
       "prettier --write",
       "git add"
-    ]
+    ],
+    "ignore": ["node_modules", "dist", "package-lock.json"]  }
   }
 }
