@@ -594,14 +594,8 @@ function prepRegularSchedule(daySchedule) {
     block.mins = Math.min(
       Math.max(
         new Date(
-          normalAllTimes[timeIndex + block.rowSpan].getTime() -
-          normalAllTimes[timeIndex].getTime()
-        ).getTime() /
-        1000 /
-        60,
-        5
-      ),
-      90
+          normalAllTimes[timeIndex + block.rowSpan].getTime() - normalAllTimes[timeIndex].getTime()).getTime() / 1000 / 60
+        , 5), 90
     );
     timeIndex = timeIndex + block.rowSpan;
   });
@@ -615,7 +609,7 @@ function appendInlineSchedule(daySchedule) {
     `<td rowspan="12" class="specialday" style="border-top-style: solid; border-right-style: solid; border-bottom: 0px; border-left-style: solid;"><table class="sched week special"><tbody>`
   );
 
-  if (daySchedule.blocks[0].startTime.getTime() !== normalTimes[0].getTime()) {
+  if (daySchedule.blocks[0].startTime.getTime() !== normalTimes[0].getTime()) { // add free block first
     daySchedule.blocks.unshift({
       startTime: normalTimes[0],
       endTime: daySchedule.blocks[0].startTime,
@@ -625,7 +619,7 @@ function appendInlineSchedule(daySchedule) {
       lateStart: true
     });
   }
-  daySchedule.blocks.forEach((block, index) => {
+  daySchedule.blocks.forEach((block, index) => { // calculate end times for blocks without them
     if (block.endTime === undefined) {
       block.endTime =
         index === daySchedule.blocks.length - 1
@@ -635,7 +629,7 @@ function appendInlineSchedule(daySchedule) {
   });
 
   let newBlocks = [];
-  daySchedule.blocks.forEach((block, index) => {
+  daySchedule.blocks.forEach((block, index) => { // add free blocks to fill in the gaps
     newBlocks.push(block);
     let nextTime =
       index === daySchedule.blocks.length - 1
@@ -654,7 +648,7 @@ function appendInlineSchedule(daySchedule) {
   });
   daySchedule.blocks = newBlocks;
 
-  daySchedule.blocks.forEach(block => {
+  daySchedule.blocks.forEach(block => { // calculate durations
     block.mins = Math.min(
       Math.max(
         new Date(
@@ -668,7 +662,7 @@ function appendInlineSchedule(daySchedule) {
     );
   });
 
-  daySchedule.blocks.forEach(block => {
+  daySchedule.blocks.forEach(block => { // append the blocks
     let minsClass = `mins${block.mins}`;
 
     if (block.lateStart) {
