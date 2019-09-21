@@ -19,53 +19,53 @@ export class ScheduleTime {
 }
 
 class ScheduleDate {
-  static now(): ScheduleDate {
-    return new ScheduleDate(new Date());
-  }
+    static now(): ScheduleDate {
+        return new ScheduleDate(new Date());
+    }
 
-  static fromString(dateString: string): ScheduleDate {
-    let splitDate = dateString.split("-");
-    return new ScheduleDate(new Date(parseInt(splitDate[0]), parseInt(splitDate[1]) - 1, parseInt(splitDate[2])));
-  }
+    static fromString(dateString: string): ScheduleDate {
+        let splitDate = dateString.split("-");
+        return new ScheduleDate(new Date(parseInt(splitDate[0]), parseInt(splitDate[1]) - 1, parseInt(splitDate[2])));
+    }
 
-  private readonly date: Date;
+    private readonly date: Date;
 
-  private constructor(date: Date) {
-    this.date = date;
-  }
+    private constructor(date: Date) {
+        this.date = date;
+    }
 
-  copy(): ScheduleDate {
-    return new ScheduleDate(new Date(this.date));
-  }
+    copy(): ScheduleDate {
+        return new ScheduleDate(new Date(this.date));
+    }
 
-  getDay() {
-    return this.date.getDay();
-  }
+    getDay() {
+        return this.date.getDay();
+    }
 
-  getDate() {
-    return this.date.getDate();
-  }
+    getDate() {
+        return this.date.getDate();
+    }
 
-  setDate(date: number) {
-    this.date.setDate(date);
-  }
+    setDate(date: number) {
+        this.date.setDate(date);
+    }
 
-  getFullYear() {
-    return this.date.getFullYear();
-  }
+    getFullYear() {
+        return this.date.getFullYear();
+    }
 
-  getMonth() {
-    return this.date.getMonth();
-  }
+    getMonth() {
+        return this.date.getMonth();
+    }
 
-  toString() {
-    return [this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate()].join("-");
-  }
+    toString() {
+        return [this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate()].join("-");
+    }
 }
 
 class Block {
-  startTime: ScheduleTime;
-  endTime: ScheduleTime;
+    startTime: ScheduleTime;
+    endTime: ScheduleTime;
     title: string;
     subtitle: string;
     location: string;
@@ -73,7 +73,7 @@ class Block {
 }
 
 abstract class Day {
-  date: ScheduleDate;
+    date: ScheduleDate;
 }
 
 abstract class BlockDay extends Day {
@@ -96,13 +96,13 @@ class TextDay extends Day {
 
 class Utilities {
     static getUrlParam(key: string) {
-        return new URL(window.location.href).searchParams.get(key)
+        return new URL(window.location.href).searchParams.get(key);
     }
 }
 
 enum ViewMode {
-  Day = 1,
-  Week = 5,
+    Day = 1,
+    Week = 5,
 }
 
 class ScheduleManager {
@@ -116,12 +116,12 @@ class ScheduleManager {
         return calendarUUID;
     }
 
-  static getSeedDate(): ScheduleDate {
+    static getSeedDate(): ScheduleDate {
         const dateString = Utilities.getUrlParam("date");
         if (dateString !== null) {
-          return ScheduleDate.fromString(dateString);
+            return ScheduleDate.fromString(dateString);
         } else {
-          return ScheduleDate.now();
+            return ScheduleDate.now();
         }
     }
 
@@ -140,76 +140,80 @@ class ScheduleManager {
 }
 
 class ScheduleRange {
-  private readonly _currentDate: ScheduleDate;
-  private readonly _nextDate: ScheduleDate;
-  private readonly _previousDate: ScheduleDate;
-  private readonly _viewMode: ViewMode;
+    private readonly _currentDate: ScheduleDate;
+    private readonly _nextDate: ScheduleDate;
+    private readonly _previousDate: ScheduleDate;
+    private readonly _viewMode: ViewMode;
 
-  constructor(currentDate: ScheduleDate, viewMode: ViewMode) { // TODO: Clean up this mess
-    this._viewMode = viewMode;
-    this._currentDate = currentDate;
-    const thisMonday = ScheduleRange.getLastFriday(currentDate);
-    thisMonday.setDate(thisMonday.getDate() + 3);
-    if (viewMode === ViewMode.Week) {
-      // get the previous and next monday for the arrows TODO: Dont modify the dates inside getDatesForWeek so this order doesn't matter
-      const previousMonday = thisMonday.copy();
-      const nextMonday = thisMonday.copy();
-      previousMonday.setDate(thisMonday.getDate() - 7);
-      nextMonday.setDate(thisMonday.getDate() + 7);
-      this._nextDate = nextMonday;
-      this._previousDate = previousMonday;
-    } else if (viewMode === ViewMode.Day) {
-      let isWeekend = (date: ScheduleDate) => date.getDay() === 0 || date.getDay() === 6;
-      let startDate = isWeekend(currentDate) ? thisMonday : currentDate;
+    constructor(currentDate: ScheduleDate, viewMode: ViewMode) { // TODO: Clean up this mess
+        this._viewMode = viewMode;
+        this._currentDate = currentDate;
+        const thisMonday = ScheduleRange.getLastFriday(currentDate);
+        thisMonday.setDate(thisMonday.getDate() + 3);
+        if (viewMode === ViewMode.Week) {
+            // get the previous and next monday for the arrows TODO: Dont modify the dates inside getDatesForWeek so this order doesn't matter
+            const previousMonday = thisMonday.copy();
+            const nextMonday = thisMonday.copy();
+            previousMonday.setDate(thisMonday.getDate() - 7);
+            nextMonday.setDate(thisMonday.getDate() + 7);
+            this._nextDate = nextMonday;
+            this._previousDate = previousMonday;
+        } else if (viewMode === ViewMode.Day) {
+            let isWeekend = (date: ScheduleDate) => date.getDay() === 0 || date.getDay() === 6;
+            let startDate = isWeekend(currentDate) ? thisMonday : currentDate;
 
-      this._nextDate = startDate.copy();
-      this._previousDate = startDate.copy();
-      this._nextDate.setDate(startDate.getDate() + 1);
-      if (isWeekend(this._nextDate)) this._nextDate.setDate(startDate.getDate() + 3);
-      this._previousDate.setDate(startDate.getDate() - 1);
-      if (isWeekend(this._previousDate)) this._previousDate.setDate(startDate.getDate() - 3);
-    } else {
-      throw new Error("Unsupported ViewMode value!");
+            this._nextDate = startDate.copy();
+            this._previousDate = startDate.copy();
+            this._nextDate.setDate(startDate.getDate() + 1);
+            if (isWeekend(this._nextDate)) this._nextDate.setDate(startDate.getDate() + 3);
+            this._previousDate.setDate(startDate.getDate() - 1);
+            if (isWeekend(this._previousDate)) this._previousDate.setDate(startDate.getDate() - 3);
+        } else {
+            throw new Error("Unsupported ViewMode value!");
+        }
     }
-  }
 
-  private static getLastFriday(date: ScheduleDate) {
-    let d = date.copy();
-    let day = d.getDay();
-    let diff = (day <= 5) ? (7 - 5 + day) : (day - 5);
+    private static getLastFriday(date: ScheduleDate) {
+        let d = date.copy();
+        let day = d.getDay();
+        let diff = (day <= 5) ? (7 - 5 + day) : (day - 5);
 
-    d.setDate(d.getDate() - diff);
-    return d;
-  }
+        d.setDate(d.getDate() - diff);
+        return d;
+    }
 
-  get nextDate(): ScheduleDate {
-    return this._nextDate;
-  }
+    get nextDate(): ScheduleDate {
+        return this._nextDate;
+    }
 
-  get currentDate(): ScheduleDate {
-    return this._currentDate;
-  }
+    get currentDate(): ScheduleDate {
+        return this._currentDate;
+    }
 
-  get previousDate(): ScheduleDate {
-    return this._previousDate;
-  }
+    get previousDate(): ScheduleDate {
+        return this._previousDate;
+    }
 
-  get viewMode(): ViewMode {
-    return this._viewMode;
-  }
+    get viewMode(): ViewMode {
+        return this._viewMode;
+    }
+}
+
+class ICalUtils {
+
 }
 
 class ScheduleFactory {
-  private calendarUUID: string; // todo uuid type
-  private blocks: Block[];
+    private calendarUUID: string; // todo uuid type
+    private blocks: Block[];
 
-  constructor(calendarUUID: string) {
-    this.calendarUUID = calendarUUID;
-  }
+    constructor(calendarUUID: string) {
+        this.calendarUUID = calendarUUID;
+    }
 
-  addBlocksICS(ics: string) {
+    addBlocksICS(ics: string) {
 
-  }
+    }
 }
 
 class CacheManager {
@@ -217,28 +221,28 @@ class CacheManager {
 }
 
 class ScheduleRenderer {
-  static updateLinks(caldendarUUID: string, range: ScheduleRange) {
-    $("#schedarea .sched").addClass(range.viewMode === ViewMode.Week ? "week" : "today");
-    // left/right arrows
-    let navigationArrows = $("td.arrows a");
-    navigationArrows.first().prop("href", "?date=" + range.previousDate.toString() + "&range=" + range + "&cal=" + caldendarUUID);
-    navigationArrows.last().prop("href", "?date=" + range.nextDate.toString() + "&range=" + range + "&cal=" + caldendarUUID);
+    static updateLinks(caldendarUUID: string, range: ScheduleRange) {
+        $("#schedarea .sched").addClass(range.viewMode === ViewMode.Week ? "week" : "today");
+        // left/right arrows
+        let navigationArrows = $("td.arrows a");
+        navigationArrows.first().prop("href", "?date=" + range.previousDate.toString() + "&range=" + range + "&cal=" + caldendarUUID);
+        navigationArrows.last().prop("href", "?date=" + range.nextDate.toString() + "&range=" + range + "&cal=" + caldendarUUID);
 
-    // this week
-    $("#today a").prop("href", "?range=day" + "&cal=" + caldendarUUID);
-    $("#this-week a").prop("href", "?range=week" + "&cal=" + caldendarUUID);
+        // this week
+        $("#today a").prop("href", "?range=day" + "&cal=" + caldendarUUID);
+        $("#this-week a").prop("href", "?range=week" + "&cal=" + caldendarUUID);
 
-    // return to portal link
-    $("td.controls.links a").last().prop("href", "https://portals.veracross.com/catlin/student/student/daily-schedule?date=" + range.currentDate.toString());
-  }
+        // return to portal link
+        $("td.controls.links a").last().prop("href", "https://portals.veracross.com/catlin/student/student/daily-schedule?date=" + range.currentDate.toString());
+    }
 }
 
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
     let calendarUUID = ScheduleManager.getCalendarUUID();
     let seedDate = ScheduleManager.getSeedDate();
-  let viewMode = ScheduleManager.getViewMode();
-  let range = new ScheduleRange(seedDate, viewMode);
-  ScheduleRenderer.updateLinks(calendarUUID, range);
+    let viewMode = ScheduleManager.getViewMode();
+    let range = new ScheduleRange(seedDate, viewMode);
+    ScheduleRenderer.updateLinks(calendarUUID, range);
 });
 
 /*
