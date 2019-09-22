@@ -21,7 +21,7 @@ Start the setup process for your schedule [here](https://cgschedulesquad.github.
 3. Bookmark the link.
 
 ## Feedback/Feature request?
-Submit a github issue [here](https://github.com/CGScheduleSquad/ts-cgs-schedule/issues)
+Submit a GitHub issue [here](https://github.com/CGScheduleSquad/ts-cgs-schedule/issues)
 
 ## Credits
 - Classic CGS schedule generation by [Liam Wang](https://github.com/wangl5/)
