@@ -49,12 +49,11 @@ window.addEventListener("load", () => {
     let viewMode = ScheduleParamUtils.getViewMode();
     let range = new ScheduleRange(seedDate, viewMode);
 
-    let scheduleBuilder = ScheduleBuilder.generateScheduleFromBlockSources(calendarUUID, new VeracrossICSRawBlockSource(calendarUUID))
-        .then((schedule: ScheduleAll) => {
-            console.log(schedule);
-            console.log(JSON.stringify(schedule));
-            debugger;
-        });
+    ScheduleBuilder.generateScheduleFromBlockSources(calendarUUID, new VeracrossICSRawBlockSource(calendarUUID)).then((schedule: ScheduleAll) => {
+        console.log(schedule);
+        console.log(JSON.stringify(schedule));
+        debugger;
+    });
 
     ScheduleRenderer.updateLinks(calendarUUID, range);
 });
