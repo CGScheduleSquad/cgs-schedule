@@ -9,47 +9,7 @@ html
     script(src = 'https://code.jquery.com/jquery-3.3.1.slim.min.js')
     script(src = 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js')
     script(src = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js')
-    script.
-      const generateScheduleLink = () => {
-        localStorage.removeItem('scheduleEvents');
-        let url =
-          './schedule.html?cal=' + uuidFromWebcalLink($('#allClassesUrl').val());
-        window.open(url, '_blank');
-      };
-      const uuidFromWebcalLink = link => {
-        return link.match(
-          /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(?=\.ics)/g
-        );
-      };
-      (() => {
-        window.addEventListener(
-          'load',
-          function() {
-            let forms = document.getElementsByClassName('needs-validation');
-            let validation = Array.prototype.filter.call(forms, function(form) {
-              form.addEventListener(
-                'submit',
-                function(event) {
-                  if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                  } else {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $('#disclaimerModal').modal();
-                  }
-                  form.classList.add('was-validated');
-                },
-                false
-              );
-            });
-          },
-          false
-        );
-      })();
-      $('.generate-link').click(() => {
-        generateScheduleLink();
-      });
+    script(src = 'script.js')
     title Setup
   body
     div.container
@@ -84,9 +44,9 @@ html
             required,
             pattern = 'webcal:\\/\\/api.veracross.com\\/catlin\\/subscribe\\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.ics\\?uid=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
           )
-          br
           div.invalid-feedback
             | Invalid calendar link. Please check the instructions above and try again.
+          br
           button.btn.btn-primary.btn-lg.btn-block.mb-3(type = 'submit') Generate Schedule Link
         h6 Step 5:
         p
@@ -112,7 +72,7 @@ html
               br
               | - We are not responsible if you are late or miss class because the schedule was not accurate.
               br
-              a(href = 'https://raw.githubusercontent.com/CGScheduleSquad/catlin-schedule/master/terms.txt') Please also review the Terms and Conditions before using CGS Schedule.
+              a(href = 'https://raw.githubusercontent.com/CGScheduleSquad/catlin-schedule/master/terms.txt', target = '_blank') Please also review the Terms and Conditions before using CGS Schedule.
           div.modal-footer
             button.btn.btn-secondary(data-dismiss = 'modal') Cancel
             button.btn.btn-success.generate-link Agree
