@@ -28,7 +28,7 @@ export class ScheduleRange {
       this.previousDate = previousMonday;
     } else if (viewMode === ViewMode.Day) {
       let isWeekend = (date: ScheduleDate) =>
-        date.getDay() === 0 || date.getDay() === 6;
+          date.getDay() === 0 || date.getDay() === 6;
       let startDate = isWeekend(currentDate) ? thisMonday : currentDate;
 
       this.nextDate = startDate.copy();

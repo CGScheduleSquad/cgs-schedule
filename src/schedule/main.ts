@@ -7,17 +7,17 @@ import { ScheduleRenderer } from './rendering/scheduleRenderer';
 
 class ScheduleParamUtils {
     static getCalendarUUID(): string {
-        let calendarUUID = ScheduleParamUtils.getUrlParam("cal");
+        let calendarUUID = ScheduleParamUtils.getUrlParam('cal');
         if (calendarUUID == null) {
-            alert("Invalid URL! Please check that you have followed the instructions correctly.");
-            window.location.href = "./?"; // exits the page
-            return "";
+            alert('Invalid URL! Please check that you have followed the instructions correctly.');
+            window.location.href = './?'; // exits the page
+            return '';
         }
         return calendarUUID;
     }
 
     static getSeedDate(): ScheduleDate {
-        const dateString = ScheduleParamUtils.getUrlParam("date");
+        const dateString = ScheduleParamUtils.getUrlParam('date');
         if (dateString !== null) {
             return ScheduleDate.fromString(dateString);
         } else {
@@ -27,11 +27,11 @@ class ScheduleParamUtils {
 
 
     static getViewMode(): ViewMode {
-        let newRange = ScheduleParamUtils.getUrlParam("range");
+        let newRange = ScheduleParamUtils.getUrlParam('range');
         switch (newRange) {
-            case "week":
+            case 'week':
                 return ViewMode.Week;
-            case "day":
+            case 'day':
                 return ViewMode.Day;
             default:
                 return ViewMode.Week; // TODO: different default for thin screens (phones)
@@ -67,7 +67,7 @@ class ScheduleCacheManager {
     }
 }
 
-window.addEventListener("load", () => {
+window.addEventListener('load', () => {
     let calendarUUID = ScheduleParamUtils.getCalendarUUID();
     let seedDate = ScheduleParamUtils.getSeedDate();
     let viewMode = ScheduleParamUtils.getViewMode();

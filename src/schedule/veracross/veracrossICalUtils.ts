@@ -4,7 +4,7 @@ import { ScheduleDate } from '../time/scheduleDate';
 export class VeracrossICalUtils {
   static getVeracrossCalendarFromUUID(calendarUUID: string): Promise<any> {
     return VeracrossICalUtils.corsGetPromise(
-      `http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics`
+        `http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics`
     ).then(icsFile => {
       // @ts-ignore
       return ICAL.parse(icsFile)[2].filter((a: any) => a[1].length === 8);
@@ -64,7 +64,7 @@ export class VeracrossICalUtils {
 
   static getLetter(event: any) {
     let letter = VeracrossICalUtils.getDescription(event)[1].Day.match(
-      /US Day [A-Z]/
+        /US Day [A-Z]/
     );
     letter = letter !== null ? letter[0].charAt(letter[0].length - 1) : '';
     return letter;
