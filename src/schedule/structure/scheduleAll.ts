@@ -1,5 +1,5 @@
-import { ScheduleDay } from "./scheduleDay";
-import { CompressionManager } from "../compressionManager";
+import { ScheduleDay } from './scheduleDay';
+import { CompressionManager } from '../compressionManager';
 
 export class ScheduleAll {
   readonly id: string; // unique id

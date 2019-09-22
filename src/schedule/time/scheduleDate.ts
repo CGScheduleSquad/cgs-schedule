@@ -4,8 +4,14 @@ export class ScheduleDate {
   }
 
   static fromString(dateString: string): ScheduleDate {
-    let splitDate = dateString.split("-");
-    return new ScheduleDate(new Date(parseInt(splitDate[0]), parseInt(splitDate[1]) - 1, parseInt(splitDate[2])));
+    let splitDate = dateString.split('-');
+    return new ScheduleDate(
+      new Date(
+        parseInt(splitDate[0]),
+        parseInt(splitDate[1]) - 1,
+        parseInt(splitDate[2])
+      )
+    );
   }
 
   static fromDate(date: Date): ScheduleDate {
@@ -43,7 +49,11 @@ export class ScheduleDate {
   }
 
   toString() {
-    return [this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate()].join("-");
+    return [
+      this.date.getFullYear(),
+      this.date.getMonth() + 1,
+      this.date.getDate()
+    ].join('-');
   }
 
   toJSON() {

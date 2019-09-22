@@ -1,17 +1,19 @@
-import { ScheduleDate } from "../time/scheduleDate";
+import { ScheduleDate } from '../time/scheduleDate';
 
 export enum ViewMode {
   Day = 1,
-  Week = 5,
+  Week = 5
 }
 
-export class ScheduleRange { // calculates the week or day range for the schedule to display
+export class ScheduleRange {
+  // calculates the week or day range for the schedule to display
   readonly currentDate: ScheduleDate;
   readonly nextDate: ScheduleDate;
   readonly previousDate: ScheduleDate;
   readonly viewMode: ViewMode;
 
-  constructor(currentDate: ScheduleDate, viewMode: ViewMode) { // TODO: Clean up this mess
+  constructor(currentDate: ScheduleDate, viewMode: ViewMode) {
+    // TODO: Clean up this mess
     this.viewMode = viewMode;
     this.currentDate = currentDate;
     const thisMonday = ScheduleRange.getLastFriday(currentDate);
@@ -25,27 +27,29 @@ export class ScheduleRange { // calculates the week or day range for the schedul
       this.nextDate = nextMonday;
       this.previousDate = previousMonday;
     } else if (viewMode === ViewMode.Day) {
-      let isWeekend = (date: ScheduleDate) => date.getDay() === 0 || date.getDay() === 6;
+      let isWeekend = (date: ScheduleDate) =>
+        date.getDay() === 0 || date.getDay() === 6;
       let startDate = isWeekend(currentDate) ? thisMonday : currentDate;
 
       this.nextDate = startDate.copy();
       this.previousDate = startDate.copy();
       this.nextDate.setDate(startDate.getDate() + 1);
-      if (isWeekend(this.nextDate)) this.nextDate.setDate(startDate.getDate() + 3);
+      if (isWeekend(this.nextDate))
+        this.nextDate.setDate(startDate.getDate() + 3);
       this.previousDate.setDate(startDate.getDate() - 1);
-      if (isWeekend(this.previousDate)) this.previousDate.setDate(startDate.getDate() - 3);
+      if (isWeekend(this.previousDate))
+        this.previousDate.setDate(startDate.getDate() - 3);
     } else {
-      throw new Error("Unsupported ViewMode value!");
+      throw new Error('Unsupported ViewMode value!');
     }
   }
 
   private static getLastFriday(date: ScheduleDate) {
     let d = date.copy();
     let day = d.getDay();
-    let diff = (day <= 5) ? (7 - 5 + day) : (day - 5);
+    let diff = day <= 5 ? 7 - 5 + day : day - 5;
 
     d.setDate(d.getDate() - diff);
     return d;
   }
 }
-

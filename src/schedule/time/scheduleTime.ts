@@ -14,7 +14,7 @@ export class ScheduleTime {
   }
 
   get hours(): number {
-    return (this.totalMinutes - this.totalMinutes % 60) / 60;
+    return (this.totalMinutes - (this.totalMinutes % 60)) / 60;
   }
 
   equals(other: ScheduleTime) {
@@ -29,4 +29,3 @@ export class ScheduleTime {
     return this.totalMinutes;
   }
 }
-
