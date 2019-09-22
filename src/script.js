@@ -24,10 +24,11 @@ window.addEventListener('load', () => {
   });
   $('.generate-link').click(() => {
     localStorage.removeItem('scheduleEvents');
-    let url = `./schedule.html?cal=${ uuidFromWebcalLink(
+    let url = `./schedule.html?cal=${uuidFromWebcalLink(
       $('#allClassesUrl').val()
-    ) }`;
+    )}`;
     window.open(url, '_blank');
   });
 });
-let test = "test test test test asdfjkl test test test test test test test test test test test" // Prettier test 7
+let test =
+  'test test test test asdfjkl test test test test test test test test test test test'; // Prettier test 8
