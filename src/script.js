@@ -30,4 +30,4 @@ window.addEventListener('load', () => {
     window.open(url, '_blank');
   });
 });
-let test = "test test test test asdfjkl test test test test test test test test test" // Prettier test 4
+let test = "test test test test asdfjkl test test test test test test test test test" // Prettier test 5
