@@ -43,17 +43,38 @@ class ScheduleParamUtils {
     }
 }
 
+class ScheduleCacheManager {
+    public static readonly LOCAL_STORAGE_KEY = 'scheduleEvents';
+
+    static getSchedule(calendarUUID: string): Promise<ScheduleAll> {
+        let scheduleString = localStorage.getItem(ScheduleCacheManager.LOCAL_STORAGE_KEY);
+        if (scheduleString === null) {
+            return this.reloadSchedulePromise(calendarUUID);
+        }
+
+        let scheduleObject = JSON.parse(scheduleString);
+
+
+    }
+
+    private static reloadSchedulePromise(calendarUUID: string): Promise<ScheduleAll> {
+        return ScheduleBuilder.generateScheduleFromBlockSources(calendarUUID, new VeracrossICSRawBlockSource(calendarUUID)).then((schedule: ScheduleAll) => {
+            localStorage.setItem('scheduleEvents', JSON.stringify(schedule));
+            console.log(schedule);
+            console.log(JSON.stringify(schedule));
+            debugger;
+        });
+    }
+}
+
 window.addEventListener("load", () => {
     let calendarUUID = ScheduleParamUtils.getCalendarUUID();
     let seedDate = ScheduleParamUtils.getSeedDate();
     let viewMode = ScheduleParamUtils.getViewMode();
     let range = new ScheduleRange(seedDate, viewMode);
 
-    ScheduleBuilder.generateScheduleFromBlockSources(calendarUUID, new VeracrossICSRawBlockSource(calendarUUID)).then((schedule: ScheduleAll) => {
-        console.log(schedule);
-        console.log(JSON.stringify(schedule));
-        debugger;
-    });
+    ScheduleCacheManager.getSchedule(calendarUUID);
+
 
     ScheduleRenderer.updateLinks(calendarUUID, range);
 });
