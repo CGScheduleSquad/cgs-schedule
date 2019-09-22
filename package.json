@@ -20,9 +20,7 @@
     "test": "echo \"No test specified\"",
     "start": "parcel serve src/*.html",
     "build": "cross-env NODE_ENV=production parcel build src/*.html --public-url .",
-    "deploy": "gh-pages -d dist",
-    "pretty": "prettier --write",
-    "precommit": "lint-staged && npm test"
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
@@ -36,16 +34,15 @@
   "dependencies": {
     "@types/jquery": "^3.3.31"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
     "*.{js,css,json,ts}": [
-      "npm run pretty",
+      "prettier --write",
       "git add"
-    ],
-    "ignore": [
-      "node_modules",
-      "dist",
-      "package-lock.json",
-      "tsconfig.json"
     ]
   }
 }
