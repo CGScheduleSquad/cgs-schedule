@@ -1,7 +1,6 @@
 export class ScheduleTime {
-  static fromDate(date: Date) {
-    return new ScheduleTime(date.getHours(), date.getMinutes());
-  }
+  static fromDate = (date: Date) =>
+    new ScheduleTime(date.getHours(), date.getMinutes());
 
   readonly totalMinutes: number;
 
@@ -17,15 +16,9 @@ export class ScheduleTime {
     return (this.totalMinutes - (this.totalMinutes % 60)) / 60;
   }
 
-  equals(other: ScheduleTime) {
-    return other.totalMinutes == this.totalMinutes;
-  }
+  equals = (other: ScheduleTime) => other.totalMinutes === this.totalMinutes;
 
-  compareTo(other: ScheduleTime) {
-    return this.totalMinutes - other.totalMinutes;
-  }
+  compareTo = (other: ScheduleTime) => this.totalMinutes - other.totalMinutes;
 
-  toJSON() {
-    return this.totalMinutes;
-  }
+  toJSON = () => this.totalMinutes;
 }

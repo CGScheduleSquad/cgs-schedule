@@ -1,7 +1,5 @@
 export class ScheduleDate {
-  static now(): ScheduleDate {
-    return new ScheduleDate(new Date());
-  }
+  static now = (): ScheduleDate => new ScheduleDate(new Date());
 
   static fromString(dateString: string): ScheduleDate {
     let splitDate = dateString.split('-');
@@ -14,9 +12,7 @@ export class ScheduleDate {
     );
   }
 
-  static fromDate(date: Date): ScheduleDate {
-    return new ScheduleDate(date);
-  }
+  static fromDate = (date: Date): ScheduleDate => new ScheduleDate(date);
 
   private readonly date: Date;
 
@@ -24,39 +20,24 @@ export class ScheduleDate {
     this.date = date;
   }
 
-  copy(): ScheduleDate {
-    return new ScheduleDate(new Date(this.date));
-  }
+  copy = (): ScheduleDate => new ScheduleDate(new Date(this.date));
 
-  getDay() {
-    return this.date.getDay();
-  }
+  getDay = (): number => this.date.getDay();
 
-  getDate() {
-    return this.date.getDate();
-  }
+  getDate = (): number => this.date.getDate();
 
-  setDate(date: number) {
-    this.date.setDate(date);
-  }
+  setDate = (date: number) => this.date.setDate(date);
 
-  getFullYear() {
-    return this.date.getFullYear();
-  }
+  getFullYear = (): number => this.date.getFullYear();
 
-  getMonth() {
-    return this.date.getMonth();
-  }
+  getMonth = (): number => this.date.getMonth();
 
-  toString() {
-    return [
+  toString = () =>
+    [
       this.date.getFullYear(),
       this.date.getMonth() + 1,
       this.date.getDate()
     ].join('-');
-  }
 
-  toJSON() {
-    return this.toString();
-  }
+  toJSON = () => this.toString();
 }
