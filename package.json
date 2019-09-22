@@ -18,17 +18,14 @@
   ],
   "scripts": {
     "test": "echo \"No test specified\"",
-    "start": "parcel serve src/*.html",
-    "build": "pug src --out dist && cross-env NODE_ENV=production parcel build src/*.html --public-url .",
+    "start": "parcel serve src/*.pug",
+    "build": "cross-env NODE_ENV=production parcel build src/*.pug --public-url .",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
     "gh-pages": "^1.2.0",
-    "husky": "^3.0.5",
-    "lint-staged": "^9.3.0",
     "parcel-bundler": "^1.9.7",
-    "prettier": "^1.18.2",
     "pug": "^2.0.4",
     "pug-loader": "^2.4.0",
     "typescript": "^2.9.2"
@@ -36,16 +33,5 @@
   "dependencies": {
     "@types/jquery": "^3.3.31",
     "pug-cli": "^1.0.0-alpha6"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,css,json,ts}": [
-      "prettier --write",
-      "git add"
-    ]
   }
 }
