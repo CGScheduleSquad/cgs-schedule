@@ -53,7 +53,7 @@
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="JavaScript">
-      <option name="SOFT_MARGINS" value="80" />
+      <option name="SOFT_MARGINS" value="120" />
       <indentOptions>
         <option name="INDENT_SIZE" value="2" />
         <option name="CONTINUATION_INDENT_SIZE" value="2" />
@@ -64,7 +64,12 @@
       <option name="RIGHT_MARGIN" value="400" />
       <option name="KEEP_LINE_BREAKS" value="false" />
       <option name="WRAP_ON_TYPING" value="0" />
-      <option name="SOFT_MARGINS" value="400" />
+      <option name="SOFT_MARGINS" value="120" />
+      <indentOptions>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
+        <option name="TAB_SIZE" value="2" />
+      </indentOptions>
     </codeStyleSettings>
   </code_scheme>
 </component>
