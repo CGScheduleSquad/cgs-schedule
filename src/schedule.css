@@ -1,3 +1,4 @@
+
 .ical {
   display: none;
 }
@@ -47,6 +48,7 @@ body {
 
 #schedarea {
   height: 100%;
+  display: none;
 }
 
 table.sched {

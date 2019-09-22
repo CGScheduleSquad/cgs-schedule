@@ -18,7 +18,7 @@ const normalTimes = [new ScheduleTime(8, 0), new ScheduleTime(8, 45), new Schedu
 const schoolEndTime = new ScheduleTime(15, 15);
 const normalAllTimes = normalTimes.concat([schoolEndTime]);
 
-enum ScheduleDayType {
+export enum ScheduleDayType {
     REGULAR, INLINE, TEXT
 }
 
@@ -85,6 +85,8 @@ class RegularDay extends ScheduleDay {
         sortedRawBlocks.push(new RawBlock('', '', '', ScheduleDate.now(), new ScheduleDayMeta(''), new ScheduleTime(24, 0), null));
         let regularDayBlocks = new Array<RegularDayBlock>();
         let timeIndex = 0;
+        if (date.toString() === '2019-9-23') debugger;
+
         sortedRawBlocks.forEach((rawBlock: RawBlock) => {
             while (timeIndex < normalTimes.length && rawBlock.startTime.totalMinutes > normalTimes[timeIndex].totalMinutes) {
                 let title = 'Free';
@@ -117,11 +119,10 @@ class RegularDay extends ScheduleDay {
             let rowSpan = 1;
             if (timeIndex < normalTimes.length - 1 && (rawBlock.label.match(/.L/) != null || rawBlock.title === 'Assembly')) {
                 rowSpan++;
-                timeIndex++;
             }
             let durationMins = Math.min(Math.max(normalAllTimes[timeIndex + rowSpan].totalMinutes - normalAllTimes[timeIndex].totalMinutes, 5), 90); // double sided constrain
             regularDayBlocks.push(new RegularDayBlock(rawBlock.title, rawBlock.location, rawBlock.label, timeIndex, rowSpan, durationMins, true));
-            timeIndex++;
+            timeIndex += rowSpan;
         });
 
         // console.log(regularDayBlocks); debugger;

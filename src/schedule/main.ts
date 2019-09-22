@@ -4,6 +4,7 @@ import { ScheduleAll } from './structure/scheduleAll';
 import { VeracrossICSRawBlockSource } from './veracross/veracrossICSRawBlockSource';
 import { ScheduleDate } from './time/scheduleDate';
 import { ScheduleRenderer } from './rendering/scheduleRenderer';
+import { ScheduleDay, ScheduleDayType } from './structure/scheduleDay';
 
 class ScheduleParamUtils {
     static getCalendarUUID(): string {
@@ -46,38 +47,142 @@ class ScheduleParamUtils {
 class ScheduleCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'scheduleEvents';
 
-    static getSchedule(calendarUUID: string): Promise<ScheduleAll> {
+    static getSchedule(calendarUUID: string): Promise<any> {
+        if (localStorage === undefined) { // not supported
+            console.log('Local storage is not supported! Loading schedule...');
+            return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
+        }
+
         let scheduleString = localStorage.getItem(ScheduleCacheManager.LOCAL_STORAGE_KEY);
         if (scheduleString === null) {
-            return this.reloadSchedulePromise(calendarUUID);
+            console.log('Schedule cache does not exist! Loading schedule...');
+            return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
         }
 
         let scheduleObject = JSON.parse(scheduleString);
+        if (scheduleObject.versionNumber !== ScheduleAll.CURRENT_VERSION_NUMBER || scheduleObject.id !== calendarUUID) {
+            console.log('Schedule cache is invalid! Loading schedule...');
+            return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
+        }
 
+        if (new Date().getTime() - scheduleObject.creationTime > 1000 * 60 * 60 * 24) {
+            console.log('Schedule cache is outdated! Loading in the background...');
+            this.reloadSchedulePromise(calendarUUID); // save in the background
+        }
 
+        console.log('Schedule loaded successfully from cache!');
+        return Promise.resolve(scheduleObject);
     }
 
-    private static reloadSchedulePromise(calendarUUID: string): Promise<ScheduleAll> {
-        return ScheduleBuilder.generateScheduleFromBlockSources(calendarUUID, new VeracrossICSRawBlockSource(calendarUUID)).then((schedule: ScheduleAll) => {
-            localStorage.setItem('scheduleEvents', JSON.stringify(schedule));
-            console.log(schedule);
-            console.log(JSON.stringify(schedule));
-            debugger;
-        });
+    private static reloadSchedulePromise(calendarUUID: string): Promise<string> {
+        return ScheduleBuilder.generateScheduleFromBlockSources(calendarUUID, new VeracrossICSRawBlockSource(calendarUUID))
+            .then((schedule: ScheduleAll) => {
+                let jsonString = JSON.stringify(schedule);
+                localStorage.setItem('scheduleEvents', jsonString);
+                console.log('Schedule reloaded from Veracross and saved to localStorage!');
+                return jsonString;
+            });
     }
 }
 
-window.addEventListener('load', () => {
-    let calendarUUID = ScheduleParamUtils.getCalendarUUID();
-    let seedDate = ScheduleParamUtils.getSeedDate();
-    let viewMode = ScheduleParamUtils.getViewMode();
-    let range = new ScheduleRange(seedDate, viewMode);
+const colorDict = {
+    0: '#C0C0C0', 1: '#FFCE51', 2: '#A67FB9', 3: '#E67326', 4: '#00ABBD', 5: '#AAC02C', 6: '#EF4957', 7: '#FF75F2', free: 'white'
+};
 
-    ScheduleCacheManager.getSchedule(calendarUUID);
+let calendarUUID = ScheduleParamUtils.getCalendarUUID();
+let seedDate = ScheduleParamUtils.getSeedDate();
+let viewMode = ScheduleParamUtils.getViewMode();
+let range = new ScheduleRange(seedDate, viewMode);
 
+
+console.log('Start schedule program');
+Promise.all([ScheduleCacheManager.getSchedule(calendarUUID), new Promise(((resolve, reject) => {
+    window.addEventListener('load', () => {
+        resolve();
+    });
+}))]).then((things: any) => {
+    let schedule = things[0];
+    console.log(schedule);
+    range.getDatesForWeek()
+        .forEach((date: ScheduleDate) => {
+            let rawDay = schedule.dayMap[date.toString()];
+
+            let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // append the header with a link to the veracross page
+            $('table.sched.main > tbody > tr:nth-child(1)').append(`
+                <td class="daylabel">
+                  <a href="https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}">
+                    <b>
+                      ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() + (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}
+                    </b>
+                  </a>
+                </td>
+                `);
+
+            if (rawDay === undefined) {
+                appendBlankSchedule('No Events', colorDict.free);
+                return;
+            }
+
+            switch (rawDay.type) {
+                case ScheduleDayType.TEXT:
+                    appendBlankSchedule('TODO', colorDict.free);
+                    break;
+                case ScheduleDayType.INLINE:
+                    appendInlineSchedule(rawDay, schedule.compressionList);
+                    break;
+                case ScheduleDayType.REGULAR:
+                    appendRegularSchedule(rawDay, schedule.compressionList);
+                    break;
+
+            }
+        });
+    $('#schedarea').show();
 
     ScheduleRenderer.updateLinks(calendarUUID, range);
 });
+
+
+function appendBlankSchedule(text: string, bgcolor: string, link: string = '') {
+    return $('table.sched.main > tbody > tr:nth-child(2)').append(`<td rowspan="12" class="specialday" style="background: ${bgcolor};"><a ${link === '' ? '' : `href=${link}`} class="coursename">${text}</a></td>`);
+}
+
+function appendInlineSchedule(rawDay: any, compressionList: Array<string>) {
+
+}
+
+function appendRegularSchedule(rawDay: any, compressionList: Array<string>) {
+    rawDay.blocks.forEach(block => {
+        let title = compressionList[block[0]];
+        let location = compressionList[block[1]];
+        let blockLabel = block[2];
+        let normalTimeIndex = block[3];
+        let rowSpan = block[4];
+        let mins = block[5];
+        let free = block[6];
+
+        let subtitle = location + (blockLabel === '' ? '' : ' - ' + (blockLabel.match(/\d(?![ Flex|X])/) !== null ? 'Blk ' : '') + blockLabel);
+
+        let smallBlock = title === subtitle || subtitle === '' || title === 'US C&C';
+        let blockNumMatchAttempt = blockLabel.match(/\d(?![ Flex|X])/);
+        let bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : ((free || subtitle.match(/Break/) != null || subtitle.match(/Lunch/) != null) ? colorDict.free : colorDict[0]);
+        // if (!free) {
+        //     title = title.split(' - ')[0];
+        //     subtitle = subtitle
+        //         .split(' • ')
+        //         .slice(-2)
+        //         .reverse()
+        //         .join(' - ')
+        //         .replace('US ', 'Blk ')
+        //         .replace(' Long', '');
+        // }
+        $(`table.sched.main > tbody > tr:nth-child(${normalTimeIndex + 2})`).append(`<td rowspan="${rowSpan}" class="period mins${mins}" style="background: ${bgcolor};"><span class="coursename">${title}</span>${smallBlock ? '' : '<br>'}<span class="subtitle">${smallBlock ? '' : subtitle}</span><br></td>`);
+        // debugger;
+    });
+}
+
 
 /*
 //Promise chain:
