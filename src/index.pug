@@ -1,0 +1,78 @@
+doctype html
+html
+  head
+    meta(charset = 'utf8')
+    meta(name = 'viewport', content = 'width=device-width, initial-scale=1.0')
+    link(rel = 'shortcut icon', href = 'https://inside.catlin.edu/scripts/sched/favicon.ico')
+    link(rel = 'apple-touch-icon', href = 'https://inside.catlin.edu/scripts/sched/favicon.ico')
+    link(rel = 'stylesheet', href = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')
+    script(src = 'https://code.jquery.com/jquery-3.3.1.slim.min.js')
+    script(src = 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js')
+    script(src = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js')
+    script(src = 'script.js')
+    title Setup
+  body
+    div.container
+      div.center
+        h1.display-3.mb-2.mt-3 Classic CGS Schedule
+        h4.mb-5 Written by Liam Wang and Tristan Peng
+      form.needs-validation(novalidate)
+        h2.mb-3 Getting Started
+        h6 Step 1:
+        p Sign in to your Veracross portal if you're signed out:&nbsp;
+          a(href = 'https://portals.veracross.com/catlin' target = '_blank') Catlin Gabel Portal
+        h6 Step 2:
+        p Once you are signed in, click here:&nbsp;
+          a(href = 'https://portals.veracross.com/catlin/student/calendar/subscribe/mine' target = '_blank') My Calendars
+        h6 Step 3:
+        p Right-click on the&nbsp;
+          kbd Subscribe
+          | &nbsp;button next to the&nbsp;
+          kbd All Classes
+          | &nbsp;entry under&nbsp;
+          kbd Class Schedules
+          | &nbsp;and click&nbsp;
+          kbd Copy Link Address
+          | .
+        h6 Step 4:
+        div.form-group
+          label(for = 'allClassesUrl') Paste the link into the box below:
+          input#allClassesUrl.form-control(
+            type = 'url',
+            aria-describedby = 'allClassesHelp',
+            placeholder = 'webcal://api.veracross.com/catlin/subscribe/XXXXXXXX...',
+            required,
+            pattern = 'webcal:\\/\\/api.veracross.com\\/catlin\\/subscribe\\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.ics\\?uid=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+          )
+          div.invalid-feedback
+            | Invalid calendar link. Please check the instructions above and try again.
+          br
+          button.btn.btn-primary.btn-lg.btn-block.mb-3(type = 'submit') Generate Schedule Link
+        h6 Step 5:
+        p
+          | Bookmark the schedule link once it is generated. If you want your schedule on your phone, just text yourself the link!
+          br
+          | If your schedule doesn't have your class blocks, make sure you copied the correct link in step three and generate your link again.
+    div#disclaimerModal.modal.fade(tabindex = -1, role = 'dialog', aria-labelledby = 'disclaimerModalLabel', aria-hidden)
+      div.modal-dialog.modal-dialog-centered.modal-lg(role = 'document')
+        div.modal-content
+          div.modal-header
+            h5#disclaimerModalLabel.modal-title Disclaimer:
+            button.close(data-dismiss = 'modal', aria-label = 'close')
+              span(aria-hidden) &times;
+          div.modal-body
+            p
+              | - The schedule does not show events before 8:00am and after 3:15pm.
+              br
+              | - If two events occur at the same time, one of the events will not be shown.
+              br
+              | - Assemblies and community blocks are not updated automatically, but they are correct as of 9/17/19.
+              br
+              | - All other schedule events are refreshed every day, so recently added events will not show up immediately.
+              br
+              | - We are not responsible if you are late or miss class because the schedule was not accurate.
+              br
+              a(href = 'https://raw.githubusercontent.com/CGScheduleSquad/catlin-schedule/master/terms.txt', target = '_blank') Please also review the Terms and Conditions before using CGS Schedule.
+          div.modal-footer
+            button.btn.btn-secondary(data-dismiss = 'modal') Cancel
+            button.btn.btn-success.generate-link Agree

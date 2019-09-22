@@ -293,3 +293,16 @@ td.controls.links {
 .specialday > .sched tr td:last-child {
     border-right: 0;
 }
+.center {
+    text-align: center;
+}
+
+br.optional {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    br.optional {
+        display: initial;
+    }
+}
