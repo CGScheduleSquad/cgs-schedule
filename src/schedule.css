@@ -1,308 +1,314 @@
 .ical {
-    display: none;
+  display: none;
 }
 
 .daylabel a {
-    color: black;
+  color: black;
 }
 
 .daylabel a:visited {
-    color: black;
+  color: black;
 }
 
 .specialday {
-    padding: 0;
+  padding: 0;
 }
 
 .specialday > .sched {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 .specialday > .sched tr:first-child td {
-    border-top: 0;
+  border-top: 0;
 }
 
 .specialday > .sched tr td:first-child {
-    border-left: 0;
+  border-left: 0;
 }
 
 .specialday > .sched tr td:last-child {
-    border-right: 0;
+  border-right: 0;
 }
 
 html {
-    height: 95%;
+  height: 95%;
 }
 
 body {
-    height: 100%;
-    overflow: hidden;
-    /* font-family: 'Times New Roman', serif; */
+  height: 100%;
+  overflow: hidden;
+  /* font-family: 'Times New Roman', serif; */
 }
 
 #schedule {
-    height: 100%;
+  height: 100%;
 }
 
 #schedarea {
-    height: 100%;
+  height: 100%;
 }
 
 table.sched {
-    border-collapse: collapse;
-    empty-cells: show;
-    height: 90%;
-    width: 100%;
+  border-collapse: collapse;
+  empty-cells: show;
+  height: 90%;
+  width: 100%;
 }
 
 a:visited {
-    color: #00e;
+  color: #00e;
 }
 
 td {
-    -webkit-print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 
 td.times {
-    border-style: solid;
-    border-width: 2px;
-    border-color: #000000;
-    text-align: center;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #000000;
+  text-align: center;
 }
 
 .main > tbody > tr > .times {
-    width: 7%;
+  width: 7%;
 }
 
 td.period {
-    border-style: solid;
-    border-width: 2px;
-    border-color: #000000;
-    text-align: center;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #000000;
+  text-align: center;
 }
 
 td.daylabel {
-    border-style: none;
-    height: 5%;
-    width: 18%;
-    text-align: center;
+  border-style: none;
+  height: 5%;
+  width: 18%;
+  text-align: center;
 }
 
 td.specialday {
-    border-style: solid;
-    border-width: 2px;
-    border-color: #000000;
-    width: 18%;
-    text-align: center;
-    vertical-align: top;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #000000;
+  width: 18%;
+  text-align: center;
+  vertical-align: top;
 }
 
 td.mainlabel {
-    border-style: none;
-    height: 5%;
-    width: 10%;
-    text-align: center;
+  border-style: none;
+  height: 5%;
+  width: 10%;
+  text-align: center;
 }
 
 td.mins90 {
-    height: 18%;
+  height: 18%;
 }
 
 td.mins85 {
-    height: 17%;
+  height: 17%;
 }
 
 td.mins80 {
-    height: 16%;
+  height: 16%;
 }
 
 td.mins75 {
-    height: 15%;
+  height: 15%;
 }
 
 td.mins70 {
-    height: 14%;
+  height: 14%;
 }
 
 td.mins65 {
-    height: 13%;
+  height: 13%;
 }
 
 td.mins60 {
-    height: 12%;
+  height: 12%;
 }
 
 td.mins55 {
-    height: 11%;
+  height: 11%;
 }
 
 td.mins50 {
-    height: 10%;
+  height: 10%;
 }
 
 td.mins45 {
-    height: 9%;
+  height: 9%;
 }
 
 td.mins40 {
-    height: 8%;
+  height: 8%;
 }
 
 td.mins35 {
-    height: 7%;
+  height: 7%;
 }
 
 td.mins30 {
-    height: 6%;
+  height: 6%;
 }
 
 td.mins25 {
-    height: 5%;
-    font-size: 90%;
+  height: 5%;
+  font-size: 90%;
 }
 
 td.mins25big {
-    height: 5%;
+  height: 5%;
 }
 
 td.mins20 {
-    height: 4%;
-    font-size: 90%;
+  height: 4%;
+  font-size: 90%;
 }
 
 td.mins15 {
-    height: 3%;
-    font-size: 80%;
+  height: 3%;
+  font-size: 80%;
 }
 
 td.mins10 {
-    height: 2%;
-    font-size: 75%;
+  height: 2%;
+  font-size: 75%;
 }
 
 td.mins5 {
-    height: 1%;
-    font-size: 75%;
+  height: 1%;
+  font-size: 75%;
 }
 
 table.controls {
-    border-style: none;
-    width: 100%;
-    max-height: 5%;
-    padding: 0px;
-    margin: 0px;
+  border-style: none;
+  width: 100%;
+  max-height: 5%;
+  padding: 0px;
+  margin: 0px;
 }
 
 hr.controls {
-    width: 100%;
-    padding: 0px;
-    margin: 0px;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
 }
 
 td.controls {
-    border-style: none;
-    text-align: center;
-    width: 20%;
-    font-family: 'sans-serif';
-    font-weight: bold;
-    padding: 0px;
-    margin: 0px;
+  border-style: none;
+  text-align: center;
+  width: 20%;
+  font-family: 'sans-serif';
+  font-weight: bold;
+  padding: 0px;
+  margin: 0px;
 }
 
 td.controls.arrows {
-    width: 8%;
+  width: 8%;
 }
 
 td.controls.links {
-    width: 28%;
+  width: 28%;
 }
 
 .coursename {
-    font-size: 100%;
+  font-size: 100%;
 }
 
 .subtitle {
-    font-size: 75%;
+  font-size: 75%;
 }
 
 .schedarea > .sched.week {
-    font-size: 120%;
+  font-size: 120%;
 }
 
 @media print {
-    .controls {
-        display: none;
-    }
+  .controls {
+    display: none;
+  }
 }
 
 @media screen and (orientation: portrait) and (min-height: 1000px) {
-    .sched.today {
-        font-size: 200%;
-        height: 96%
-    }
+  .sched.today {
+    font-size: 200%;
+    height: 96%;
+  }
 
-    td.controls {
-        font-size: 175%;
-    }
+  td.controls {
+    font-size: 175%;
+  }
 }
 
 @media screen and (orientation: landscape) and (max-height: 500px) {
-    td.controls {
-        font-size: 150%;
-    }
+  td.controls {
+    font-size: 150%;
+  }
 }
 
 @media screen and (orientation: portrait) and (max-height: 1000px) {
-    .sched.today {
-        font-size: 200%;
-    }
+  .sched.today {
+    font-size: 200%;
+  }
 
-    td.controls {
-        font-size: 150%;
-    }
+  td.controls {
+    font-size: 150%;
+  }
 }
 
 @media screen and (orientation: landscape) and (min-height: 500px) {
-    td.controls {
-        font-size: 100%;
-    }
+  td.controls {
+    font-size: 100%;
+  }
 }
 
-.daylabel a, .daylabel a:visited {
-    color: black;
+.daylabel a,
+.daylabel a:visited {
+  color: black;
 }
 
 .specialday {
-    padding: 0;
+  padding: 0;
 }
 
 .specialday > .sched {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 .specialday > .sched tr:first-child td {
-    border-top: 0;
+  border-top: 0;
 }
 
 .specialday > .sched tr td:first-child {
-    border-left: 0;
+  border-left: 0;
 }
 
 .specialday > .sched tr td:last-child {
-    border-right: 0;
+  border-right: 0;
 }
 .center {
-    text-align: center;
+  text-align: center;
 }
 
-br.optional {
-    display: none;
+.center {
+  height: 100%;
+  position: relative;
 }
 
-@media (max-width: 800px) {
-    br.optional {
-        display: initial;
-    }
+.center p {
+  font-size: 40px;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }

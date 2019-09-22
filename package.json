@@ -8,7 +8,10 @@
   ],
   "bugs": "https://github.com/CGScheduleSquad/ts-cgs-schedule/issues",
   "homepage": "https://cgschedulesquad.github.io/ts-cgs-schedule/",
-  "repository": "https://github.com/CGScheduleSquad/ts-cgs-schedule",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CGScheduleSquad/ts-cgs-schedule"
+  },
   "license": "MIT",
   "files": [
     "src/"

@@ -24,9 +24,9 @@ window.addEventListener('load', () => {
   });
   $('.generate-link').click(() => {
     localStorage.removeItem('scheduleEvents');
-    let url = `./schedule.html?cal=${ uuidFromWebcalLink(
+    let url = `./schedule.html?cal=${uuidFromWebcalLink(
       $('#allClassesUrl').val()
-    ) }`;
+    )}`;
     window.open(url, '_blank');
   });
 });

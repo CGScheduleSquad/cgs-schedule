@@ -1,7 +1,7 @@
-import { ScheduleTime } from "../time/scheduleTime";
-import { ScheduleDayMeta } from "./scheduleDay";
-import { CompressionManager } from "../compressionManager";
-import { ScheduleDate } from "../time/scheduleDate";
+import { ScheduleTime } from '../time/scheduleTime';
+import { ScheduleDayMeta } from './scheduleDay';
+import { CompressionManager } from '../compressionManager';
+import { ScheduleDate } from '../time/scheduleDate';
 
 class ScheduleBlock {
   readonly title: string;
@@ -21,7 +21,15 @@ export class RawBlock extends ScheduleBlock {
   readonly startTime: ScheduleTime;
   readonly endTime: ScheduleTime | null;
 
-  constructor(title: string, location: string, label: string, date: ScheduleDate, dayMeta: ScheduleDayMeta, startTime: ScheduleTime, endTime: ScheduleTime | null) {
+  constructor(
+    title: string,
+    location: string,
+    label: string,
+    date: ScheduleDate,
+    dayMeta: ScheduleDayMeta,
+    startTime: ScheduleTime,
+    endTime: ScheduleTime | null
+  ) {
     super(title, location, label);
     this.date = date;
     this.dayMeta = dayMeta;
@@ -36,7 +44,15 @@ export class RegularDayBlock extends ScheduleBlock {
   readonly durationMins: number;
   readonly free: boolean;
 
-  constructor(title: string, location: string, label: string, timeIndex: number, rowSpan: number, durationMins: number, free: boolean) {
+  constructor(
+    title: string,
+    location: string,
+    label: string,
+    timeIndex: number,
+    rowSpan: number,
+    durationMins: number,
+    free: boolean
+  ) {
     super(title, location, label);
     this.timeIndex = timeIndex;
     this.rowSpan = rowSpan;
@@ -64,7 +80,15 @@ export class InlineDayBlock extends ScheduleBlock {
   readonly durationMins: number;
   readonly free: boolean;
 
-  constructor(title: string, location: string, label: string, startTime: ScheduleTime, endTime: ScheduleTime, durationMins: number, free: boolean) {
+  constructor(
+    title: string,
+    location: string,
+    label: string,
+    startTime: ScheduleTime,
+    endTime: ScheduleTime,
+    durationMins: number,
+    free: boolean
+  ) {
     super(title, location, label);
     this.startTime = startTime;
     this.endTime = endTime;
