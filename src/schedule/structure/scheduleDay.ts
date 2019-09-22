@@ -14,27 +14,12 @@ export class ScheduleDayMeta {
     }
 }
 
-const normalTimes = [
-    new ScheduleTime(8, 0),
-    new ScheduleTime(8, 45),
-    new ScheduleTime(9, 20),
-    new ScheduleTime(9, 30),
-    new ScheduleTime(9, 45),
-    new ScheduleTime(10, 35),
-    new ScheduleTime(11, 20),
-    new ScheduleTime(11, 55),
-    new ScheduleTime(12, 30),
-    new ScheduleTime(13, 10),
-    new ScheduleTime(13, 40),
-    new ScheduleTime(14, 30)
-];
+const normalTimes = [new ScheduleTime(8, 0), new ScheduleTime(8, 45), new ScheduleTime(9, 20), new ScheduleTime(9, 30), new ScheduleTime(9, 45), new ScheduleTime(10, 35), new ScheduleTime(11, 20), new ScheduleTime(11, 55), new ScheduleTime(12, 30), new ScheduleTime(13, 10), new ScheduleTime(13, 40), new ScheduleTime(14, 30)];
 const schoolEndTime = new ScheduleTime(15, 15);
 const normalAllTimes = normalTimes.concat([schoolEndTime]);
 
 enum ScheduleDayType {
-    REGULAR,
-    INLINE,
-    TEXT
+    REGULAR, INLINE, TEXT
 }
 
 export abstract class ScheduleDay {
@@ -56,8 +41,7 @@ export abstract class ScheduleDay {
         let dayDate = dayWithDate.date;
 
         let dayWithMeta = rawBlocks.find(rawBlock => rawBlock.dayMeta !== null);
-        let dayMeta =
-            dayWithMeta !== undefined ? dayWithMeta.dayMeta : new ScheduleDayMeta(''); // default day meta if no blocks have info
+        let dayMeta = dayWithMeta !== undefined ? dayWithMeta.dayMeta : new ScheduleDayMeta(''); // default day meta if no blocks have info
 
         if (this.isRegularDay(rawBlocks)) {
             return RegularDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
@@ -73,9 +57,7 @@ export abstract class ScheduleDay {
             if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
             // TODO: time comparators
                 return true;
-            return normalTimes.some(
-                time => startHours === time.hours && startMinutes === time.minutes
-            );
+            return normalTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
         });
     }
 
@@ -94,38 +76,17 @@ export abstract class ScheduleDay {
 class RegularDay extends ScheduleDay {
     blocks: RegularDayBlock[];
 
-    constructor(
-        date: ScheduleDate,
-        dayMeta: ScheduleDayMeta,
-        blocks: RegularDayBlock[]
-    ) {
+    constructor(date: ScheduleDate, dayMeta: ScheduleDayMeta, blocks: RegularDayBlock[]) {
         super(date, dayMeta);
         this.blocks = blocks;
     }
 
-    static fromRawBlocks(
-        date: ScheduleDate,
-        dayMeta: ScheduleDayMeta,
-        sortedRawBlocks: RawBlock[]
-    ): RegularDay {
-        sortedRawBlocks.push(
-            new RawBlock(
-                '',
-                '',
-                '',
-                ScheduleDate.now(),
-                new ScheduleDayMeta(''),
-                new ScheduleTime(24, 0),
-                null
-            )
-        );
+    static fromRawBlocks(date: ScheduleDate, dayMeta: ScheduleDayMeta, sortedRawBlocks: RawBlock[]): RegularDay {
+        sortedRawBlocks.push(new RawBlock('', '', '', ScheduleDate.now(), new ScheduleDayMeta(''), new ScheduleTime(24, 0), null));
         let regularDayBlocks = new Array<RegularDayBlock>();
         let timeIndex = 0;
         sortedRawBlocks.forEach((rawBlock: RawBlock) => {
-            while (
-                timeIndex < normalTimes.length &&
-                rawBlock.startTime.totalMinutes > normalTimes[timeIndex].totalMinutes
-                ) {
+            while (timeIndex < normalTimes.length && rawBlock.startTime.totalMinutes > normalTimes[timeIndex].totalMinutes) {
                 let title = 'Free';
                 let label = '';
                 switch (timeIndex) {
@@ -146,57 +107,20 @@ class RegularDay extends ScheduleDay {
                         break;
                 }
                 let rowSpan = 1; // TODO: free block merging
-                let durationMins = Math.min(
-                    Math.max(
-                        normalAllTimes[timeIndex + rowSpan].totalMinutes -
-                        normalAllTimes[timeIndex].totalMinutes,
-                        5
-                    ),
-                    90
-                ); // double sided constrain
-                regularDayBlocks.push(
-                    new RegularDayBlock(
-                        title,
-                        '',
-                        label,
-                        timeIndex,
-                        rowSpan,
-                        durationMins,
-                        true
-                    )
-                );
+                let durationMins = Math.min(Math.max(normalAllTimes[timeIndex + rowSpan].totalMinutes - normalAllTimes[timeIndex].totalMinutes, 5), 90); // double sided constrain
+                regularDayBlocks.push(new RegularDayBlock(title, '', label, timeIndex, rowSpan, durationMins, true));
                 timeIndex++;
             }
 
             if (timeIndex >= normalTimes.length) return;
 
             let rowSpan = 1;
-            if (
-                timeIndex < normalTimes.length - 1 &&
-                (rawBlock.label.match(/.L/) != null || rawBlock.title === 'Assembly')
-            ) {
+            if (timeIndex < normalTimes.length - 1 && (rawBlock.label.match(/.L/) != null || rawBlock.title === 'Assembly')) {
                 rowSpan++;
                 timeIndex++;
             }
-            let durationMins = Math.min(
-                Math.max(
-                    normalAllTimes[timeIndex + rowSpan].totalMinutes -
-                    normalAllTimes[timeIndex].totalMinutes,
-                    5
-                ),
-                90
-            ); // double sided constrain
-            regularDayBlocks.push(
-                new RegularDayBlock(
-                    rawBlock.title,
-                    rawBlock.location,
-                    rawBlock.label,
-                    timeIndex,
-                    rowSpan,
-                    durationMins,
-                    true
-                )
-            );
+            let durationMins = Math.min(Math.max(normalAllTimes[timeIndex + rowSpan].totalMinutes - normalAllTimes[timeIndex].totalMinutes, 5), 90); // double sided constrain
+            regularDayBlocks.push(new RegularDayBlock(rawBlock.title, rawBlock.location, rawBlock.label, timeIndex, rowSpan, durationMins, true));
             timeIndex++;
         });
 
@@ -213,88 +137,33 @@ class InlineDay extends ScheduleDay {
     blocks: InlineDayBlock[];
     lateStart: boolean;
 
-    constructor(
-        date: ScheduleDate,
-        dayMeta: ScheduleDayMeta,
-        blocks: InlineDayBlock[],
-        lateStart: boolean
-    ) {
+    constructor(date: ScheduleDate, dayMeta: ScheduleDayMeta, blocks: InlineDayBlock[], lateStart: boolean) {
         super(date, dayMeta);
         this.blocks = blocks;
         this.lateStart = lateStart;
     }
 
-    static fromRawBlocks(
-        date: ScheduleDate,
-        dayMeta: ScheduleDayMeta,
-        sortedRawBlocks: RawBlock[]
-    ): InlineDay {
+    static fromRawBlocks(date: ScheduleDate, dayMeta: ScheduleDayMeta, sortedRawBlocks: RawBlock[]): InlineDay {
         if (!sortedRawBlocks[0].startTime.equals(normalTimes[0])) {
-            sortedRawBlocks.unshift(
-                new RawBlock(
-                    'Late Start',
-                    '',
-                    '',
-                    date,
-                    dayMeta,
-                    normalTimes[0],
-                    sortedRawBlocks[0].startTime
-                )
-            );
+            sortedRawBlocks.unshift(new RawBlock('Late Start', '', '', date, dayMeta, normalTimes[0], sortedRawBlocks[0].startTime));
         }
 
         let inlineDayBlocks = new Array<InlineDayBlock>();
-        sortedRawBlocks.forEach(
-            (rawBlock: RawBlock, index: number, otherBlocks: RawBlock[]) => {
-                // Calculate end time and duration if not already set
-                let endTime =
-                    rawBlock.endTime === null
-                        ? index === otherBlocks.length - 1
-                        ? schoolEndTime
-                        : otherBlocks[index + 1].startTime
-                        : rawBlock.endTime;
-                let duration = Math.min(
-                    Math.max(endTime.compareTo(rawBlock.startTime), 5),
-                    90
-                );
+        sortedRawBlocks.forEach((rawBlock: RawBlock, index: number, otherBlocks: RawBlock[]) => {
+            // Calculate end time and duration if not already set
+            let endTime = rawBlock.endTime === null ? index === otherBlocks.length - 1 ? schoolEndTime : otherBlocks[index + 1].startTime : rawBlock.endTime;
+            let duration = Math.min(Math.max(endTime.compareTo(rawBlock.startTime), 5), 90);
 
-                // Add this block
-                inlineDayBlocks.push(
-                    new InlineDayBlock(
-                        rawBlock.title,
-                        rawBlock.location,
-                        rawBlock.label,
-                        rawBlock.startTime,
-                        endTime,
-                        duration,
-                        false
-                    )
-                );
+            // Add this block
+            inlineDayBlocks.push(new InlineDayBlock(rawBlock.title, rawBlock.location, rawBlock.label, rawBlock.startTime, endTime, duration, false));
 
-                // Add a free block if necessary
-                let nextTime =
-                    index === otherBlocks.length - 1
-                        ? schoolEndTime
-                        : otherBlocks[index + 1].startTime;
-                if (nextTime.compareTo(endTime) > 10) {
-                    let freeDuration = Math.min(
-                        Math.max(nextTime.compareTo(endTime), 5),
-                        90
-                    );
-                    inlineDayBlocks.push(
-                        new InlineDayBlock(
-                            'Free',
-                            '',
-                            '',
-                            endTime,
-                            nextTime,
-                            freeDuration,
-                            true
-                        )
-                    );
-                }
+            // Add a free block if necessary
+            let nextTime = index === otherBlocks.length - 1 ? schoolEndTime : otherBlocks[index + 1].startTime;
+            if (nextTime.compareTo(endTime) > 10) {
+                let freeDuration = Math.min(Math.max(nextTime.compareTo(endTime), 5), 90);
+                inlineDayBlocks.push(new InlineDayBlock('Free', '', '', endTime, nextTime, freeDuration, true));
             }
-        );
+        });
 
         // console.log(inlineDayBlocks); debugger;
         return new InlineDay(date, dayMeta, inlineDayBlocks, false); // TODO: remove lateStart
@@ -309,12 +178,7 @@ export class TextDay extends ScheduleDay {
     text: string;
     url: string;
 
-    constructor(
-        date: ScheduleDate,
-        dayMeta: ScheduleDayMeta,
-        text: string,
-        url: string
-    ) {
+    constructor(date: ScheduleDate, dayMeta: ScheduleDayMeta, text: string, url: string) {
         super(date, dayMeta);
         this.text = text;
         this.url = url;

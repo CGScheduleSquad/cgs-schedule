@@ -24,8 +24,7 @@ export class ScheduleAll {
         // copy all fields from `this` to an empty object and return in
         return Object.assign({}, this, {
             // convert fields that need converting
-            dayMap: ScheduleAll.dayMapToObj(this.dayMap),
-            compressionList: CompressionManager.compressionList
+            dayMap: ScheduleAll.dayMapToObj(this.dayMap), compressionList: CompressionManager.compressionList
         });
     }
 
