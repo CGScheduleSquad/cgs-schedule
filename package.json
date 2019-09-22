@@ -37,10 +37,15 @@
     }
   },
   "lint-staged": {
-    "*.{js,json,ts}": [
+    "*.{js,css,json,ts}": [
       "prettier --write",
       "git add"
     ],
-    "ignore": ["node_modules", "dist", "package-lock.json", "tsconfig.json"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "package-lock.json",
+      "tsconfig.json"
+    ]
   }
 }
