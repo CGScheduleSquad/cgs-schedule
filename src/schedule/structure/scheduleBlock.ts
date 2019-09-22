@@ -77,7 +77,7 @@ export class RegularDayBlock extends ScheduleBlock {
 export class InlineDayBlock extends ScheduleBlock {
   readonly startTime: ScheduleTime;
   readonly endTime: ScheduleTime;
-  readonly durationMins: number;
+  readonly durationMins: number; // TODO: not needed with both a start and end time
   readonly free: boolean;
 
   constructor(

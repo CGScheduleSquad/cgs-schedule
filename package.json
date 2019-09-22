@@ -18,8 +18,8 @@
   ],
   "scripts": {
     "test": "echo \"No test specified\"",
-    "start": "parcel serve src/*.html",
-    "build": "pug src --out dist && cross-env NODE_ENV=production parcel build src/*.html --public-url .",
+    "start": "parcel serve src/*.pug",
+    "build": "cross-env NODE_ENV=production parcel build src/*.pug --public-url .",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {

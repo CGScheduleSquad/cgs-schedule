@@ -1,9 +1,9 @@
-import { ScheduleRange, ViewMode } from "./schedule/rendering/scheduleRange";
-import { ScheduleBuilder } from "./schedule/building/scheduleBuilder";
-import { ScheduleAll } from "./schedule/structure/scheduleAll";
-import { VeracrossICSRawBlockSource } from "./schedule/veracross/veracrossICSRawBlockSource";
-import { ScheduleDate } from "./schedule/time/scheduleDate";
-import { ScheduleRenderer } from "./schedule/rendering/scheduleRenderer";
+import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
+import { ScheduleBuilder } from './building/scheduleBuilder';
+import { ScheduleAll } from './structure/scheduleAll';
+import { VeracrossICSRawBlockSource } from './veracross/veracrossICSRawBlockSource';
+import { ScheduleDate } from './time/scheduleDate';
+import { ScheduleRenderer } from './rendering/scheduleRenderer';
 
 class ScheduleParamUtils {
     static getCalendarUUID(): string {

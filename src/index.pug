@@ -9,7 +9,7 @@ html
     script(src = 'https://code.jquery.com/jquery-3.3.1.slim.min.js')
     script(src = 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js')
     script(src = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js')
-    script(src = 'script.js')
+    script(src = 'js-util/setup-form-validator.js')
     title Setup
   body
     div.container
@@ -72,7 +72,8 @@ html
               br
               | - We are not responsible if you are late or miss class because the schedule was not accurate.
               br
-              a(href = 'https://raw.githubusercontent.com/CGScheduleSquad/catlin-schedule/master/terms.txt', target = '_blank') Please also review the Terms and Conditions before using CGS Schedule.
+              a(href = 'https://raw.githubusercontent.com/CGScheduleSquad/catlin-schedule/master/terms.txt', target = '_blank')
+                | - You have read and agree to the Terms and Conditions before using CGS Schedule.
           div.modal-footer
             button.btn.btn-secondary(data-dismiss = 'modal') Cancel
             button.btn.btn-success.generate-link Agree
