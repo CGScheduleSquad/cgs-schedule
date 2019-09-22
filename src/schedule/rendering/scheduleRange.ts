@@ -1,4 +1,4 @@
-import { ScheduleDate } from '../time/scheduleDate';
+import ScheduleDate from '../time/scheduleDate';
 
 export enum ViewMode {
     Day = 1, Week = 5

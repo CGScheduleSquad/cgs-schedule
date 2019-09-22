@@ -2,7 +2,7 @@ import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
 import { ScheduleBuilder } from './building/scheduleBuilder';
 import { ScheduleAll } from './structure/scheduleAll';
 import { VeracrossICSRawBlockSource } from './veracross/veracrossICSRawBlockSource';
-import { ScheduleDate } from './time/scheduleDate';
+import ScheduleDate from './time/scheduleDate';
 import { ScheduleRenderer } from './rendering/scheduleRenderer';
 import { ScheduleDay, ScheduleDayType } from './structure/scheduleDay';
 

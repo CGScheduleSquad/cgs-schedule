@@ -1,5 +1,5 @@
-import { ScheduleTime } from '../time/scheduleTime';
-import { ScheduleDate } from '../time/scheduleDate';
+import ScheduleTime from '../time/scheduleTime';
+import ScheduleDate from '../time/scheduleDate';
 
 export class VeracrossICalUtils {
     static getVeracrossCalendarFromUUID(calendarUUID: string): Promise<any> {

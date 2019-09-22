@@ -1,7 +1,7 @@
-import { ScheduleTime } from '../time/scheduleTime';
+import ScheduleTime from '../time/scheduleTime';
 import { ScheduleDayMeta } from './scheduleDay';
 import { CompressionManager } from '../compressionManager';
-import { ScheduleDate } from '../time/scheduleDate';
+import ScheduleDate from '../time/scheduleDate';
 
 class ScheduleBlock {
     readonly title: string;

@@ -1,6 +1,6 @@
-import { ScheduleTime } from '../time/scheduleTime';
+import ScheduleTime from '../time/scheduleTime';
 import { InlineDayBlock, RawBlock, RegularDayBlock } from './scheduleBlock';
-import { ScheduleDate } from '../time/scheduleDate';
+import ScheduleDate from '../time/scheduleDate';
 
 export class ScheduleDayMeta {
     readonly letter: string;
