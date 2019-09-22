@@ -31,6 +31,7 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
-    "@types/jquery": "^3.3.31"
+    "@types/jquery": "^3.3.31",
+    "pug-cli": "^1.0.0-alpha6"
   }
 }
