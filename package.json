@@ -8,7 +8,10 @@
   ],
   "bugs": "https://github.com/CGScheduleSquad/ts-cgs-schedule/issues",
   "homepage": "https://cgschedulesquad.github.io/ts-cgs-schedule/",
-  "repository": "https://github.com/CGScheduleSquad/ts-cgs-schedule",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CGScheduleSquad/ts-cgs-schedule"
+  },
   "license": "MIT",
   "files": [
     "src/"
@@ -17,7 +20,9 @@
     "test": "echo \"No test specified\"",
     "start": "parcel serve src/*.html",
     "build": "cross-env NODE_ENV=production parcel build src/*.html --public-url .",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "pretty": "prettier --write",
+    "precommit": "lint-staged && npm test"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
@@ -31,14 +36,9 @@
   "dependencies": {
     "@types/jquery": "^3.3.31"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{js,css,json,ts}": [
-      "prettier --write",
+      "npm run pretty",
       "git add"
     ],
     "ignore": [
