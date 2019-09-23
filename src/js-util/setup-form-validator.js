@@ -5,8 +5,8 @@ window.addEventListener('load', () => {
         form.addEventListener(
             'submit',
             event => {
-              event.preventDefault();
-              event.stopPropagation();
+                event.preventDefault();
+                event.stopPropagation();
                 if (form.checkValidity()) $('#disclaimerModal').modal();
                 form.classList.add('was-validated');
             },
@@ -14,8 +14,7 @@ window.addEventListener('load', () => {
         );
     });
     document.getElementsByClassName('generate-link')[0].addEventListener('click', () => {
-      localStorage.removeItem('scheduleEvents');
-      let url = `./schedule.html?cal=${uuidFromWebcalLink(document.getElementById('allClassesUrl').value)}`;
-      window.open(url, '_blank');
+        localStorage.removeItem('scheduleEvents');
+        window.open(`./schedule.html?cal=${uuidFromWebcalLink(document.getElementById('allClassesUrl').value)}`, '_blank');
     });
 });
