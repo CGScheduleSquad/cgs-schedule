@@ -97,7 +97,7 @@ let range = new ScheduleRange(seedDate, viewMode);
 
 console.log('Start schedule program');
 Promise.all([ScheduleCacheManager.getSchedule(calendarUUID), new Promise(((resolve, reject) => {
-    window.addEventListener('load', () => {
+    window.addEventListener('DOMContentLoaded', () => {
         resolve();
     });
 }))]).then((things: any) => {
@@ -168,21 +168,29 @@ function appendRegularSchedule(rawDay: any, compressionList: Array<string>) {
         let smallBlock = title === subtitle || subtitle === '' || title === 'US C&C';
         let blockNumMatchAttempt = blockLabel.match(/\d(?![ Flex|X])/);
         let bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : ((free || subtitle.match(/Break/) != null || subtitle.match(/Lunch/) != null) ? colorDict.free : colorDict[0]);
-        // if (!free) {
-        //     title = title.split(' - ')[0];
-        //     subtitle = subtitle
-        //         .split(' • ')
-        //         .slice(-2)
-        //         .reverse()
-        //         .join(' - ')
-        //         .replace('US ', 'Blk ')
-        //         .replace(' Long', '');
-        // }
-        $(`table.sched.main > tbody > tr:nth-child(${normalTimeIndex + 2})`).append(`<td rowspan="${rowSpan}" class="period mins${mins}" style="background: ${bgcolor};"><span class="coursename">${title}</span>${smallBlock ? '' : '<br>'}<span class="subtitle">${smallBlock ? '' : subtitle}</span><br></td>`);
-        // debugger;
+
+        let trElement = document.getElementById(`time-${normalTimeIndex+1}`);
+        trElement.appendChild(generateBlockElement(rowSpan, mins, bgcolor, title, subtitle, !smallBlock));
+        // $(`table.sched.main > tbody > tr:nth-child(${normalTimeIndex + 2})`).append(`<td rowspan="${rowSpan}" class="period mins${mins}" style="background: ${bgcolor};"><span class="coursename">${title}</span>${smallBlock ? '' : '<br>'}<span class="subtitle">${smallBlock ? '' : subtitle}</span><br></td>`);
     });
 }
 
+function generateBlockElement(rowSpan:number, mins:string, bgcolor:string, title:string, subtitle:string, newLine: boolean) {
+    let tableData = document.createElement("td");
+    tableData.setAttribute("rowspan", rowSpan);
+    tableData.setAttribute("class", `period mins${mins}`);
+    tableData.setAttribute("style", `background: ${bgcolor};`); // todo replace style with css class
+    let titleSpan = document.createElement("span");
+    titleSpan.setAttribute("class", "coursename");
+    titleSpan.appendChild(document.createTextNode(title));
+    let subtitleSpan = document.createElement("subtitle");
+    subtitleSpan.setAttribute("class", "subtitle");
+    subtitleSpan.appendChild(document.createTextNode(subtitle));
+    tableData.appendChild(titleSpan);
+    if (newLine) tableData.appendChild(document.createElement("br"));
+    tableData.appendChild(subtitleSpan);
+    return tableData;
+}
 
 /*
 //Promise chain:

@@ -85,7 +85,7 @@ class RegularDay extends ScheduleDay {
         sortedRawBlocks.push(new RawBlock('', '', '', ScheduleDate.now(), new ScheduleDayMeta(''), new ScheduleTime(24, 0), null));
         let regularDayBlocks = new Array<RegularDayBlock>();
         let timeIndex = 0;
-        if (date.toString() === '2019-9-23') debugger;
+        // if (date.toString() === '2019-9-23') debugger;
 
         sortedRawBlocks.forEach((rawBlock: RawBlock) => {
             while (timeIndex < normalTimes.length && rawBlock.startTime.totalMinutes > normalTimes[timeIndex].totalMinutes) {
