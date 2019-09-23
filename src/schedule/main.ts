@@ -4,7 +4,7 @@ import { ScheduleAll } from './structure/scheduleAll';
 import { VeracrossICSRawBlockSource } from './veracross/veracrossICSRawBlockSource';
 import ScheduleDate from './time/scheduleDate';
 import { ScheduleRenderer } from './rendering/scheduleRenderer';
-import { ScheduleDay, ScheduleDayType } from './structure/scheduleDay';
+import { ScheduleDayType } from './structure/scheduleDay';
 
 class ScheduleParamUtils {
     static getCalendarUUID(): string {
@@ -145,7 +145,7 @@ Promise.all([ScheduleCacheManager.getSchedule(calendarUUID), new Promise(((resol
 });
 
 
-function appendBlankSchedule(text: string, bgcolor: string, link: string = '') {
+function appendBlankSchedule(text: string, bgcolor: string, link: string = '') { // TODO: Remove jquery dependency
     return $('table.sched.main > tbody > tr:nth-child(2)').append(`<td rowspan="12" class="specialday" style="background: ${bgcolor};"><a ${link === '' ? '' : `href=${link}`} class="coursename">${text}</a></td>`);
 }
 
@@ -169,7 +169,7 @@ function appendRegularSchedule(rawDay: any, compressionList: Array<string>) {
         let blockNumMatchAttempt = blockLabel.match(/\d(?![ Flex|X])/);
         let bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : ((free || subtitle.match(/Break/) != null || subtitle.match(/Lunch/) != null) ? colorDict.free : colorDict[0]);
 
-        let trElement = document.getElementById(`time-${normalTimeIndex+1}`);
+      let trElement = document.getElementById(`time-${normalTimeIndex + 1}`); // TODO: Get all elements and put them in an array, then use those instead of searching by ID
         trElement.appendChild(generateBlockElement(rowSpan, mins, bgcolor, title, subtitle, !smallBlock));
         // $(`table.sched.main > tbody > tr:nth-child(${normalTimeIndex + 2})`).append(`<td rowspan="${rowSpan}" class="period mins${mins}" style="background: ${bgcolor};"><span class="coursename">${title}</span>${smallBlock ? '' : '<br>'}<span class="subtitle">${smallBlock ? '' : subtitle}</span><br></td>`);
     });
