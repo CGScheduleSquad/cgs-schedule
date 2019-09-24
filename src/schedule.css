@@ -92,12 +92,16 @@ td.daylabel {
 }
 
 td.specialday {
-  border-style: solid;
   border-width: 2px;
   border-color: #000000;
   width: 18%;
   text-align: center;
   vertical-align: top;
+    padding: 0;
+    border-top-style: solid;
+    border-right-style: solid;
+    border-bottom: 0;
+    border-left-style: solid;
 }
 
 td.mainlabel {
@@ -239,7 +243,7 @@ td.controls.links {
 }
 
 @media screen and (orientation: portrait) and (min-height: 1000px) {
-  .sched.today {
+    .main.sched.today {
     font-size: 200%;
     height: 96%;
   }
@@ -256,7 +260,7 @@ td.controls.links {
 }
 
 @media screen and (orientation: portrait) and (max-height: 1000px) {
-  .sched.today {
+    .main.sched.today {
     font-size: 200%;
   }
 
@@ -274,10 +278,6 @@ td.controls.links {
 .daylabel a,
 .daylabel a:visited {
   color: black;
-}
-
-.specialday {
-  padding: 0;
 }
 
 .specialday > .sched {

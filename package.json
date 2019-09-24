@@ -4,13 +4,13 @@
   "version": "0.0.1",
   "contributors": [
     "Tristan Peng <pengt@catlin.edu> (https://kizjkre.github.io)",
-    "Liam Wang <wangl@catlin.edu>"
+    "Liam Wang <wangl@catlin.edu> (https://github.com/wangl5)"
   ],
-  "bugs": "https://github.com/CGScheduleSquad/ts-cgs-schedule/issues",
-  "homepage": "https://cgschedulesquad.github.io/ts-cgs-schedule/",
+  "bugs": "https://github.com/CGScheduleSquad/cgs-schedule/issues",
+  "homepage": "https://cgschedulesquad.github.io/cgs-schedule/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CGScheduleSquad/ts-cgs-schedule"
+    "url": "git+https://github.com/CGScheduleSquad/cgs-schedule"
   },
   "license": "MIT",
   "files": [
@@ -18,8 +18,8 @@
   ],
   "scripts": {
     "test": "echo \"No test specified\"",
-    "start": "parcel serve src/*.pug src/*.html",
-    "build": "cross-env NODE_ENV=production parcel build src/*.pug src/*.html --public-url .",
+    "start": "parcel serve src/*.pug src/*.html src/schedule/json/blocks.json",
+    "build": "cross-env NODE_ENV=production parcel build src/*.pug src/*.html src/schedule/json/blocks.json --public-url .",
     "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
