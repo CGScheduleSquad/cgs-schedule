@@ -9,12 +9,12 @@ import ScheduleCacheManager from './utils/scheduleCacheManager';
 const getClassAsArray = (cl: string) => Array.from(document.getElementsByClassName(cl));
 
 const appendBlankSchedule = (text: string, bgcolor: string, link: string = '') => {
-    let [td, a] = [document.createElement('td'), document.createElement('a')];
+  let [td, a] = [document.createElement('td'), document.createElement(link === '' ? 'span' : 'a')];
     td.setAttribute('rowspan', '12');
   td.setAttribute('class', 'period specialday');
   td.setAttribute('style', `background: ${bgcolor}`);
     a.setAttribute('class', 'coursename');
-    link === '' && a.setAttribute('href', link);
+  if (link !== '') a.setAttribute('href', link);
     a.innerText = text;
     td.appendChild(a);
     // @ts-ignore
