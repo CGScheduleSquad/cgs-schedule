@@ -135,7 +135,7 @@ Promise.all([
 
         switch (rawDay.type) {
             case ScheduleDayType.TEXT:
-                appendBlankSchedule('TODO', colorDict.free);
+                appendBlankSchedule('No Events', colorDict.free);
                 break;
             case ScheduleDayType.INLINE:
                 if (oneDay) $('.times').hide();
@@ -160,7 +160,7 @@ Promise.all([
 function appendBlankSchedule(text: string, bgcolor: string, link: string = '') {
     // TODO: Remove jquery dependency
     return $('table.sched.main > tbody > tr:nth-child(2)').append(
-        `<td rowspan="12" class="specialday" style="background: ${bgcolor};"><a ${
+        `<td rowspan="12" class="specialday" style="background: ${bgcolor}; border-bottom: 2px; border-style: solid"><a ${
             link === '' ? '' : `href=${link}`
         } class="coursename">${text}</a></td>`
     );
