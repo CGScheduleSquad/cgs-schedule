@@ -32,6 +32,10 @@
   border-right: 0;
 }
 
+.specialday > .sched tr:last-child td {
+  border-bottom: 0;
+}
+
 html {
   height: 95%;
 }
@@ -92,16 +96,10 @@ td.daylabel {
 }
 
 td.specialday {
-  border-width: 2px;
-  border-color: #000000;
   width: 18%;
   text-align: center;
   vertical-align: top;
-    padding: 0;
-    border-top-style: solid;
-    border-right-style: solid;
-    border-bottom: 0;
-    border-left-style: solid;
+  padding: 0;
 }
 
 td.mainlabel {

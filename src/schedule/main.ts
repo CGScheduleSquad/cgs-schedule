@@ -11,8 +11,8 @@ const getClassAsArray = (cl: string) => Array.from(document.getElementsByClassNa
 const appendBlankSchedule = (text: string, bgcolor: string, link: string = '') => {
     let [td, a] = [document.createElement('td'), document.createElement('a')];
     td.setAttribute('rowspan', '12');
-    td.setAttribute('class', 'specialday');
-    td.setAttribute('style', `background: ${bgcolor}; border-bottom: 2px; border-style: solid;`);
+  td.setAttribute('class', 'period specialday');
+  td.setAttribute('style', `background: ${bgcolor}`);
     a.setAttribute('class', 'coursename');
     link === '' && a.setAttribute('href', link);
     a.innerText = text;
@@ -117,7 +117,7 @@ class InlineScheduleRenderer {
 
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(12));
-        tableData.setAttribute('class', `specialday`);
+      tableData.setAttribute('class', `period specialday`);
         let specialTable = document.createElement('table');
         specialTable.setAttribute('class', 'sched week special');
         let tbody = document.createElement('tbody');
