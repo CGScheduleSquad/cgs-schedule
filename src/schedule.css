@@ -243,7 +243,7 @@ td.controls.links {
 }
 
 @media screen and (orientation: portrait) and (min-height: 1000px) {
-  .sched.today {
+    .main.sched.today {
     font-size: 200%;
     height: 96%;
   }
@@ -260,7 +260,7 @@ td.controls.links {
 }
 
 @media screen and (orientation: portrait) and (max-height: 1000px) {
-  .sched.today {
+    .main.sched.today {
     font-size: 200%;
   }
 
