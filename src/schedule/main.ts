@@ -6,6 +6,7 @@ import ScheduleDate from './time/scheduleDate';
 import { ScheduleRenderer } from './rendering/scheduleRenderer';
 import { ScheduleDayType } from './structure/scheduleDay';
 import ScheduleTime from './time/scheduleTime';
+import { JsonRawBlockSource } from './json/jsonRawBlockSource';
 
 class ScheduleParamUtils {
     static getCalendarUUID(): string {
@@ -75,7 +76,8 @@ class ScheduleCacheManager {
     private static reloadSchedulePromise(calendarUUID: string): Promise<string> {
         return ScheduleBuilder.generateScheduleFromBlockSources(
             calendarUUID,
-            new VeracrossICSRawBlockSource(calendarUUID)
+            new VeracrossICSRawBlockSource(calendarUUID),
+            new JsonRawBlockSource()
         ).then((schedule: ScheduleAll) => {
             let jsonString = JSON.stringify(schedule);
             localStorage.setItem('scheduleEvents', jsonString);
@@ -294,7 +296,8 @@ abstract class ParsedBlock {
             blockLabel = 'Blk ' + blockLabel;
         }
 
-        if (this.free || this.title === 'Free' || this.title === 'Late Start') {
+        let freeNames = ['Free', 'Late Start', 'Break', 'Lunch']; // TODO: get rid of this
+        if (this.free || freeNames.some(name => name === this.title)) {
             this.bgcolor = colorDict.free;
         } else if (this.shouldBeColored) {
             let blockNumMatchAttempt = blockLabel.match(/\d/);

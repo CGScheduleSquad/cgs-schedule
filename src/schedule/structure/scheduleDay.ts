@@ -44,8 +44,10 @@ export abstract class ScheduleDay {
         let dayMeta = dayWithMeta !== undefined ? dayWithMeta.dayMeta : new ScheduleDayMeta(''); // default day meta if no blocks have info
 
         if (this.isRegularDay(rawBlocks)) {
+            // @ts-ignore
             return RegularDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
         } else {
+            // @ts-ignore
             return InlineDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
         }
     }

@@ -17,11 +17,11 @@ class ScheduleBlock {
 
 export class RawBlock extends ScheduleBlock {
     readonly date: ScheduleDate;
-    readonly dayMeta: ScheduleDayMeta;
+    readonly dayMeta: ScheduleDayMeta | null;
     readonly startTime: ScheduleTime;
     readonly endTime: ScheduleTime | null;
 
-    constructor(title: string, location: string, label: string, date: ScheduleDate, dayMeta: ScheduleDayMeta, startTime: ScheduleTime, endTime: ScheduleTime | null) {
+    constructor(title: string, location: string, label: string, date: ScheduleDate, dayMeta: ScheduleDayMeta | null, startTime: ScheduleTime, endTime: ScheduleTime | null) {
         super(title, location, label);
         this.date = date;
         this.dayMeta = dayMeta;
