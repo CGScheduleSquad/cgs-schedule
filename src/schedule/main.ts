@@ -1,91 +1,27 @@
-import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
-import { ScheduleBuilder } from './building/scheduleBuilder';
-import { ScheduleAll } from './structure/scheduleAll';
-import { VeracrossICSRawBlockSource } from './veracross/veracrossICSRawBlockSource';
+import { ScheduleRange } from './rendering/scheduleRange';
 import ScheduleDate from './time/scheduleDate';
 import { ScheduleRenderer } from './rendering/scheduleRenderer';
 import { ScheduleDayType } from './structure/scheduleDay';
 import ScheduleTime from './time/scheduleTime';
-import { JsonRawBlockSource } from './json/jsonRawBlockSource';
+import ScheduleParamUtils from './utils/scheduleParamUtils';
+import ScheduleCacheManager from './utils/scheduleCacheManager';
 
-class ScheduleParamUtils {
-    static getCalendarUUID(): string {
-        let calendarUUID = ScheduleParamUtils.getUrlParam('cal');
-        if (calendarUUID == null) {
-            alert('Invalid URL! Please check that you have followed the instructions correctly.');
-            window.location.href = './?'; // exits the page
-            return '';
-        }
-        return calendarUUID;
-    }
+const getClassAsArray = (cl: string) => Array.from(document.getElementsByClassName(cl));
 
-    static getSeedDate(): ScheduleDate {
-        const dateString = ScheduleParamUtils.getUrlParam('date');
-        return dateString !== null ? ScheduleDate.fromString(dateString) : ScheduleDate.now();
-    }
+const appendBlankSchedule = (text: string, bgcolor: string, link: string = '') => {
+    let [td, a] = [document.createElement('td'), document.createElement('a')];
+    td.setAttribute('rowspan', '12');
+    td.setAttribute('class', 'specialday');
+    td.setAttribute('style', `background: ${bgcolor}; border-bottom: 2px; border-style: solid;`);
+    a.setAttribute('class', 'coursename');
+    link === '' && a.setAttribute('href', link);
+    a.innerText = text;
+    td.appendChild(a);
+    // @ts-ignore
+    document.querySelector('table.sched.main > tbody > tr:nth-child(2)').appendChild(td);
+};
 
-    static getViewMode(): ViewMode {
-        let newRange = ScheduleParamUtils.getUrlParam('range');
-        switch (newRange) {
-            case 'week':
-                return ViewMode.Week;
-            case 'day':
-                return ViewMode.Day;
-            default:
-                return ViewMode.Week; // TODO: different default for thin screens (phones)
-        }
-    }
-
-    private static getUrlParam = (key: string) => new URL(window.location.href).searchParams.get(key);
-}
-
-class ScheduleCacheManager {
-    public static readonly LOCAL_STORAGE_KEY = 'scheduleEvents';
-
-    static async getSchedule(calendarUUID: string): Promise<any> {
-        if (localStorage === undefined) {
-            // not supported
-            console.log('Local storage is not supported! Loading schedule...');
-            const jsonString = await this.reloadSchedulePromise(calendarUUID);
-            return JSON.parse(jsonString);
-        }
-
-        let scheduleString = localStorage.getItem(ScheduleCacheManager.LOCAL_STORAGE_KEY);
-        if (scheduleString === null) {
-            console.log('Schedule cache does not exist! Loading schedule...');
-            const jsonString_1 = await this.reloadSchedulePromise(calendarUUID);
-            return JSON.parse(jsonString_1);
-        }
-
-        let scheduleObject = JSON.parse(scheduleString);
-        if (scheduleObject.versionNumber !== ScheduleAll.CURRENT_VERSION_NUMBER || scheduleObject.id !== calendarUUID) {
-            console.log('Schedule cache is invalid! Loading schedule...');
-            const jsonString_2 = await this.reloadSchedulePromise(calendarUUID);
-            return JSON.parse(jsonString_2);
-        }
-
-        if (new Date().getTime() - scheduleObject.creationTime > 1000 * 60 * 60 * 24) {
-            console.log('Schedule cache is outdated! Loading in the background...');
-            this.reloadSchedulePromise(calendarUUID); // save in the background
-        }
-
-        console.log('Schedule loaded successfully from cache!');
-        return Promise.resolve(scheduleObject);
-    }
-
-    private static reloadSchedulePromise(calendarUUID: string): Promise<string> {
-        return ScheduleBuilder.generateScheduleFromBlockSources(
-            calendarUUID,
-            new VeracrossICSRawBlockSource(calendarUUID),
-            new JsonRawBlockSource()
-        ).then((schedule: ScheduleAll) => {
-            let jsonString = JSON.stringify(schedule);
-            localStorage.setItem('scheduleEvents', jsonString);
-            console.log('Schedule reloaded from Veracross and saved to localStorage!');
-            return jsonString;
-        });
-    }
-}
+const format12HourTime = (date: ScheduleTime) => ((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes;
 
 const colorDict = {
     0: '#C0C0C0',
@@ -122,16 +58,18 @@ Promise.all([
         let rawDay = schedule.dayMap[date.toString()];
 
         // append the header with a link to the veracross page
-        $('table.sched.main > tbody > tr:nth-child(1)').append(`
-                <td class="daylabel">
-                  <a href="https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}">
-                    <b>
-                      ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
-        (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}
-                    </b>
-                  </a>
-                </td>
-                `);
+        let [td, a, b] = [document.createElement('td'), document.createElement('a'), document.createElement('b')];
+        td.setAttribute('class', 'daylabel');
+        a.setAttribute(
+            'href',
+            `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}`
+        );
+        b.innerText = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
+            (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
+        a.appendChild(b);
+        td.appendChild(a);
+        // @ts-ignore
+        document.querySelector('table.sched.main > tbody > tr:nth-child(1)').appendChild(td);
 
         if (rawDay === undefined) rawDay = { type: ScheduleDayType.TEXT };
 
@@ -140,9 +78,11 @@ Promise.all([
                 appendBlankSchedule('No Events', colorDict.free);
                 break;
             case ScheduleDayType.INLINE:
-                if (oneDay) $('.times').remove();
+                // @ts-ignore
+                oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
                 InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
-                if (oneDay) $('.times').css('width', '39%'); // TODO: Remove this
+                // @ts-ignore
+                oneDay && getClassAsArray('times').forEach(el => el.style.width = '39%'); // TODO: Remove this
                 break;
             case ScheduleDayType.REGULAR:
                 RegularScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
@@ -150,31 +90,17 @@ Promise.all([
         }
     });
     if (oneDay) {
-        $('.mainlabel').hide();
-        $('.daylabel')
-            .first()
-            .attr('colspan', 2);
+        // @ts-ignore
+        document.getElementsByClassName('mainlabel')[0].style.display = 'none';
+        document.getElementsByClassName('daylabel')[0].setAttribute('colspan', '2');
     }
-    $('#schedarea').show();
+    // @ts-ignore
+    document.getElementById('schedarea').style.display = 'block';
 
     ScheduleRenderer.updateLinks(calendarUUID, range);
 });
 
-function appendBlankSchedule(text: string, bgcolor: string, link: string = '') {
-    // TODO: Remove jquery dependency
-    return $('table.sched.main > tbody > tr:nth-child(2)').append(
-        `<td rowspan="12" class="specialday" style="background: ${bgcolor}; border-bottom: 2px; border-style: solid"><a ${
-            link === '' ? '' : `href=${link}`
-        } class="coursename">${text}</a></td>`
-    );
-}
-
-function format12HourTime(date: ScheduleTime) {
-    return (((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes);
-}
-
 class InlineScheduleRenderer {
-
     public static getInstance() {
         if (this.instance === undefined) this.instance = new InlineScheduleRenderer();
         return this.instance;
@@ -182,8 +108,7 @@ class InlineScheduleRenderer {
 
     private static instance: InlineScheduleRenderer;
 
-    private constructor() {
-    }
+    private constructor() {}
 
     appendSchedule(rawDay: any, compressionList: Array<string>) {
         let blocks: Array<Array<any>> = rawDay.blocks;
@@ -209,7 +134,6 @@ class InlineScheduleRenderer {
 }
 
 class RegularScheduleRenderer {
-
     public static getInstance() {
         if (this.instance === undefined) this.instance = new RegularScheduleRenderer();
         return this.instance;
@@ -241,8 +165,8 @@ class RegularScheduleRenderer {
 abstract class ParsedBlock {
     // Maps block label content to: [replacement text, whether the block should be colored]
     private static readonly blockLabelMappings = {
-        'L': ['', true],
-        'X': [' Flex', false]
+        L: ['', true],
+        X: [' Flex', false]
     };
 
     // calculated values
@@ -255,7 +179,6 @@ abstract class ParsedBlock {
     protected readonly title: string;
     protected readonly mins: string;
     private readonly free: boolean;
-
 
     protected constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean) {
         this.title = title;
@@ -301,8 +224,9 @@ abstract class ParsedBlock {
             this.bgcolor = colorDict.free;
         } else if (this.shouldBeColored) {
             let blockNumMatchAttempt = blockLabel.match(/\d/);
-            // @ts-ignore
-            this.bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : colorDict[0];
+            this.bgcolor =
+                // @ts-ignore
+                blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : colorDict[0];
         } else {
             this.bgcolor = colorDict[0];
         }
@@ -315,7 +239,8 @@ abstract class ParsedBlock {
         bgcolor: string,
         title: string,
         subtitle: string,
-        newLine: boolean, specialPeriod = false
+        newLine: boolean,
+        specialPeriod = false
     ) {
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
@@ -335,7 +260,6 @@ abstract class ParsedBlock {
 }
 
 class RegularParseBlock extends ParsedBlock {
-
     public static parseRawBlock(block: any, compressionList: Array<string>) {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
@@ -351,19 +275,33 @@ class RegularParseBlock extends ParsedBlock {
     public readonly normalTimeIndex: number;
     private readonly rowSpan: number;
 
-    constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean, normalTimeIndex: number, rowSpan: number) {
+    constructor(
+        title: string,
+        location: string,
+        blockLabel: string,
+        mins: string,
+        free: boolean,
+        normalTimeIndex: number,
+        rowSpan: number
+    ) {
         super(title, location, blockLabel, mins, free);
         this.normalTimeIndex = normalTimeIndex;
         this.rowSpan = rowSpan;
     }
 
     generateBlockElement() {
-        return ParsedBlock.generateBlockElement(this.rowSpan, this.mins, this.bgcolor, this.title, this.subtitle, this.addLineBreak);
+        return ParsedBlock.generateBlockElement(
+            this.rowSpan,
+            this.mins,
+            this.bgcolor,
+            this.title,
+            this.subtitle,
+            this.addLineBreak
+        );
     }
 }
 
 class InlineParseBlock extends ParsedBlock {
-
     public static parseRawBlock(block: any, compressionList: Array<string>) {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
@@ -378,7 +316,15 @@ class InlineParseBlock extends ParsedBlock {
     private readonly startTime: ScheduleTime;
     private readonly endTime: ScheduleTime;
 
-    constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean, startTime: ScheduleTime, endTime: ScheduleTime) {
+    constructor(
+        title: string,
+        location: string,
+        blockLabel: string,
+        mins: string,
+        free: boolean,
+        startTime: ScheduleTime,
+        endTime: ScheduleTime
+    ) {
         super(title, location, blockLabel, mins, free);
         this.startTime = startTime;
         this.endTime = endTime;
@@ -389,8 +335,18 @@ class InlineParseBlock extends ParsedBlock {
         tableRowElement.setAttribute('class', `mins${this.mins}`);
         let timeDataElement = document.createElement('td');
         timeDataElement.setAttribute('class', `times mins${this.mins}`);
-        timeDataElement.appendChild(document.createTextNode(`${format12HourTime(this.startTime)}-${format12HourTime(this.endTime)}`));
-        let blockElement = ParsedBlock.generateBlockElement(1, this.mins, this.bgcolor, this.title, this.subtitle, this.addLineBreak, true);
+        timeDataElement.appendChild(
+            document.createTextNode(`${format12HourTime(this.startTime)}-${format12HourTime(this.endTime)}`)
+        );
+        let blockElement = ParsedBlock.generateBlockElement(
+            1,
+            this.mins,
+            this.bgcolor,
+            this.title,
+            this.subtitle,
+            this.addLineBreak,
+            true
+        );
         tableRowElement.appendChild(timeDataElement);
         tableRowElement.appendChild(blockElement);
         return tableRowElement;
