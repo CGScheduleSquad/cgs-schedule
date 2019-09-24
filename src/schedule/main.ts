@@ -140,10 +140,11 @@ Promise.all([
                 appendBlankSchedule('TODO', colorDict.free);
                 break;
             case ScheduleDayType.INLINE:
-                appendInlineSchedule(rawDay, schedule.compressionList);
+                appendBlankSchedule('TODO', colorDict.free);
+                // InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
                 break;
             case ScheduleDayType.REGULAR:
-                RegularScheduleRenderer.getInstance().appendRegularSchedule(rawDay, schedule.compressionList);
+                RegularScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
                 break;
         }
     });
@@ -183,83 +184,133 @@ class RegularScheduleRenderer {
         }
     }
 
-    appendRegularSchedule(rawDay: any, compressionList: Array<string>) {
+    appendSchedule(rawDay: any, compressionList: Array<string>) {
         let blocks: Array<Array<any>> = rawDay.blocks;
         blocks.forEach((block: Array<any>) => {
-            let title = compressionList[block[0]];
-            let location = compressionList[block[1]];
-            let blockLabel = block[2];
-            let normalTimeIndex = block[3];
-            let rowSpan = block[4];
-            let mins = block[5];
-            let free = block[6];
-
-            let subtitleThings = generateBlockSubtitle(location, blockLabel);
-            let subtitle = subtitleThings[0];
-            let addLineBreak = subtitleThings[1];
-            // let subtitle = location + (blockLabel === '' ? '' : ' - ' + (blockLabel.match(/\d(?![ Flex|X])/) !== null ? 'Blk ' : '') + blockLabel);
-
-            let blockNumMatchAttempt = blockLabel.match(/\d(?![ Flex|X])/);
-            let bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : free ? colorDict.free : colorDict[0];
-
-            let trElement = this.mainTimeElements[normalTimeIndex];
-            trElement.appendChild(generateBlockElement(rowSpan, mins, bgcolor, title, subtitle, addLineBreak));
+            let inlineParseBlock = InlineParseBlock.parseRawBlock(block, compressionList);
+            let trElement = this.mainTimeElements[inlineParseBlock.normalTimeIndex];
+            trElement.appendChild(inlineParseBlock.generateBlockElement());
         });
     }
 }
 
-let mappings = {
-    'L': '',
-    'X': ' Flex'
-};
+abstract class ParsedBlock {
+    // Maps block label content to: [replacement text, whether the block should be colored]
+    private static readonly blockLabelMappings = {
+        'L': ['', true],
+        'X': [' Flex', false]
+    };
 
-function expandBlockLabel(blockLabel: string): string {
-    if (blockLabel.charAt(0).match(/\d/) !== null) {
-        if (blockLabel.length > 1) {
-            for (let mappingsKey in mappings) {
-                // @ts-ignore
-                blockLabel = blockLabel.replace(mappingsKey, mappings[mappingsKey]);
-            }
+    // calculated values
+    private shouldBeColored = true;
+    protected addLineBreak = true;
+    protected subtitle = '';
+    protected bgcolor = 'white';
+
+    // read values
+    protected readonly title: string;
+    protected readonly mins: string;
+    private readonly free: boolean;
+
+
+    protected constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean) {
+        this.title = title;
+        this.mins = mins;
+        this.free = free;
+
+        this.generateBlockSubtitle(location, blockLabel);
+    }
+
+    private generateBlockSubtitle(location: string, blockLabel: string) {
+        blockLabel = this.expandBlockLabel(blockLabel);
+        if (blockLabel === 'C&C') {
+            this.subtitle = ' - ' + location;
+            this.addLineBreak = false;
+        } else if (blockLabel === '') {
+            this.subtitle = location;
+            this.addLineBreak = true;
+        } else if (location === '') {
+            this.subtitle = ' - ' + blockLabel;
+            this.addLineBreak = false;
+        } else {
+            this.subtitle = location + ' - ' + blockLabel;
         }
-        blockLabel = 'Blk ' + blockLabel;
     }
-    return blockLabel;
+
+    private expandBlockLabel(blockLabel: string) {
+        if (blockLabel.charAt(0).match(/\d/) !== null) {
+            if (blockLabel.length > 1) {
+                for (let mappingsKey in ParsedBlock.blockLabelMappings) {
+                    if (blockLabel.indexOf(mappingsKey) !== -1) {
+                        // @ts-ignore
+                        blockLabel = blockLabel.replace(mappingsKey, ParsedBlock.blockLabelMappings[mappingsKey][0]);
+                        // @ts-ignore
+                        this.shouldBeColored = this.shouldBeColored && ParsedBlock.blockLabelMappings[mappingsKey][1];
+                    }
+                }
+            }
+            blockLabel = 'Blk ' + blockLabel;
+        }
+
+        if (this.shouldBeColored) {
+            let blockNumMatchAttempt = blockLabel.match(/\d/);
+            // @ts-ignore
+            this.bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : this.free ? colorDict.free : colorDict[0];
+        }
+        return blockLabel;
+    }
+
+    protected static generateBlockElement(
+        rowSpan: number,
+        mins: string,
+        bgcolor: string,
+        title: string,
+        subtitle: string,
+        newLine: boolean
+    ) {
+        let tableData = document.createElement('td');
+        tableData.setAttribute('rowspan', String(rowSpan));
+        tableData.setAttribute('class', `period mins${mins}`);
+        tableData.setAttribute('style', `background: ${bgcolor};`); // todo replace style with css class
+        let titleSpan = document.createElement('span');
+        titleSpan.setAttribute('class', 'coursename');
+        titleSpan.appendChild(document.createTextNode(title));
+        let subtitleSpan = document.createElement('subtitle');
+        subtitleSpan.setAttribute('class', 'subtitle');
+        subtitleSpan.appendChild(document.createTextNode(subtitle));
+        tableData.appendChild(titleSpan);
+        if (newLine) tableData.appendChild(document.createElement('br'));
+        tableData.appendChild(subtitleSpan);
+        return tableData;
+    }
 }
 
-function generateBlockSubtitle(location: string, blockLabel: string): [string, boolean] {
-    blockLabel = expandBlockLabel(blockLabel);
-    if (blockLabel === 'C&C') {
-        return [' - ' + location, false];
-    } else if (blockLabel === '') {
-        return [location, true];
-    } else if (location === '') {
-        return [' - ' + blockLabel, false];
-    }
-    return [location + ' - ' + blockLabel, true];
-}
+class InlineParseBlock extends ParsedBlock {
 
-function generateBlockElement(
-    rowSpan: number,
-    mins: string,
-    bgcolor: string,
-    title: string,
-    subtitle: string,
-    newLine: boolean
-) {
-    let tableData = document.createElement('td');
-    tableData.setAttribute('rowspan', rowSpan);
-    tableData.setAttribute('class', `period mins${mins}`);
-    tableData.setAttribute('style', `background: ${bgcolor};`); // todo replace style with css class
-    let titleSpan = document.createElement('span');
-    titleSpan.setAttribute('class', 'coursename');
-    titleSpan.appendChild(document.createTextNode(title));
-    let subtitleSpan = document.createElement('subtitle');
-    subtitleSpan.setAttribute('class', 'subtitle');
-    subtitleSpan.appendChild(document.createTextNode(subtitle));
-    tableData.appendChild(titleSpan);
-    if (newLine) tableData.appendChild(document.createElement('br'));
-    tableData.appendChild(subtitleSpan);
-    return tableData;
+    public static parseRawBlock(block: any, compressionList: Array<string>) {
+        let title = compressionList[block[0]];
+        let location = compressionList[block[1]];
+        let blockLabel = block[2];
+        let normalTimeIndex = block[3];
+        let rowSpan = block[4];
+        let mins = block[5];
+        let free = block[6];
+
+        return new InlineParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan);
+    }
+
+    public readonly normalTimeIndex: number;
+    private readonly rowSpan: number;
+
+    constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean, normalTimeIndex: number, rowSpan: number) {
+        super(title, location, blockLabel, mins, free);
+        this.normalTimeIndex = normalTimeIndex;
+        this.rowSpan = rowSpan;
+    }
+
+    generateBlockElement() {
+        return ParsedBlock.generateBlockElement(this.rowSpan, this.mins, this.bgcolor, this.title, this.subtitle, this.addLineBreak);
+    }
 }
 
 /*
