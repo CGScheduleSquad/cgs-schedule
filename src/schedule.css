@@ -228,7 +228,7 @@ td.controls.links {
   font-size: 75%;
 }
 
-.schedarea > .sched.week {
+#schedarea > .sched.week {
   font-size: 120%;
 }
 
