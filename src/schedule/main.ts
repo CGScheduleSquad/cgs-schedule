@@ -8,7 +8,7 @@ import ScheduleCacheManager from './utils/scheduleCacheManager';
 
 const getClassAsArray = (cl: string) => Array.from(document.getElementsByClassName(cl));
 
-const appendBlankSchedule = (text: string, bgcolor: string, link: string = '') => {
+const appendBlankSchedule = (text: string, bgcolor: string, link: string = ''): void => {
     let [td, a] = [document.createElement('td'), document.createElement(link === '' ? 'span' : 'a')];
     td.setAttribute('rowspan', '12');
     td.setAttribute('class', 'period specialday');
@@ -21,7 +21,7 @@ const appendBlankSchedule = (text: string, bgcolor: string, link: string = '') =
     document.querySelector('table.sched.main > tbody > tr:nth-child(2)').appendChild(td);
 };
 
-const format12HourTime = (date: ScheduleTime) =>
+const format12HourTime = (date: ScheduleTime): string =>
     ((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes;
 
 const colorDict = {
@@ -102,7 +102,7 @@ Promise.all([
 });
 
 class InlineScheduleRenderer {
-    public static getInstance() {
+    public static getInstance(): InlineScheduleRenderer {
         if (this.instance === undefined) this.instance = new InlineScheduleRenderer();
         return this.instance;
     }
@@ -111,7 +111,7 @@ class InlineScheduleRenderer {
 
     private constructor() {}
 
-    appendSchedule(rawDay: any, compressionList: Array<string>) {
+    appendSchedule(rawDay: any, compressionList: Array<string>): void {
         let blocks: Array<Array<any>> = rawDay.blocks;
         let trElement = document.getElementById(`time-0`);
         if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
@@ -135,7 +135,7 @@ class InlineScheduleRenderer {
 }
 
 class RegularScheduleRenderer {
-    public static getInstance() {
+    public static getInstance(): RegularScheduleRenderer {
         if (this.instance === undefined) this.instance = new RegularScheduleRenderer();
         return this.instance;
     }
@@ -153,7 +153,7 @@ class RegularScheduleRenderer {
         }
     }
 
-    appendSchedule(rawDay: any, compressionList: Array<string>) {
+    appendSchedule(rawDay: any, compressionList: Array<string>): void {
         let blocks: Array<Array<any>> = rawDay.blocks;
         blocks.forEach((block: Array<any>) => {
             let inlineParseBlock = RegularParseBlock.parseRawBlock(block, compressionList);
@@ -189,7 +189,7 @@ abstract class ParsedBlock {
         this.generateBlockSubtitle(location, blockLabel);
     }
 
-    private generateBlockSubtitle(location: string, blockLabel: string) {
+    private generateBlockSubtitle(location: string, blockLabel: string): void {
         blockLabel = this.expandBlockLabel(blockLabel);
         if (blockLabel === 'C&C') {
             this.subtitle = ' - ' + location;
@@ -205,7 +205,7 @@ abstract class ParsedBlock {
         }
     }
 
-    private expandBlockLabel(blockLabel: string) {
+    private expandBlockLabel(blockLabel: string): string {
         if (blockLabel.charAt(0).match(/\d/) !== null) {
             if (blockLabel.length > 1) {
                 for (let mappingsKey in ParsedBlock.blockLabelMappings) {
@@ -242,7 +242,7 @@ abstract class ParsedBlock {
         subtitle: string,
         newLine: boolean,
         specialPeriod = false
-    ) {
+    ): any { // What data type is tableData?
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
         tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''}`);
@@ -261,7 +261,7 @@ abstract class ParsedBlock {
 }
 
 class RegularParseBlock extends ParsedBlock {
-    public static parseRawBlock(block: any, compressionList: Array<string>) {
+    public static parseRawBlock(block: any, compressionList: Array<string>): RegularParseBlock {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
         let blockLabel = block[2];
@@ -290,7 +290,7 @@ class RegularParseBlock extends ParsedBlock {
         this.rowSpan = rowSpan;
     }
 
-    generateBlockElement() {
+    generateBlockElement(): ParsedBlock {
         return ParsedBlock.generateBlockElement(
             this.rowSpan,
             this.mins,
@@ -303,7 +303,7 @@ class RegularParseBlock extends ParsedBlock {
 }
 
 class InlineParseBlock extends ParsedBlock {
-    public static parseRawBlock(block: any, compressionList: Array<string>) {
+    public static parseRawBlock(block: any, compressionList: Array<string>): InlineParseBlock {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
         let blockLabel = block[2];
@@ -331,7 +331,7 @@ class InlineParseBlock extends ParsedBlock {
         this.endTime = endTime;
     }
 
-    generateBlockElement() {
+    generateBlockElement(): any { // What data type is tableRowElement?
         let tableRowElement = document.createElement('tr');
         tableRowElement.setAttribute('class', `mins${this.mins}`);
         let timeDataElement = document.createElement('td');
