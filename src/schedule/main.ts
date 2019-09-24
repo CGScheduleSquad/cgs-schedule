@@ -290,7 +290,7 @@ class RegularParseBlock extends ParsedBlock {
         this.rowSpan = rowSpan;
     }
 
-    generateBlockElement(): ParsedBlock {
+    generateBlockElement(): any {
         return ParsedBlock.generateBlockElement(
             this.rowSpan,
             this.mins,
@@ -331,7 +331,7 @@ class InlineParseBlock extends ParsedBlock {
         this.endTime = endTime;
     }
 
-    generateBlockElement(): any { // What data type is tableRowElement?
+    generateBlockElement(): any {
         let tableRowElement = document.createElement('tr');
         tableRowElement.setAttribute('class', `mins${this.mins}`);
         let timeDataElement = document.createElement('td');
