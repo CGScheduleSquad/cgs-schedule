@@ -1,7 +1,7 @@
 import { ScheduleAll } from '../structure/scheduleAll';
 import { ScheduleBuilder } from '../building/scheduleBuilder';
 import { VeracrossICSRawBlockSource } from '../veracross/veracrossICSRawBlockSource';
-import JSONRawBlockSource from '../json/JSONRawBlockSource';
+import JSONRawBlockSource from '../json/jsonRawBlockSource';
 
 export default class ScheduleCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'scheduleEvents';
