@@ -1,0 +1,14 @@
+table.sched.main {
+    border-collapse: separate;
+    border-spacing: 6px !important;
+}
+
+table.sched.main td {
+    border-width: 0;
+    border-radius: 5px !important;
+    box-shadow: 3px 3px 8px #c8c8c8;
+}
+
+.mainlabel, .daylabel {
+    box-shadow: none !important;
+}
