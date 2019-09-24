@@ -92,18 +92,18 @@ class RegularDay extends ScheduleDay {
                 let title = 'Free';
                 let label = '';
                 switch (timeIndex) {
-                    // case 3:
-                    //     title = 'Break';
-                    //     break;
+                    case 1:
+                        label = 'Early Flex';
+                        break;
                     case 6:
                         label = 'AM Flex';
                         break;
                     case 7:
                         title = 'Co-Curric';
                         break;
-                    // case 8:
-                    //     title = 'Lunch';
-                    //     break;
+                    case 8:
+                        title = 'Lunch';
+                        break;
                     case 9:
                         label = 'PM Flex';
                         break;
@@ -121,7 +121,7 @@ class RegularDay extends ScheduleDay {
                 rowSpan++;
             }
             let durationMins = Math.min(Math.max(normalAllTimes[timeIndex + rowSpan].totalMinutes - normalAllTimes[timeIndex].totalMinutes, 5), 90); // double sided constrain
-            regularDayBlocks.push(new RegularDayBlock(rawBlock.title, rawBlock.location, rawBlock.label, timeIndex, rowSpan, durationMins, true));
+            regularDayBlocks.push(new RegularDayBlock(rawBlock.title, rawBlock.location, rawBlock.label, timeIndex, rowSpan, durationMins, false));
             timeIndex += rowSpan;
         });
 

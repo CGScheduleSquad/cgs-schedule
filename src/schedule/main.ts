@@ -143,7 +143,7 @@ Promise.all([
                 appendInlineSchedule(rawDay, schedule.compressionList);
                 break;
             case ScheduleDayType.REGULAR:
-                appendRegularSchedule(rawDay, schedule.compressionList);
+                RegularScheduleRenderer.getInstance().appendRegularSchedule(rawDay, schedule.compressionList);
                 break;
         }
     });
@@ -163,35 +163,79 @@ function appendBlankSchedule(text: string, bgcolor: string, link: string = '') {
 
 function appendInlineSchedule(rawDay: any, compressionList: Array<string>) {}
 
-function appendRegularSchedule(rawDay: any, compressionList: Array<string>) {
-    rawDay.blocks.forEach(block => {
-        let title = compressionList[block[0]];
-        let location = compressionList[block[1]];
-        let blockLabel = block[2];
-        let normalTimeIndex = block[3];
-        let rowSpan = block[4];
-        let mins = block[5];
-        let free = block[6];
+class RegularScheduleRenderer {
 
-        let subtitle =
-            location +
-            (blockLabel === ''
-                ? ''
-                : ' - ' + (blockLabel.match(/\d(?![ Flex|X])/) !== null ? 'Blk ' : '') + blockLabel);
+    public static getInstance() {
+        if (this.instance === undefined) this.instance = new RegularScheduleRenderer();
+        return this.instance;
+    }
 
-        let smallBlock = title === subtitle || subtitle === '' || title === 'US C&C';
-        let blockNumMatchAttempt = blockLabel.match(/\d(?![ Flex|X])/);
-        let bgcolor =
-            blockNumMatchAttempt !== null
-                ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))]
-                : free || subtitle.match(/Break/) != null || subtitle.match(/Lunch/) != null
-                ? colorDict.free
-                : colorDict[0];
+    private static instance: RegularScheduleRenderer;
+    private static readonly NUM_REGULAR_TIMES = 11;
 
-        let trElement = document.getElementById(`time-${normalTimeIndex + 1}`); // TODO: Get all elements and put them in an array, then use those instead of searching by ID
-        trElement.appendChild(generateBlockElement(rowSpan, mins, bgcolor, title, subtitle, !smallBlock));
-        // $(`table.sched.main > tbody > tr:nth-child(${normalTimeIndex + 2})`).append(`<td rowspan="${rowSpan}" class="period mins${mins}" style="background: ${bgcolor};"><span class="coursename">${title}</span>${smallBlock ? '' : '<br>'}<span class="subtitle">${smallBlock ? '' : subtitle}</span><br></td>`);
-    });
+    private mainTimeElements = new Array<HTMLElement>();
+
+    private constructor() {
+        for (let i = 0; i <= RegularScheduleRenderer.NUM_REGULAR_TIMES; i++) {
+            let elementById = document.getElementById(`time-${i}`);
+            if (elementById === null) throw new Error('Error rendering schedule: Time elements not found!');
+            this.mainTimeElements.push(elementById);
+        }
+    }
+
+    appendRegularSchedule(rawDay: any, compressionList: Array<string>) {
+        let blocks: Array<Array<any>> = rawDay.blocks;
+        blocks.forEach((block: Array<any>) => {
+            let title = compressionList[block[0]];
+            let location = compressionList[block[1]];
+            let blockLabel = block[2];
+            let normalTimeIndex = block[3];
+            let rowSpan = block[4];
+            let mins = block[5];
+            let free = block[6];
+
+            let subtitleThings = generateBlockSubtitle(location, blockLabel);
+            let subtitle = subtitleThings[0];
+            let addLineBreak = subtitleThings[1];
+            // let subtitle = location + (blockLabel === '' ? '' : ' - ' + (blockLabel.match(/\d(?![ Flex|X])/) !== null ? 'Blk ' : '') + blockLabel);
+
+            let blockNumMatchAttempt = blockLabel.match(/\d(?![ Flex|X])/);
+            let bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : free ? colorDict.free : colorDict[0];
+
+            let trElement = this.mainTimeElements[normalTimeIndex];
+            trElement.appendChild(generateBlockElement(rowSpan, mins, bgcolor, title, subtitle, addLineBreak));
+        });
+    }
+}
+
+let mappings = {
+    'L': '',
+    'X': ' Flex'
+};
+
+function expandBlockLabel(blockLabel: string): string {
+    if (blockLabel.charAt(0).match(/\d/) !== null) {
+        if (blockLabel.length > 1) {
+            for (let mappingsKey in mappings) {
+                // @ts-ignore
+                blockLabel = blockLabel.replace(mappingsKey, mappings[mappingsKey]);
+            }
+        }
+        blockLabel = 'Blk ' + blockLabel;
+    }
+    return blockLabel;
+}
+
+function generateBlockSubtitle(location: string, blockLabel: string): [string, boolean] {
+    blockLabel = expandBlockLabel(blockLabel);
+    if (blockLabel === 'C&C') {
+        return [' - ' + location, false];
+    } else if (blockLabel === '') {
+        return [location, true];
+    } else if (location === '') {
+        return [' - ' + blockLabel, false];
+    }
+    return [location + ' - ' + blockLabel, true];
 }
 
 function generateBlockElement(
