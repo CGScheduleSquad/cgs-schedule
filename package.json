@@ -1,7 +1,7 @@
 {
-  "name": "ts-cgs-schedule",
-  "description": "Recreating the old CG Schedule with TypeScript",
-  "version": "0.0.1",
+  "name": "cgs-schedule",
+  "description": "Recreating the old CGS Schedule with TypeScript",
+  "version": "1.0.0",
   "contributors": [
     "Tristan Peng <pengt@catlin.edu> (https://kizjkre.github.io)",
     "Liam Wang <wangl@catlin.edu> (https://github.com/wangl5)"
