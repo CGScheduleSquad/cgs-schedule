@@ -125,7 +125,7 @@ Promise.all([
                   <a href="https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}">
                     <b>
                       ${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
-            (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}
+        (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}
                     </b>
                   </a>
                 </td>
@@ -293,10 +293,14 @@ abstract class ParsedBlock {
             blockLabel = 'Blk ' + blockLabel;
         }
 
-        if (this.shouldBeColored) {
+        if (this.free || this.title === 'Free' || this.title === 'Late Start') {
+            this.bgcolor = colorDict.free;
+        } else if (this.shouldBeColored) {
             let blockNumMatchAttempt = blockLabel.match(/\d/);
             // @ts-ignore
-            this.bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : this.free || this.title === 'Free' || this.title === 'Late Start' ? colorDict.free : colorDict[0];
+            this.bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : colorDict[0];
+        } else {
+            this.bgcolor = colorDict[0];
         }
         return blockLabel;
     }
