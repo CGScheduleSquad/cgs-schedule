@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/CGScheduleSquad/ts-cgs-schedule.svg?branch=master)](https://travis-ci.com/CGScheduleSquad/cgs-schedule)
+[![Build Status](https://travis-ci.com/CGScheduleSquad/ts-cgs-schedule.svg?branch=master)](https://travis-ci.com/CGScheduleSquad/ts-cgs-schedule)
 
 # Typescript Veracross CGS Schedule
 Bring the old CGS schedule view to the Veracross student schedule - now written in TypeScript!
