@@ -5,6 +5,7 @@ import { VeracrossICSRawBlockSource } from './veracross/veracrossICSRawBlockSour
 import ScheduleDate from './time/scheduleDate';
 import { ScheduleRenderer } from './rendering/scheduleRenderer';
 import { ScheduleDayType } from './structure/scheduleDay';
+import ScheduleTime from './time/scheduleTime';
 
 class ScheduleParamUtils {
     static getCalendarUUID(): string {
@@ -103,7 +104,7 @@ let range = new ScheduleRange(seedDate, viewMode);
 
 console.log('Start schedule program');
 Promise.all([
-    ScheduleCacheManager.getSchedule(calendarUUID),
+    ScheduleCacheManager.getSchedule(calendarUUID), // start loading schedule before dom content has loaded, but only draw when the dom has loaded and the schedule has also
     new Promise(resolve => {
         window.addEventListener('DOMContentLoaded', () => {
             resolve();
@@ -111,12 +112,12 @@ Promise.all([
     })
 ]).then((things: any) => {
     let schedule = things[0];
-    console.log(schedule);
-    range.getDatesForWeek().forEach((date: ScheduleDate) => {
+    let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    let dates = range.getDatesForWeek();
+    let oneDay = dates.length === 1;
+    dates.forEach((date: ScheduleDate) => {
         let rawDay = schedule.dayMap[date.toString()];
-
-        let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         // append the header with a link to the veracross page
         $('table.sched.main > tbody > tr:nth-child(1)').append(`
@@ -130,24 +131,27 @@ Promise.all([
                 </td>
                 `);
 
-        if (rawDay === undefined) {
-            appendBlankSchedule('No Events', colorDict.free);
-            return;
-        }
+        if (rawDay === undefined) rawDay = { type: ScheduleDayType.TEXT };
 
         switch (rawDay.type) {
             case ScheduleDayType.TEXT:
                 appendBlankSchedule('TODO', colorDict.free);
                 break;
             case ScheduleDayType.INLINE:
-                appendBlankSchedule('TODO', colorDict.free);
-                // InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
+                if (oneDay) $('.times').hide();
+                InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
                 break;
             case ScheduleDayType.REGULAR:
                 RegularScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
                 break;
         }
     });
+    if (oneDay) {
+        $('.mainlabel').hide();
+        $('.daylabel')
+            .first()
+            .attr('colspan', 2);
+    }
     $('#schedarea').show();
 
     ScheduleRenderer.updateLinks(calendarUUID, range);
@@ -162,7 +166,44 @@ function appendBlankSchedule(text: string, bgcolor: string, link: string = '') {
     );
 }
 
-function appendInlineSchedule(rawDay: any, compressionList: Array<string>) {}
+function format12HourTime(date: ScheduleTime) {
+    return (((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes);
+}
+
+class InlineScheduleRenderer {
+
+    public static getInstance() {
+        if (this.instance === undefined) this.instance = new InlineScheduleRenderer();
+        return this.instance;
+    }
+
+    private static instance: InlineScheduleRenderer;
+
+    private constructor() {
+    }
+
+    appendSchedule(rawDay: any, compressionList: Array<string>) {
+        let blocks: Array<Array<any>> = rawDay.blocks;
+        let trElement = document.getElementById(`time-0`);
+        if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
+
+        let tableData = document.createElement('td');
+        tableData.setAttribute('rowspan', String(12));
+        tableData.setAttribute('class', `specialday`);
+        let specialTable = document.createElement('table');
+        specialTable.setAttribute('class', 'sched week special');
+        let tbody = document.createElement('tbody');
+        specialTable.appendChild(tbody);
+        tableData.appendChild(specialTable);
+        trElement.appendChild(tableData);
+
+        blocks.forEach((block: Array<any>) => {
+            let inlineParseBlock = InlineParseBlock.parseRawBlock(block, compressionList);
+            // @ts-ignore
+            tbody.appendChild(inlineParseBlock.generateBlockElement());
+        });
+    }
+}
 
 class RegularScheduleRenderer {
 
@@ -187,7 +228,7 @@ class RegularScheduleRenderer {
     appendSchedule(rawDay: any, compressionList: Array<string>) {
         let blocks: Array<Array<any>> = rawDay.blocks;
         blocks.forEach((block: Array<any>) => {
-            let inlineParseBlock = InlineParseBlock.parseRawBlock(block, compressionList);
+            let inlineParseBlock = RegularParseBlock.parseRawBlock(block, compressionList);
             let trElement = this.mainTimeElements[inlineParseBlock.normalTimeIndex];
             trElement.appendChild(inlineParseBlock.generateBlockElement());
         });
@@ -255,7 +296,7 @@ abstract class ParsedBlock {
         if (this.shouldBeColored) {
             let blockNumMatchAttempt = blockLabel.match(/\d/);
             // @ts-ignore
-            this.bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : this.free ? colorDict.free : colorDict[0];
+            this.bgcolor = blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : this.free || this.title === 'Free' || this.title === 'Late Start' ? colorDict.free : colorDict[0];
         }
         return blockLabel;
     }
@@ -266,11 +307,11 @@ abstract class ParsedBlock {
         bgcolor: string,
         title: string,
         subtitle: string,
-        newLine: boolean
+        newLine: boolean, specialPeriod = false
     ) {
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
-        tableData.setAttribute('class', `period mins${mins}`);
+        tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''}`);
         tableData.setAttribute('style', `background: ${bgcolor};`); // todo replace style with css class
         let titleSpan = document.createElement('span');
         titleSpan.setAttribute('class', 'coursename');
@@ -285,7 +326,7 @@ abstract class ParsedBlock {
     }
 }
 
-class InlineParseBlock extends ParsedBlock {
+class RegularParseBlock extends ParsedBlock {
 
     public static parseRawBlock(block: any, compressionList: Array<string>) {
         let title = compressionList[block[0]];
@@ -296,7 +337,7 @@ class InlineParseBlock extends ParsedBlock {
         let mins = block[5];
         let free = block[6];
 
-        return new InlineParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan);
+        return new RegularParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan);
     }
 
     public readonly normalTimeIndex: number;
@@ -310,6 +351,41 @@ class InlineParseBlock extends ParsedBlock {
 
     generateBlockElement() {
         return ParsedBlock.generateBlockElement(this.rowSpan, this.mins, this.bgcolor, this.title, this.subtitle, this.addLineBreak);
+    }
+}
+
+class InlineParseBlock extends ParsedBlock {
+
+    public static parseRawBlock(block: any, compressionList: Array<string>) {
+        let title = compressionList[block[0]];
+        let location = compressionList[block[1]];
+        let blockLabel = block[2];
+        let startTime = new ScheduleTime(0, block[3]);
+        let endTime = new ScheduleTime(0, block[4]);
+        let mins = block[5];
+        let free = block[6];
+        return new InlineParseBlock(title, location, blockLabel, mins, free, startTime, endTime);
+    }
+
+    private readonly startTime: ScheduleTime;
+    private readonly endTime: ScheduleTime;
+
+    constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean, startTime: ScheduleTime, endTime: ScheduleTime) {
+        super(title, location, blockLabel, mins, free);
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
+    generateBlockElement() {
+        let tableRowElement = document.createElement('tr');
+        tableRowElement.setAttribute('class', `mins${this.mins}`);
+        let timeDataElement = document.createElement('td');
+        timeDataElement.setAttribute('class', `times mins${this.mins}`);
+        timeDataElement.appendChild(document.createTextNode(`${format12HourTime(this.startTime)}-${format12HourTime(this.endTime)}`));
+        let blockElement = ParsedBlock.generateBlockElement(1, this.mins, this.bgcolor, this.title, this.subtitle, this.addLineBreak, true);
+        tableRowElement.appendChild(timeDataElement);
+        tableRowElement.appendChild(blockElement);
+        return tableRowElement;
     }
 }
 
