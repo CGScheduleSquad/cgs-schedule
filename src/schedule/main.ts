@@ -9,19 +9,20 @@ import ScheduleCacheManager from './utils/scheduleCacheManager';
 const getClassAsArray = (cl: string) => Array.from(document.getElementsByClassName(cl));
 
 const appendBlankSchedule = (text: string, bgcolor: string, link: string = '') => {
-  let [td, a] = [document.createElement('td'), document.createElement(link === '' ? 'span' : 'a')];
+    let [td, a] = [document.createElement('td'), document.createElement(link === '' ? 'span' : 'a')];
     td.setAttribute('rowspan', '12');
-  td.setAttribute('class', 'period specialday');
-  td.setAttribute('style', `background: ${bgcolor}`);
+    td.setAttribute('class', 'period specialday');
+    td.setAttribute('style', `background: ${bgcolor}`);
     a.setAttribute('class', 'coursename');
-  if (link !== '') a.setAttribute('href', link);
+    if (link !== '') a.setAttribute('href', link);
     a.innerText = text;
     td.appendChild(a);
     // @ts-ignore
     document.querySelector('table.sched.main > tbody > tr:nth-child(2)').appendChild(td);
 };
 
-const format12HourTime = (date: ScheduleTime) => ((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes;
+const format12HourTime = (date: ScheduleTime) =>
+    ((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes;
 
 const colorDict = {
     0: '#C0C0C0',
@@ -82,7 +83,7 @@ Promise.all([
                 oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
                 InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
                 // @ts-ignore
-                oneDay && getClassAsArray('times').forEach(el => el.style.width = '39%'); // TODO: Remove this
+                oneDay && getClassAsArray('times').forEach(el => (el.style.width = '39%')); // TODO: Remove this
                 break;
             case ScheduleDayType.REGULAR:
                 RegularScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
@@ -117,7 +118,7 @@ class InlineScheduleRenderer {
 
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(12));
-      tableData.setAttribute('class', `period specialday`);
+        tableData.setAttribute('class', `period specialday`);
         let specialTable = document.createElement('table');
         specialTable.setAttribute('class', 'sched week special');
         let tbody = document.createElement('tbody');

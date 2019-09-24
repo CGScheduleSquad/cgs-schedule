@@ -24,9 +24,14 @@ export class ScheduleBuilder {
 
             let dayMap = new Map<string, ScheduleDay>();
             blockMap.forEach((rawBlocks: RawBlock[], key: string) => {
-                dayMap.set(key, ScheduleDay.createBlockDay(rawBlocks
-                    .filter(this.contextBlockFilter)
-                    .sort((a: RawBlock, b: RawBlock) => a.startTime.compareTo(b.startTime))));
+                dayMap.set(
+                    key,
+                    ScheduleDay.createBlockDay(
+                        rawBlocks
+                            .filter(this.contextBlockFilter)
+                            .sort((a: RawBlock, b: RawBlock) => a.startTime.compareTo(b.startTime))
+                    )
+                );
             });
 
             return new ScheduleAll(id, dayMap);
@@ -38,7 +43,11 @@ export class ScheduleBuilder {
         if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3) return false;
         return !otherRawBlocks.some(otherBlock => {
             // keep longer description one (TODO: show conflict)
-            return (rawBlock.startTime.equals(otherBlock.startTime) && (rawBlock.title.length < otherBlock.title.length || rawBlock.location.length < otherBlock.location.length));
+            return (
+                rawBlock.startTime.equals(otherBlock.startTime) &&
+                (rawBlock.title.length < otherBlock.title.length ||
+                    rawBlock.location.length < otherBlock.location.length)
+            );
         });
     }
 }
