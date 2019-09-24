@@ -138,8 +138,9 @@ Promise.all([
                 appendBlankSchedule('No Events', colorDict.free);
                 break;
             case ScheduleDayType.INLINE:
-                if (oneDay) $('.times').hide();
+                if (oneDay) $('.times').remove();
                 InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
+                if (oneDay) $('.times').css('width', '39%'); // TODO: Remove this
                 break;
             case ScheduleDayType.REGULAR:
                 RegularScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
