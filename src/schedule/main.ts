@@ -1,7 +1,7 @@
 import { ScheduleRange } from './rendering/scheduleRange';
 import ScheduleDate from './time/scheduleDate';
 import { ScheduleRenderer } from './rendering/scheduleRenderer';
-import { ScheduleDayType } from './structure/scheduleDay';
+import { lateStartAllTimes, ScheduleDayType } from './structure/scheduleDay';
 import ScheduleTime from './time/scheduleTime';
 import ScheduleParamUtils from './utils/scheduleParamUtils';
 import ScheduleCacheManager from './utils/scheduleCacheManager';
@@ -77,6 +77,13 @@ Promise.all([
             case ScheduleDayType.TEXT:
                 appendBlankSchedule('No Events', colorDict.free);
                 break;
+            case ScheduleDayType.LATE_START:
+                // @ts-ignore
+                oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
+                LateStartScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
+                // @ts-ignore
+                oneDay && getClassAsArray('times').forEach(el => el.style.width = '39%'); // TODO: Remove this
+                break;
             case ScheduleDayType.INLINE:
                 // @ts-ignore
                 oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
@@ -126,9 +133,43 @@ class InlineScheduleRenderer {
         trElement.appendChild(tableData);
 
         blocks.forEach((block: Array<any>) => {
-            let inlineParseBlock = InlineParseBlock.parseRawBlock(block, compressionList);
+            let lateStartParseBlock = InlineParseBlock.parseRawBlock(block, compressionList);
             // @ts-ignore
-            tbody.appendChild(inlineParseBlock.generateBlockElement());
+            tbody.appendChild(lateStartParseBlock.generateBlockElement());
+        });
+    }
+}
+
+class LateStartScheduleRenderer {
+    public static getInstance() {
+        if (this.instance === undefined) this.instance = new LateStartScheduleRenderer();
+        return this.instance;
+    }
+
+    private static instance: LateStartScheduleRenderer;
+
+    private constructor() {
+    }
+
+    appendSchedule(rawDay: any, compressionList: Array<string>) {
+        let blocks: Array<Array<any>> = rawDay.blocks;
+        let trElement = document.getElementById(`time-0`);
+        if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
+
+        let tableData = document.createElement('td');
+        tableData.setAttribute('rowspan', String(12));
+        tableData.setAttribute('class', `period specialday`);
+        let specialTable = document.createElement('table');
+        specialTable.setAttribute('class', 'sched week special');
+        let tbody = document.createElement('tbody');
+        specialTable.appendChild(tbody);
+        tableData.appendChild(specialTable);
+        trElement.appendChild(tableData);
+
+        blocks.forEach((block: Array<any>) => {
+            let lateStartParseBlock = LateStartParseBlock.parseRawBlock(block, compressionList);
+            // @ts-ignore
+            tbody.appendChild(lateStartParseBlock.generateBlockElement());
         });
     }
 }
@@ -298,6 +339,64 @@ class RegularParseBlock extends ParsedBlock {
             this.subtitle,
             this.addLineBreak
         );
+    }
+}
+
+class LateStartParseBlock extends ParsedBlock {
+
+    public static parseRawBlock(block: any, compressionList: Array<string>) {
+        let title = compressionList[block[0]];
+        let location = compressionList[block[1]];
+        let blockLabel = block[2];
+        let normalTimeIndex = block[3];
+        let rowSpan = block[4];
+        let mins = block[5];
+        let free = block[6];
+
+        return new LateStartParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan);
+    }
+
+    public readonly normalTimeIndex: number;
+    private readonly rowSpan: number;
+
+    constructor(
+        title: string,
+        location: string,
+        blockLabel: string,
+        mins: string,
+        free: boolean,
+        normalTimeIndex: number,
+        rowSpan: number
+    ) {
+        super(title, location, blockLabel, mins, free);
+        this.normalTimeIndex = normalTimeIndex;
+        this.rowSpan = rowSpan;
+    }
+
+    generateBlockElement() {
+        let tableRowElement = document.createElement('tr');
+        tableRowElement.setAttribute('class', `mins${this.mins}`);
+        let isLateStart = this.title === 'Late Start';
+        let blockElement = ParsedBlock.generateBlockElement(
+            1,
+            this.mins,
+            this.bgcolor,
+            this.title,
+            this.subtitle,
+            this.addLineBreak
+        );
+        if (!isLateStart) {
+            let timeDataElement = document.createElement('td');
+            timeDataElement.setAttribute('class', `times mins${this.mins}`);
+            timeDataElement.appendChild(
+                document.createTextNode(`${format12HourTime(lateStartAllTimes[this.normalTimeIndex])}-${format12HourTime(lateStartAllTimes[this.normalTimeIndex + this.rowSpan])}`)
+            );
+            tableRowElement.appendChild(timeDataElement);
+        } else {
+            blockElement.setAttribute('colspan', '2');
+        }
+        tableRowElement.appendChild(blockElement);
+        return tableRowElement;
     }
 }
 

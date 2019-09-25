@@ -18,8 +18,24 @@ const normalTimes = [new ScheduleTime(8, 0), new ScheduleTime(8, 45), new Schedu
 const schoolEndTime = new ScheduleTime(15, 15);
 const normalAllTimes = normalTimes.concat([schoolEndTime]);
 
+const lateStartTimes = [
+    new ScheduleTime(8, 0),
+    new ScheduleTime(9, 0),
+    new ScheduleTime(9, 45), // TODO: What time does morning flex start? I don't have any morning flex blocks
+    new ScheduleTime(10, 10),
+    new ScheduleTime(10, 30),
+    new ScheduleTime(11, 20),
+    new ScheduleTime(12, 5),
+    new ScheduleTime(12, 30),
+    new ScheduleTime(13, 15),
+    new ScheduleTime(13, 40),
+    new ScheduleTime(14, 30)
+];
+export const lateStartAllTimes = lateStartTimes.concat([schoolEndTime]);
+
+
 export enum ScheduleDayType {
-    REGULAR, INLINE, TEXT
+    REGULAR, INLINE, TEXT, LATE_START
 }
 
 export abstract class ScheduleDay {
@@ -36,7 +52,7 @@ export abstract class ScheduleDay {
     static createBlockDay(rawBlocks: RawBlock[]): ScheduleDay {
         let dayWithDate = rawBlocks.find(rawBlock => rawBlock.date !== null);
         if (dayWithDate === undefined) {
-            throw new Error('No blocks contain a day! This should be impossible.');
+            throw new Error('Assertion Failed: No blocks contain a date!');
         }
         let dayDate = dayWithDate.date;
 
@@ -46,6 +62,12 @@ export abstract class ScheduleDay {
         if (this.isRegularDay(rawBlocks)) {
             // @ts-ignore
             return RegularDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
+        } else if (this.isLateStartDay(rawBlocks)) {
+            // @ts-ignore
+            let lateStartDay = LateStartDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
+            // @ts-ignore
+            if (lateStartDay === null) return InlineDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
+            return lateStartDay;
         } else {
             // @ts-ignore
             return InlineDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
@@ -60,6 +82,17 @@ export abstract class ScheduleDay {
             // TODO: time comparators
                 return true;
             return normalTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
+        });
+    }
+
+    private static isLateStartDay(rawBlocks: RawBlock[]) {
+        return rawBlocks.every(block => {
+            let startHours = block.startTime.hours;
+            let startMinutes = block.startTime.minutes;
+            if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
+            // TODO: time comparators
+                return true;
+            return lateStartTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
         });
     }
 
@@ -136,6 +169,71 @@ class RegularDay extends ScheduleDay {
     }
 }
 
+class LateStartDay extends ScheduleDay {
+    blocks: RegularDayBlock[];
+
+    constructor(date: ScheduleDate, dayMeta: ScheduleDayMeta, blocks: RegularDayBlock[]) {
+        super(date, dayMeta);
+        this.blocks = blocks;
+    }
+
+    static fromRawBlocks(date: ScheduleDate, dayMeta: ScheduleDayMeta, sortedRawBlocks: RawBlock[]): LateStartDay | null {
+        let regularDayBlocks = new Array<RegularDayBlock>();
+        let timeIndex = 0;
+        // if (date.toString() === '2019-9-23') debugger;
+
+        let result = sortedRawBlocks.every((rawBlock: RawBlock) => {
+            while (timeIndex < lateStartTimes.length && rawBlock.startTime.totalMinutes > lateStartTimes[timeIndex].totalMinutes) {
+                let title = 'Free';
+                let label = '';
+                switch (timeIndex) {
+                    case 0:
+                        title = 'Late Start';
+                        break;
+                    case 2:
+                        label = 'Early Flex';
+                        break;
+                    case 6:
+                        label = 'AM Flex';
+                        break;
+                    case 8:
+                        label = 'PM Flex';
+                        break;
+                }
+                let rowSpan = 1; // TODO: free block merging
+                let durationMins = Math.min(Math.max(lateStartAllTimes[timeIndex + rowSpan].totalMinutes - lateStartAllTimes[timeIndex].totalMinutes, 5), 90); // double sided constrain
+                regularDayBlocks.push(new RegularDayBlock(title, '', label, timeIndex, rowSpan, durationMins, true));
+                timeIndex++;
+            }
+
+            if (timeIndex >= lateStartTimes.length) return true;
+
+            let rowSpan = 1;
+            if (timeIndex < lateStartTimes.length - 1 && (rawBlock.label.match(/.L/) !== null)) {
+                rowSpan++;
+            }
+            if (lateStartTimes[timeIndex].totalMinutes !== rawBlock.startTime.totalMinutes) {
+                console.log('Assertion Failed: Day matched as regular day but was going to display incorrect time!');
+                return false;
+            }
+            let durationMins = Math.min(Math.max(lateStartAllTimes[timeIndex + rowSpan].totalMinutes - lateStartAllTimes[timeIndex].totalMinutes, 5), 90); // double sided constrain
+            regularDayBlocks.push(new RegularDayBlock(rawBlock.title, rawBlock.location, rawBlock.label, timeIndex, rowSpan, durationMins, false));
+            timeIndex += rowSpan;
+            return true;
+        });
+        if (!result) {
+            return null;
+        }
+
+        // console.log(regularDayBlocks); debugger;
+        return new LateStartDay(date, dayMeta, regularDayBlocks);
+    }
+
+    getType(): ScheduleDayType {
+        return ScheduleDayType.LATE_START;
+    }
+}
+
 class InlineDay extends ScheduleDay {
     blocks: InlineDayBlock[];
     lateStart: boolean;
@@ -148,7 +246,7 @@ class InlineDay extends ScheduleDay {
 
     static fromRawBlocks(date: ScheduleDate, dayMeta: ScheduleDayMeta, sortedRawBlocks: RawBlock[]): InlineDay {
         if (!sortedRawBlocks[0].startTime.equals(normalTimes[0])) {
-            sortedRawBlocks.unshift(new RawBlock('Late Start', '', '', date, dayMeta, normalTimes[0], sortedRawBlocks[0].startTime));
+            sortedRawBlocks.unshift(new RawBlock('Free', '', '', date, dayMeta, normalTimes[0], sortedRawBlocks[0].startTime));
         }
 
         let inlineDayBlocks = new Array<InlineDayBlock>();
