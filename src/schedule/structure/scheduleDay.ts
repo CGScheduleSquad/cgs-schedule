@@ -90,7 +90,7 @@ export abstract class ScheduleDay {
         }
     }
 
-    private static isRegularDay(rawBlocks: RawBlock[]) {
+    private static isRegularDay(rawBlocks: RawBlock[]): boolean {
         return rawBlocks.every(block => {
             let startHours = block.startTime.hours;
             let startMinutes = block.startTime.minutes;
@@ -101,7 +101,7 @@ export abstract class ScheduleDay {
         });
     }
 
-    private static isLateStartDay(rawBlocks: RawBlock[]) {
+    private static isLateStartDay(rawBlocks: RawBlock[]): boolean {
         return rawBlocks.every(block => {
             let startHours = block.startTime.hours;
             let startMinutes = block.startTime.minutes;
@@ -301,9 +301,7 @@ class LateStartDay extends ScheduleDay {
         return new LateStartDay(date, dayMeta, regularDayBlocks);
     }
 
-    getType(): ScheduleDayType {
-        return ScheduleDayType.LATE_START;
-    }
+    getType = (): ScheduleDayType => ScheduleDayType.LATE_START;
 }
 
 class InlineDay extends ScheduleDay {
@@ -374,7 +372,5 @@ export class TextDay extends ScheduleDay {
         this.url = url;
     }
 
-    getType(): ScheduleDayType {
-        return ScheduleDayType.TEXT;
-    }
+    getType = (): ScheduleDayType => ScheduleDayType.TEXT;
 }
