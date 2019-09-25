@@ -6,13 +6,23 @@ export class ScheduleRenderer {
         // @ts-ignore
         let schedarea = document.getElementById('schedarea').firstElementChild;
         // @ts-ignore
-        schedarea.setAttribute('class', `${schedarea.getAttribute('class')} ${range.viewMode === ViewMode.Week ? 'week' : 'today'}`);
+        schedarea.setAttribute(
+            'class',
+            // @ts-ignore
+            `${schedarea.getAttribute('class')} ${range.viewMode === ViewMode.Week ? 'week' : 'today'}`
+        );
         // left/right arrows
         let navigationArrows = document.querySelectorAll('td.arrows a');
         // @ts-ignore
-        navigationArrows[0].setAttribute('href', `?date=${range.previousDate.toString()}&range=${viewMode}&cal=${calendarUUID}`);
+        navigationArrows[0].setAttribute(
+            'href',
+            `?date=${range.previousDate.toString()}&range=${viewMode}&cal=${calendarUUID}`
+        );
         // @ts-ignore
-        navigationArrows[1].setAttribute('href', `?date=${range.nextDate.toString()}&range=${viewMode}&cal=${calendarUUID}`);
+        navigationArrows[1].setAttribute(
+            'href',
+            `?date=${range.nextDate.toString()}&range=${viewMode}&cal=${calendarUUID}`
+        );
 
         // this week
         // @ts-ignore
@@ -20,6 +30,11 @@ export class ScheduleRenderer {
         // @ts-ignore
         document.getElementById('this-week').firstElementChild.setAttribute('href', `?range=week&cal=${calendarUUID}`);
         // @ts-ignore
-        document.getElementById('my-portal').setAttribute('href', `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${range.startDate.toString()}`);
+        document
+            .getElementById('my-portal')
+            .setAttribute(
+                'href',
+                `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${range.startDate.toString()}`
+            );
     }
 }
