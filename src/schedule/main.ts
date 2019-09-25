@@ -83,7 +83,7 @@ Promise.all([
                 oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
                 LateStartScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
                 // @ts-ignore
-                oneDay && getClassAsArray('times').forEach(el => el.style.width = '39%'); // TODO: Remove this
+                oneDay && getClassAsArray('times').forEach(el => (el.style.width = '39%')); // TODO: Remove this
                 break;
             case ScheduleDayType.INLINE:
                 // @ts-ignore
@@ -149,8 +149,7 @@ class LateStartScheduleRenderer {
 
     private static instance: LateStartScheduleRenderer;
 
-    private constructor() {
-    }
+    private constructor() {}
 
     appendSchedule(rawDay: any, compressionList: Array<string>) {
         let blocks: Array<Array<any>> = rawDay.blocks;
@@ -283,7 +282,8 @@ abstract class ParsedBlock {
         subtitle: string,
         newLine: boolean,
         specialPeriod = false
-    ): any { // What data type is tableData?
+    ): any {
+        // What data type is tableData?
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
         tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''}`);
@@ -344,7 +344,6 @@ class RegularParseBlock extends ParsedBlock {
 }
 
 class LateStartParseBlock extends ParsedBlock {
-
     public static parseRawBlock(block: any, compressionList: Array<string>) {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
@@ -390,7 +389,11 @@ class LateStartParseBlock extends ParsedBlock {
             let timeDataElement = document.createElement('td');
             timeDataElement.setAttribute('class', `times mins${this.mins}`);
             timeDataElement.appendChild(
-                document.createTextNode(`${format12HourTime(lateStartAllTimes[this.normalTimeIndex])}-${format12HourTime(lateStartAllTimes[this.normalTimeIndex + this.rowSpan])}`)
+                document.createTextNode(
+                    `${format12HourTime(lateStartAllTimes[this.normalTimeIndex])}-${format12HourTime(
+                        lateStartAllTimes[this.normalTimeIndex + this.rowSpan]
+                    )}`
+                )
             );
             tableRowElement.appendChild(timeDataElement);
         } else {

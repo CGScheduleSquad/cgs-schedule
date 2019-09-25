@@ -31,6 +31,7 @@ const lateStartTimes = [
     new ScheduleTime(13, 40),
     new ScheduleTime(14, 30)
 ];
+
 export const lateStartAllTimes = lateStartTimes.concat([schoolEndTime]);
 
 
