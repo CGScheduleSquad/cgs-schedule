@@ -90,23 +90,25 @@ export abstract class ScheduleDay {
         }
     }
 
-    private static isRegularDay = (rawBlocks: RawBlock[]): boolean => rawBlocks.every(block => {
-        let startHours = block.startTime.hours;
-        let startMinutes = block.startTime.minutes;
-        if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
-            // TODO: time comparators
-            return true;
-        return normalTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
-    });
+    private static isRegularDay = (rawBlocks: RawBlock[]): boolean =>
+        rawBlocks.every(block => {
+            let startHours = block.startTime.hours;
+            let startMinutes = block.startTime.minutes;
+            if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
+                // TODO: time comparators
+                return true;
+            return normalTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
+        });
 
-    private static isLateStartDay = (rawBlocks: RawBlock[]): boolean => rawBlocks.every(block => {
-        let startHours = block.startTime.hours;
-        let startMinutes = block.startTime.minutes;
-        if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
-            // TODO: time comparators
-            return true;
-        return lateStartTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
-    });
+    private static isLateStartDay = (rawBlocks: RawBlock[]): boolean =>
+        rawBlocks.every(block => {
+            let startHours = block.startTime.hours;
+            let startMinutes = block.startTime.minutes;
+            if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
+                // TODO: time comparators
+                return true;
+            return lateStartTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
+        });
 
     abstract getType(): ScheduleDayType;
 

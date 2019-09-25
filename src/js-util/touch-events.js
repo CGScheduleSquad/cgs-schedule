@@ -111,8 +111,8 @@ window.determineSwipeDirection = () => {
 
 window.processingRoutine = () => {
     if (swipeDirection === 'left') {
-        window.location.href = document.getElementsByClassName('arrows')[1].childNodes[0].getAttribute("href");
+        window.location.href = document.getElementsByClassName('arrows')[1].childNodes[0].getAttribute('href');
     } else if (swipeDirection === 'right') {
-        window.location.href = document.getElementsByClassName('arrows')[0].childNodes[0].getAttribute("href");
+        window.location.href = document.getElementsByClassName('arrows')[0].childNodes[0].getAttribute('href');
     }
 };

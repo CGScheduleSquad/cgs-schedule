@@ -89,7 +89,7 @@ export class VeracrossICalUtils {
         return i > -1 ? ScheduleDate.fromDate(new Date(matrix[i][3])) : null;
     }
 
-    static getTitle(matrix: any): string[] | string {
+    static getTitle(matrix: any): any {
         let i = VeracrossICalUtils.inMatrix('summary', matrix);
         return i > -1 ? matrix[i][3].split(' - ')[0] : 'N/A';
     }

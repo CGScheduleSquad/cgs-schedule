@@ -22,8 +22,13 @@ export class VeracrossICSRawBlockSource implements RawBlockSource {
                     let letter = VeracrossICalUtils.getLetter(event[1]);
                     let label = VeracrossICalUtils.getLabel(event[1]);
 
-                    if (date === null || endTime === null || startTime === null || title.match(/Morning Choir/) !== null // TODO: Remove custom rules
-                    ) return null;
+                    if (
+                        date === null ||
+                        endTime === null ||
+                        startTime === null ||
+                        title.match(/Morning Choir/) !== null // TODO: Remove custom rules
+                    )
+                        return null;
 
                     return new RawBlock(title, location, label, date, new ScheduleDayMeta(letter), startTime, endTime);
                 })

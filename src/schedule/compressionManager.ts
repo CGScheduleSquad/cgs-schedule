@@ -1,4 +1,4 @@
-export class CompressionManager {
+export default class CompressionManager {
     static compressionList: Array<string>;
 
     static processCompressString(inString: string): number {

@@ -1,7 +1,8 @@
 import ScheduleDate from '../time/scheduleDate';
 
 export enum ViewMode {
-    Day = 1, Week = 5
+    Day = 1,
+    Week = 5
 }
 
 export class ScheduleRange {
