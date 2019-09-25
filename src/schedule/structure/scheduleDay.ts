@@ -90,27 +90,23 @@ export abstract class ScheduleDay {
         }
     }
 
-    private static isRegularDay(rawBlocks: RawBlock[]): boolean {
-        return rawBlocks.every(block => {
-            let startHours = block.startTime.hours;
-            let startMinutes = block.startTime.minutes;
-            if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
-                // TODO: time comparators
-                return true;
-            return normalTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
-        });
-    }
+    private static isRegularDay = (rawBlocks: RawBlock[]): boolean => rawBlocks.every(block => {
+        let startHours = block.startTime.hours;
+        let startMinutes = block.startTime.minutes;
+        if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
+            // TODO: time comparators
+            return true;
+        return normalTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
+    });
 
-    private static isLateStartDay(rawBlocks: RawBlock[]): boolean {
-        return rawBlocks.every(block => {
-            let startHours = block.startTime.hours;
-            let startMinutes = block.startTime.minutes;
-            if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
-                // TODO: time comparators
-                return true;
-            return lateStartTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
-        });
-    }
+    private static isLateStartDay = (rawBlocks: RawBlock[]): boolean => rawBlocks.every(block => {
+        let startHours = block.startTime.hours;
+        let startMinutes = block.startTime.minutes;
+        if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3)
+            // TODO: time comparators
+            return true;
+        return lateStartTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
+    });
 
     abstract getType(): ScheduleDayType;
 
@@ -301,7 +297,9 @@ class LateStartDay extends ScheduleDay {
         return new LateStartDay(date, dayMeta, regularDayBlocks);
     }
 
-    getType = (): ScheduleDayType => ScheduleDayType.LATE_START;
+    getType(): ScheduleDayType {
+        return ScheduleDayType.LATE_START;
+    }
 }
 
 class InlineDay extends ScheduleDay {
@@ -372,5 +370,7 @@ export class TextDay extends ScheduleDay {
         this.url = url;
     }
 
-    getType = (): ScheduleDayType => ScheduleDayType.TEXT;
+    getType(): ScheduleDayType {
+        return ScheduleDayType.TEXT;
+    }
 }
