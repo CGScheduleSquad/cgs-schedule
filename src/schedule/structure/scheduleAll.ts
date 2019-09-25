@@ -28,10 +28,11 @@ export class ScheduleAll {
         });
     }
 
-    static dayMapToObj(strMap: Map<string, ScheduleDay>) {
+    static dayMapToObj(strMap: Map<string, ScheduleDay>): object {
         CompressionManager.resetCompressionList();
-        let obj = Object.create(null);
+        let obj = {};
         strMap.forEach((day: ScheduleDay, dateString: string) => {
+            // @ts-ignore
             obj[dateString] = day;
         });
         return obj;
