@@ -25,7 +25,7 @@ export default class JSONRawBlockSource implements RawBlockSource {
             resolve(rawBlocks);
         });
 
-    private static parseVeracrossTime(timeString: string) {
+    private static parseVeracrossTime(timeString: string): Date {
         let isPm = timeString.includes('pm');
         timeString = timeString.replace(/[ap]m/g, '');
         let splitString = timeString.split(':');
