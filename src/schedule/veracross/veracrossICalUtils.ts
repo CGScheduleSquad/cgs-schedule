@@ -2,41 +2,44 @@ import ScheduleTime from '../time/scheduleTime';
 import ScheduleDate from '../time/scheduleDate';
 
 export class VeracrossICalUtils {
-    static getVeracrossCalendarFromUUID(calendarUUID: string): Promise<any> {
-        return VeracrossICalUtils.corsGetPromise(`http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics`).then(icsFile => {
-            // @ts-ignore
-            return ICAL.parse(icsFile)[2].filter((a: any) => a[1].length === 8);
-        });
-    }
+    static getVeracrossCalendarFromUUID = (calendarUUID: string): Promise<any> =>
+        VeracrossICalUtils.corsGetPromise(`http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics`).then(
+            icsFile => {
+                // @ts-ignore
+                return ICAL.parse(icsFile)[2].filter((a: any) => a[1].length === 8);
+            }
+        );
 
-    private static corsGetPromise(url: string) {
+    private static corsGetPromise(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
-            $.get('https://cors-anywhere.herokuapp.com/' + url, httpText => {
-                resolve(httpText);
-            }).fail(() => {
-                reject();
-            });
+            let request = new XMLHttpRequest();
+            request.open('GET', `https://cors-anywhere.herokuapp.com/${url}`, true);
+            request.onload = function() {
+                if (this.status >= 200 && this.status < 400) {
+                    resolve(this.response);
+                } else {
+                    reject();
+                }
+            };
+            request.onerror = () => reject();
+            request.send();
         });
     }
 
-    // @ts-ignore
-    static inMatrix(query, matrix) {
+    private static inMatrix(query: any, matrix: [[]]): number {
         let res = -1;
-        // @ts-ignore
-        matrix.forEach((el, i) => {
+        matrix.forEach((el: any, i: number) => {
             if (el.includes(query)) res = i;
         });
         return res;
     }
 
-    // @ts-ignore
-    private static getDescription(matrix) {
+    private static getDescription(matrix: any): any {
         let i = VeracrossICalUtils.inMatrix('description', matrix);
         let description = [];
         if (i > -1) {
             let raw = matrix[i][3];
-            // @ts-ignore
-            description = raw.split('; ').map(b => {
+            description = raw.split('; ').map((b: string) => {
                 let kv = b.split(': ');
                 if (kv.length > 2) {
                     for (let i = 2; i < kv.length; i++) kv[1] += `: ${kv[i]}`;
@@ -47,10 +50,12 @@ export class VeracrossICalUtils {
         return description;
     }
 
-    static getLocation(event: any) {
+    static getLocation(event: any): string {
         let location = VeracrossICalUtils.getDescription(event)[2].Room;
         let replacements = {
-            'Math: ': '', 'Science Lab ': '', Library: 'Lib'
+            'Math: ': '',
+            'Science Lab ': '',
+            Library: 'Lib'
         };
         Object.entries(replacements).forEach(entry => {
             location = location.replace(entry[0], entry[1]);
@@ -58,40 +63,33 @@ export class VeracrossICalUtils {
         return location;
     }
 
-    static getLetter(event: any) {
+    static getLetter(event: any): string {
         let letter = VeracrossICalUtils.getDescription(event)[1].Day.match(/US Day [A-Z]/);
         letter = letter !== null ? letter[0].charAt(letter[0].length - 1) : '';
         return letter;
     }
 
-    static getLabel(event: any) {
-        return VeracrossICalUtils.getDescription(event)[0].Block;
-    }
+    static getLabel = (event: any): string => VeracrossICalUtils.getDescription(event)[0].Block;
 
-    // @ts-ignore
-    private static getDT(time, matrix) {
+    private static getDT(time: string, matrix: any): ScheduleTime | null {
         let i = VeracrossICalUtils.inMatrix(`dt${time}`, matrix);
         return i > -1 ? ScheduleTime.fromDate(new Date(matrix[i][3])) : null;
     }
 
-    // @ts-ignore
-    static getStartTime(matrix) {
+    static getStartTime(matrix: any): ScheduleTime | null {
         return this.getDT('start', matrix);
     }
 
-    // @ts-ignore
-    static getEndTime(matrix) {
+    static getEndTime(matrix: any): ScheduleTime | null {
         return this.getDT('end', matrix);
     }
 
-    // @ts-ignore
-    static getDate(matrix) {
+    static getDate(matrix: any): ScheduleDate | null {
         let i = VeracrossICalUtils.inMatrix(`dtstart`, matrix);
         return i > -1 ? ScheduleDate.fromDate(new Date(matrix[i][3])) : null;
     }
 
-    // @ts-ignore
-    static getTitle(matrix) {
+    static getTitle(matrix: any): string[] | string {
         let i = VeracrossICalUtils.inMatrix('summary', matrix);
         return i > -1 ? matrix[i][3].split(' - ')[0] : 'N/A';
     }
