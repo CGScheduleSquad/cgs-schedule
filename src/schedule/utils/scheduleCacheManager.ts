@@ -1,7 +1,7 @@
 import { ScheduleAll } from '../structure/scheduleAll';
 import { ScheduleBuilder } from '../building/scheduleBuilder';
 import { VeracrossICSRawBlockSource } from '../veracross/veracrossICSRawBlockSource';
-import { JsonRawBlockSource } from '../json/jsonRawBlockSource';
+import JSONRawBlockSource from '../json/jsonRawBlockSource';
 
 export default class ScheduleCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'scheduleEvents';
@@ -41,7 +41,7 @@ export default class ScheduleCacheManager {
         return ScheduleBuilder.generateScheduleFromBlockSources(
             calendarUUID,
             new VeracrossICSRawBlockSource(calendarUUID),
-            new JsonRawBlockSource()
+            new JSONRawBlockSource()
         ).then((schedule: ScheduleAll) => {
             let jsonString = JSON.stringify(schedule);
             localStorage.setItem('scheduleEvents', jsonString);
