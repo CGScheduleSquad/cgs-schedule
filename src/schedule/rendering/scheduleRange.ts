@@ -40,7 +40,7 @@ export class ScheduleRange {
         }
     }
 
-    getDatesForWeek() {
+    getDatesForWeek(): ScheduleDate[] {
         // [2019-9-16, 2019-9-17, etc...]
         let tempDate = this.startDate.copy();
         let dates = [];
@@ -51,7 +51,7 @@ export class ScheduleRange {
         return dates;
     }
 
-    private static getLastFriday(date: ScheduleDate) {
+    private static getLastFriday(date: ScheduleDate): ScheduleDate {
         let d = date.copy();
         let day = d.getDay();
         let diff = day <= 5 ? 7 - 5 + day : day - 5;
