@@ -1,6 +1,6 @@
 import { ScheduleRange } from './rendering/scheduleRange';
 import ScheduleDate from './time/scheduleDate';
-import { ScheduleRenderer } from './rendering/scheduleRenderer';
+import ScheduleRenderer from './rendering/scheduleRenderer';
 import { lateStartAllTimes, ScheduleDayType } from './structure/scheduleDay';
 import ScheduleTime from './time/scheduleTime';
 import ScheduleParamUtils from './utils/scheduleParamUtils';
@@ -63,7 +63,7 @@ Promise.all([
         td.setAttribute('class', 'daylabel');
         a.setAttribute(
             'href',
-            `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}`
+            `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}` // TODO: faculty
         );
         b.innerText = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
             (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;

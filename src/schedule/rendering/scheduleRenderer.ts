@@ -1,6 +1,6 @@
 import { ScheduleRange, ViewMode } from './scheduleRange';
 
-export class ScheduleRenderer {
+export default class ScheduleRenderer {
     static updateLinks(calendarUUID: string, range: ScheduleRange): void {
         let viewMode = range.viewMode === ViewMode.Day ? 'day' : 'week';
         // @ts-ignore
