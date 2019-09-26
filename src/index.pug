@@ -12,39 +12,36 @@ html
     section.section
       div.container
         div
-          h1.title.is-1.has-text-centered.has-text-weight-bold Classic CGS Schedule
-          h4.subtitle.is-3.has-text-centered.has-text-weight-bold Written by Liam Wang and Tristan Peng
+            h1.title.is-1.has-text-centered.has-text-weight-light Classic CGS Schedule
+            h4.subtitle.is-3.has-text-centered.has-text-weight-light Written by Liam Wang and Tristan Peng
         hr
         form.needs-validation(novalidate)
           h2.title.is-4 Getting Started
           h6.is-size-5.has-text-weight-semibold Step 1:
-          p Once you are signed in, click here:&nbsp;
+            p Sign in to your Veracross portal and navigate to this page:&nbsp;
             a(href = 'https://portals.veracross.com/catlin/student/calendar/subscribe/mine' target = '_blank') My Calendars
           br
           h6.is-size-5.has-text-weight-semibold Step 2:
           p Right-click on the&nbsp;
-            kbd Subscribe
+              code Subscribe
             | &nbsp;button next to the&nbsp;
-            kbd All Classes
+              code All Classes
             | &nbsp;entry under&nbsp;
-            kbd Class Schedules
+              code Class Schedules
             | &nbsp;and click&nbsp;
-            kbd Copy Link Address
+              code Copy Link Address
             | .
           br
           h6.is-size-5.has-text-weight-semibold Step 3:
           div.field
-            label.label(for = 'allClassesUrl') Paste the link into the box below:
+              label.label.has-text-weight-normal(for = 'allClassesUrl') Paste the link into the box below:
             input#allClassesUrl.input(
               placeholder = 'webcal://api.veracross.com/catlin/subscribe/XXXXXXXX...',
               required,
               pattern = 'webcal:\\/\\/api.veracross.com\\/catlin\\/subscribe\\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}.ics\\?uid=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
             )
-            p#invalid.help.is-danger(style = 'display: none;') Invalid calendar link. Please check the instructions above and try again.
-            br
-            br
-            button.button.is-success.is-large.is-fullwidth(type = 'submit') Generate Schedule Link
-          br
+              p#invalid.help.is-danger(style = 'display: none; position: absolute') Invalid calendar link. Please check the instructions above and try again.
+              button.button.is-link.is-large.is-fullwidth(type = 'submit', style='margin-top: 1.2em') Generate Schedule Link
           h6.is-size-5.has-text-weight-semibold Step 4:
           p
             | Bookmark the schedule link once it is generated. If you want your schedule on your phone, just text yourself the link!
