@@ -1,3 +1,8 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+body, .controls {
+    font-family: Roboto, sans-serif !important;
+}
+
 table.sched.main {
     border-collapse: separate;
     border-spacing: 6px !important;
