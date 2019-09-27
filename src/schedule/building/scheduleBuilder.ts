@@ -38,16 +38,11 @@ export class ScheduleBuilder {
         });
     }
 
-    private static contextBlockFilter(rawBlock: RawBlock, _: any, otherRawBlocks: RawBlock[]): boolean {
+    private static contextBlockFilter(rawBlock: RawBlock, index: number, otherRawBlocks: RawBlock[]): boolean {
         let startHours = rawBlock.startTime.hours;
         if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3) return false;
-        return !otherRawBlocks.some(otherBlock => {
-            // keep longer description one (TODO: show conflict)
-            return (
-                rawBlock.startTime.equals(otherBlock.startTime) &&
-                (rawBlock.title.length < otherBlock.title.length ||
-                    rawBlock.location.length < otherBlock.location.length)
-            );
-        });
+
+        // TODO: Add block keeping preferences
+        return otherRawBlocks.findIndex((value: RawBlock) => rawBlock.startTime.equals(value.startTime)) >= index;
     }
 }
