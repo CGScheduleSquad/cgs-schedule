@@ -1,5 +1,6 @@
 import ScheduleDate from '../time/scheduleDate';
 import { ViewMode } from '../rendering/scheduleRange';
+import ScheduleTime from '../time/scheduleTime';
 
 export default class ScheduleParamUtils {
     static getCalendarUUID(): string {
@@ -14,7 +15,7 @@ export default class ScheduleParamUtils {
 
     static getSeedDate(): ScheduleDate {
         const dateString = ScheduleParamUtils.getUrlParam('date');
-        return dateString !== null ? ScheduleDate.fromString(dateString) : ScheduleDate.now();
+        return dateString !== null ? ScheduleDate.fromString(dateString) : (ScheduleTime.now().hours < 3 ? ScheduleDate.now() : ScheduleDate.now().setDate(ScheduleDate.now().getDate()+1));
     }
 
     static getViewMode(): ViewMode {
