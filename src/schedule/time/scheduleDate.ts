@@ -20,7 +20,10 @@ export default class ScheduleDate {
 
     getDate = (): number => this.date.getDate();
 
-    setDate = (date: number) => this.date.setDate(date);
+    setDate = (date: number) => {
+        this.date.setDate(date);
+        return this;
+    };
 
     getFullYear = (): number => this.date.getFullYear();
 

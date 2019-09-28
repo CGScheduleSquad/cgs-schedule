@@ -1,4 +1,5 @@
 export default class ScheduleTime {
+    static now = (): ScheduleTime => ScheduleTime.fromDate(new Date());
     static fromDate = (date: Date): ScheduleTime => new ScheduleTime(date.getHours(), date.getMinutes());
 
     readonly totalMinutes: number;
