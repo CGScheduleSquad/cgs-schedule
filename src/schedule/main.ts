@@ -11,8 +11,7 @@ const getClassAsArray = (cl: string) => Array.from(document.getElementsByClassNa
 const appendBlankSchedule = (text: string, bgcolor: string, link: string = ''): void => {
     let [td, a] = [document.createElement('td'), document.createElement(link === '' ? 'span' : 'a')];
     td.setAttribute('rowspan', '12');
-    td.setAttribute('class', 'period specialday');
-    td.setAttribute('style', `background: ${bgcolor}`);
+    td.setAttribute('class', `period specialday ${bgcolor}`);
     a.setAttribute('class', 'coursename');
     if (link !== '') a.setAttribute('href', link);
     a.innerText = text;
@@ -24,16 +23,17 @@ const appendBlankSchedule = (text: string, bgcolor: string, link: string = ''): 
 const format12HourTime = (date: ScheduleTime): string =>
     ((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes;
 
-const colorDict = {
-    0: '#C0C0C0',
-    1: '#FFCE51',
-    2: '#A67FB9',
-    3: '#E67326',
-    4: '#00ABBD',
-    5: '#AAC02C',
-    6: '#EF4957',
-    7: '#FF75F2',
-    free: 'white'
+
+const colorClasses = {
+    0: 'blk-activity',
+    1: 'blk-1',
+    2: 'blk-2',
+    3: 'blk-3',
+    4: 'blk-4',
+    5: 'blk-5',
+    6: 'blk-6',
+    7: 'blk-7',
+    free: 'blk-free'
 };
 
 let calendarUUID = ScheduleParamUtils.getCalendarUUID();
@@ -76,7 +76,7 @@ Promise.all([
 
         switch (rawDay.type) {
             case ScheduleDayType.TEXT:
-                appendBlankSchedule('No Events', colorDict.free);
+                appendBlankSchedule('No Events', colorClasses.free);
                 break;
             case ScheduleDayType.LATE_START:
                 // @ts-ignore
@@ -297,14 +297,14 @@ abstract class ParsedBlock {
 
         let freeNames = ['Free', 'Late Start', 'Break', 'Lunch']; // TODO: get rid of this
         if (this.free || freeNames.some(name => name === this.title)) {
-            this.bgcolor = colorDict.free;
+            this.bgcolor = colorClasses.free;
         } else if (this.shouldBeColored) {
             let blockNumMatchAttempt = blockLabel.match(/\d/);
             this.bgcolor =
                 // @ts-ignore
-                blockNumMatchAttempt !== null ? colorDict[parseInt(blockNumMatchAttempt[0].slice(-1))] : colorDict[0];
+                blockNumMatchAttempt !== null ? colorClasses[parseInt(blockNumMatchAttempt[0].slice(-1))] : colorClasses[0];
         } else {
-            this.bgcolor = colorDict[0];
+            this.bgcolor = colorClasses[0];
         }
         return blockLabel;
     }
@@ -321,8 +321,7 @@ abstract class ParsedBlock {
         // What data type is tableData?
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
-        tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''}`);
-        tableData.setAttribute('style', `background: ${bgcolor};`); // todo replace style with css class
+        tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor}`);
         let titleSpan = document.createElement('span');
         titleSpan.setAttribute('class', 'coursename');
         titleSpan.appendChild(document.createTextNode(title));

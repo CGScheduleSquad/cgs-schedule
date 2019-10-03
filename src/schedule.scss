@@ -312,3 +312,21 @@ td.controls.links {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+
+$icons: (
+        1: #FFCE51,
+        2: #A67FB9,
+        3: #E67326,
+        4: #00ABBD,
+        5: #AAC02C,
+        6: #EF4957,
+        7: #FF75F2,
+        activity: #C0C0C0,
+        free: #FFFFFF
+);
+
+@each $name, $color in $icons {
+  .blk-#{$name} {
+    background: $color;
+  }
+}

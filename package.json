@@ -29,6 +29,7 @@
     "prettier": "^1.18.2",
     "pug": "^2.0.4",
     "pug-loader": "^2.4.0",
+    "sass": "^1.23.0",
     "typescript": "^2.9.2"
   },
   "dependencies": {
