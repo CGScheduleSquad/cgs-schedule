@@ -106,7 +106,42 @@ Promise.all([
     document.getElementById('schedarea').style.display = 'block';
 
     ScheduleRenderer.updateLinks(calendarUUID, range);
+
+    scheduleLinksGAPI().then((value => {
+        let thing = JSON.parse(value);
+        let linkObject = {};
+        thing.forEach(thing => {
+            if (thing.length > 1) {
+                linkObject[thing[0]] = thing.slice(1);
+            }
+        })
+
+        $(".coursename").each((index, thing) => {
+            if (linkObject[thing.innerText] !== undefined) {
+                $(thing.parentElement).on( "click", () => {
+                    window.open(linkObject[thing.innerText][0], '_blank');
+                })
+            }
+        })
+
+    }))
 });
+
+function scheduleLinksGAPI(): Promise<string> {
+    return new Promise((resolve, reject) => {
+        let request = new XMLHttpRequest();
+        request.open('GET', `https://cgs-schedule.herokuapp.com/`, true);
+        request.onload = function() {
+            if (this.status >= 200 && this.status < 400) {
+                resolve(this.response);
+            } else {
+                reject();
+            }
+        };
+        request.onerror = () => reject();
+        request.send();
+    });
+}
 
 class InlineScheduleRenderer {
     public static getInstance(): InlineScheduleRenderer {
