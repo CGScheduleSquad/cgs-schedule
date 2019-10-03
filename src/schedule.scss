@@ -325,8 +325,28 @@ $icons: (
         free: #FFFFFF
 );
 
+/* @include transition(all,2s,ease-out); */
+@mixin transition($what: all, $time: 0.2s, $how: ease-in-out) {
+  -webkit-transition: $what $time $how;
+  -moz-transition: $what $time $how;
+  -ms-transition: $what $time $how;
+  -o-transition: $what $time $how;
+  transition: $what $time $how;
+}
+
 @each $name, $color in $icons {
   .blk-#{$name} {
-    background: $color;
+    @include transition (all, 0.05s, ease);
+    background-color: $color;
+
+    &.has-link {
+      &:hover {
+        background-color: mix($color, black, 90%);
+      }
+
+      &:active {
+        background-color: mix($color, black, 70%);
+      }
+    }
   }
 }

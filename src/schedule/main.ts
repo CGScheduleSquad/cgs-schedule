@@ -118,9 +118,11 @@ Promise.all([
 
         $(".coursename").each((index, thing) => {
             if (linkObject[thing.innerText] !== undefined) {
-                $(thing.parentElement).on( "click", () => {
+                let htmlElement = $(thing.parentElement);
+                htmlElement.addClass('has-link');
+                htmlElement.on('click', (a) => {
                     window.open(linkObject[thing.innerText][0], '_blank');
-                })
+                });
             }
         })
 
