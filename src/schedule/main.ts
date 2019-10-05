@@ -66,7 +66,7 @@ Promise.all([
             `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}`
         );
         b.innerText = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
-            (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
+        (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
         a.appendChild(b);
         td.appendChild(a);
         // @ts-ignore
@@ -114,7 +114,7 @@ Promise.all([
             if (thing.length > 1) {
                 linkObject[thing[0]] = thing.slice(1);
             }
-        })
+        });
 
         $(".coursename").each((index, thing) => {
             if (linkObject[thing.innerText] !== undefined) {
@@ -126,8 +126,29 @@ Promise.all([
             }
         })
 
-    }))
+    }));
+
+    $('#settings').click(() => {
+        openModal('settings-modal');
+    });
+    $('#settings-modal .modal-background, #cancel-settings').click(() => {
+        closeModal('settings-modal');
+    });
+    $('#save-settings').click(() => {
+        closeModal('settings-modal');
+    });
 });
+
+
+function openModal(target) {
+    var targetElement = document.getElementById(target);
+    targetElement.classList.add('is-active');
+}
+
+function closeModal(target) {
+    var targetElement = document.getElementById(target);
+    targetElement.classList.remove('is-active');
+}
 
 function scheduleLinksGAPI(): Promise<string> {
     return new Promise((resolve, reject) => {

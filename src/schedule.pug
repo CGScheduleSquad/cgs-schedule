@@ -1,65 +1,87 @@
 doctype html
 html
-  head
-    meta(name = 'viewport', content = 'width=device-width, initial-scale=0.6')
-    meta(name = 'apple-mobile-web-app-capable', content = 'yes')
-    link(rel = 'shortcut icon', href = 'https://inside.catlin.edu/scripts/sched/favicon.ico')
-    link(rel = 'apple-touch-icon-precomposed', sizes = '144x144', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-144x144-precomposed.png')
-    link(rel = 'apple-touch-icon-precomposed', sizes = '114x114', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-114x114-precomposed.png')
-    link(rel = 'apple-touch-icon-precomposed', sizes = '72x72', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-72x72-precomposed.png')
-    link(rel = 'apple-touch-icon-precomposed', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-precomposed.png')
-    link(rel = 'stylesheet', href = 'schedule.scss')
-    script(src = 'https://code.jquery.com/jquery-3.4.1.js')
-    script(src = 'https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.3.0/ical.min.js')
-    script(src = 'schedule/main.ts')
-    script(src = 'js-util/touch-events.js')
-    title CGS Schedule
-  body
+    head
+        meta(name = 'viewport', content = 'width=device-width, initial-scale=0.6')
+        meta(name = 'apple-mobile-web-app-capable', content = 'yes')
+        link(rel = 'shortcut icon', href = 'https://inside.catlin.edu/scripts/sched/favicon.ico')
+        link(rel = 'apple-touch-icon-precomposed', sizes = '144x144', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-144x144-precomposed.png')
+        link(rel = 'apple-touch-icon-precomposed', sizes = '114x114', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-114x114-precomposed.png')
+        link(rel = 'apple-touch-icon-precomposed', sizes = '72x72', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-72x72-precomposed.png')
+        link(rel = 'apple-touch-icon-precomposed', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-precomposed.png')
+        link(rel = 'stylesheet', href = 'schedule.scss')
+        script(src = 'https://code.jquery.com/jquery-3.4.1.js')
+        script(src = 'https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.3.0/ical.min.js')
+        script(src = 'schedule/main.ts')
+        script(src = 'js-util/touch-events.js')
+        title CGS Schedule
+    body
+        .modal-wrapper
+            .modal#settings-modal
+                .modal-background
+                .modal-card
+                    header.modal-card-head
+                        p.modal-card-title Settings
+                    section.modal-card-body
+                        .field.is-horizontal
+                            .field-label.is-normal
+                                label.label Theme
+                            .field-body
+                                .field.is-narrow
+                                    .control
+                                        .select.is-fullwidth
+                                            select
+                                                option Classic
+                                                option Dark
+
+                    footer.modal-card-foot
+                        button.button.is-success#save-settings Save changes
+                        button.button#cancel-settings Cancel
+
     div#loading.center(style = 'display: none;')
-      p Loading...
+        p Loading...
     div#schedule
-      table.controls
-        tbody
-          tr
-            td.controls.arrows
-              a
-                img(src = 'https://inside.catlin.edu/scripts/sched/left48.png')
-            td#today.controls.links
-              a Today
-            td#this-week.controls.links
-              a This Week
-            td.controls.links
-              a#my-portal My Portal
-            td.controls.arrows
-              a
-                img(src = 'https://inside.catlin.edu/scripts/sched/right48.png')
-      hr.controls
-      div#schedarea(ontouchstart = 'touchStart(event, `schedarea`);', ontouchend = 'touchEnd(event);', ontouchmove = 'touchMove(event);', ontouchcancel = 'touchCancel(event);')
-        table.sched.main
-          tbody
-            tr
-              td.mainlabel
-            tr#time-0.mins45
-              td.times.mins45 8:00-8:45
-            tr#time-1.mins25
-              td.times.mins25 8:45-9:15
-            tr#time-2.mins10
-              td.times.mins10 9:20-9:30
-            tr#time-3.mins10
-              td.times.mins10 9:30-9:40
-            tr#time-4.mins45
-              td.times.mins45 9:45-10:30
-            tr#time-5.mins45
-              td.times.mins45 10:35-11:20
-            tr#time-6.mins25
-              td.times.mins25 11:20-11:50
-            tr#time-7.mins35
-              td.times.mins35 11:55-12:30
-            tr#time-8.mins45
-              td.times.mins35 12:30-1:05
-            tr#time-9.mins25
-              td.times.mins25 1:10-1:40
-            tr#time-10.mins45
-              td.times.mins45 1:40-2:25
-            tr#time-11.mins45
-              td.times.mins45 2:30-3:15
+        table.controls
+            tbody
+                tr
+                    td.controls.arrows
+                        a
+                            img(src = 'https://inside.catlin.edu/scripts/sched/left48.png')
+                    td#today.controls.links
+                        a Today
+                    td#this-week.controls.links
+                        a This Week
+                    td.controls.links
+                        a#settings(href = '#') Settings
+                    td.controls.arrows
+                        a
+                            img(src = 'https://inside.catlin.edu/scripts/sched/right48.png')
+        hr.controls
+        div#schedarea(ontouchstart = 'touchStart(event, `schedarea`);', ontouchend = 'touchEnd(event);', ontouchmove = 'touchMove(event);', ontouchcancel = 'touchCancel(event);')
+            table.sched.main
+                tbody
+                    tr
+                        td.mainlabel
+                    tr#time-0.mins45
+                        td.times.mins45 8:00-8:45
+                    tr#time-1.mins25
+                        td.times.mins25 8:45-9:15
+                    tr#time-2.mins10
+                        td.times.mins10 9:20-9:30
+                    tr#time-3.mins10
+                        td.times.mins10 9:30-9:40
+                    tr#time-4.mins45
+                        td.times.mins45 9:45-10:30
+                    tr#time-5.mins45
+                        td.times.mins45 10:35-11:20
+                    tr#time-6.mins25
+                        td.times.mins25 11:20-11:50
+                    tr#time-7.mins35
+                        td.times.mins35 11:55-12:30
+                    tr#time-8.mins45
+                        td.times.mins35 12:30-1:05
+                    tr#time-9.mins25
+                        td.times.mins25 1:10-1:40
+                    tr#time-10.mins45
+                        td.times.mins45 1:40-2:25
+                    tr#time-11.mins45
+                        td.times.mins45 2:30-3:15

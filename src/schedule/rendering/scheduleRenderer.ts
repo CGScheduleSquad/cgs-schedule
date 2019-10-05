@@ -30,11 +30,11 @@ export class ScheduleRenderer {
         // @ts-ignore
         document.getElementById('this-week').firstElementChild.setAttribute('href', `?range=week&cal=${calendarUUID}`);
         // @ts-ignore
-        document
-            .getElementById('my-portal')
-            .setAttribute(
-                'href',
-                `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${range.startDate.toString()}`
-            );
+        // document
+        //     .getElementById('my-portal')
+        //     .setAttribute(
+        //         'href',
+        //         `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${range.startDate.toString()}`
+        //     );
     }
 }
