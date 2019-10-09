@@ -6,7 +6,7 @@ import ScheduleTime from './time/scheduleTime';
 import ScheduleParamUtils from './utils/scheduleParamUtils';
 import ScheduleCacheManager from './utils/scheduleCacheManager';
 
-const getClassAsArray = (cl: string) => Array.from(document.getElementsByClassName(cl));
+const getClassAsArray = (cl: string): Array<any> => Array.from(document.getElementsByClassName(cl));
 
 const appendBlankSchedule = (text: string, bgcolor: string, link: string = ''): void => {
     let [td, a] = [document.createElement('td'), document.createElement(link === '' ? 'span' : 'a')];
@@ -23,6 +23,11 @@ const appendBlankSchedule = (text: string, bgcolor: string, link: string = ''): 
 const format12HourTime = (date: ScheduleTime): string =>
     ((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes;
 
+// @ts-ignore
+const openModal: any = (target: string) => document.getElementById(target).classList.add('is-active');
+
+// @ts-ignore
+const closeModal: any = (target: string) => document.getElementById(target).classList.remove('is-active');
 
 const colorClasses = {
     0: 'blk-activity',
@@ -66,7 +71,7 @@ Promise.all([
             `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}`
         );
         b.innerText = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
-        (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
+            (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
         a.appendChild(b);
         td.appendChild(a);
         // @ts-ignore
@@ -107,51 +112,38 @@ Promise.all([
 
     ScheduleRenderer.updateLinks(calendarUUID, range);
 
-    scheduleLinksGAPI().then((value => {
+    scheduleLinksGAPI().then(value => {
         let thing = JSON.parse(value);
         let linkObject = {};
-        thing.forEach(thing => {
+        thing.forEach((thing: any) => {
             if (thing.length > 1) {
+                // @ts-ignore
                 linkObject[thing[0]] = thing.slice(1);
             }
         });
-
-        $(".coursename").each((index, thing) => {
-            if (linkObject[thing.innerText] !== undefined) {
-                let htmlElement = $(thing.parentElement);
-                htmlElement.addClass('has-link');
-                htmlElement.on('click', (a) => {
-                    window.open(linkObject[thing.innerText][0], '_blank');
-                });
+        Array.from(document.getElementsByClassName('coursename')).forEach((el: any): any => {
+            // @ts-ignore
+            if (linkObject[el.innerText] !== undefined) {
+                let htmlElement = el.parentElement;
+                htmlElement.classList.add('has-link');
+                // @ts-ignore
+                htmlElement.addEventListener('click', () => window.open(linkObject[el.innerText][0], '_blank'));
             }
-        })
-
-    }));
-
-    $('#settings').click(() => {
-        openModal('settings-modal');
+        });
     });
-    $('#settings-modal .modal-background, #cancel-settings').click(() => {
-        closeModal('settings-modal');
-    });
-    $('#save-settings').click(() => {
-        closeModal('settings-modal');
-    });
+    // @ts-ignore
+    document.getElementById('settings').addEventListener('click', () => openModal('settings-modal'));
+    [
+        document.getElementsByClassName('modal-background')[0],
+        document.getElementById('cancel-settings'),
+        document.getElementById('save-settings')
+    ].forEach(
+        (el: Element | null): any => el !== null && el.addEventListener('click', () => closeModal('settings-modal'))
+    );
 });
 
-
-function openModal(target) {
-    var targetElement = document.getElementById(target);
-    targetElement.classList.add('is-active');
-}
-
-function closeModal(target) {
-    var targetElement = document.getElementById(target);
-    targetElement.classList.remove('is-active');
-}
-
-function scheduleLinksGAPI(): Promise<string> {
-    return new Promise((resolve, reject) => {
+const scheduleLinksGAPI = (): Promise<string> =>
+    new Promise((resolve, reject) => {
         let request = new XMLHttpRequest();
         request.open('GET', `https://cgs-schedule.herokuapp.com/`, true);
         request.onload = function() {
@@ -164,7 +156,6 @@ function scheduleLinksGAPI(): Promise<string> {
         request.onerror = () => reject();
         request.send();
     });
-}
 
 class InlineScheduleRenderer {
     public static getInstance(): InlineScheduleRenderer {
@@ -325,7 +316,9 @@ abstract class ParsedBlock {
             let blockNumMatchAttempt = blockLabel.match(/\d/);
             this.bgcolor =
                 // @ts-ignore
-                blockNumMatchAttempt !== null ? colorClasses[parseInt(blockNumMatchAttempt[0].slice(-1))] : colorClasses[0];
+                blockNumMatchAttempt !== null
+                    ? colorClasses[parseInt(blockNumMatchAttempt[0].slice(-1))]
+                    : colorClasses[0];
         } else {
             this.bgcolor = colorClasses[0];
         }
