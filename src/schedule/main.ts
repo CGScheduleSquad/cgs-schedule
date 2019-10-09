@@ -315,8 +315,8 @@ abstract class ParsedBlock {
         } else if (this.shouldBeColored) {
             let blockNumMatchAttempt = blockLabel.match(/\d/);
             this.bgcolor =
-                // @ts-ignore
                 blockNumMatchAttempt !== null
+                    // @ts-ignore
                     ? colorClasses[parseInt(blockNumMatchAttempt[0].slice(-1))]
                     : colorClasses[0];
         } else {
