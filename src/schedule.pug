@@ -36,9 +36,9 @@ html
                         button.button.is-success#save-settings Save changes
                         button.button#cancel-settings Cancel
 
-    div#loading.center(style = 'display: none;')
+    #loading.center(style = 'display: none;')
         p Loading...
-    div#schedule
+    #schedule
         table.controls
             tbody
                 tr
@@ -55,7 +55,7 @@ html
                         a
                             img(src = 'https://inside.catlin.edu/scripts/sched/right48.png')
         hr.controls
-        div#schedarea(ontouchstart = 'touchStart(event, `schedarea`);', ontouchend = 'touchEnd(event);', ontouchmove = 'touchMove(event);', ontouchcancel = 'touchCancel(event);')
+        #schedarea(ontouchstart = 'touchStart(event, `schedarea`);', ontouchend = 'touchEnd(event);', ontouchmove = 'touchMove(event);', ontouchcancel = 'touchCancel(event);')
             table.sched.main
                 tbody
                     tr
