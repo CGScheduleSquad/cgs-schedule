@@ -1,9 +1,17 @@
+@import 'scss/classic';
+@import 'scss/dark';
+
+body {
+    background: $bgcolor;
+    color: $color !important;
+}
+
 .daylabel a {
-    color: black;
+    color: $color;
 }
 
 .daylabel a:visited {
-    color: black;
+    color: $color;
 }
 
 .specialday {
@@ -68,7 +76,7 @@ td {
 td.times {
     border-style: solid;
     border-width: 2px;
-    border-color: #000000;
+    border-color: $color;
     text-align: center;
 }
 
@@ -79,7 +87,7 @@ td.times {
 td.period {
     border-style: solid;
     border-width: 2px;
-    border-color: #000000;
+    border-color: $color;
     text-align: center;
 }
 
@@ -88,6 +96,10 @@ td.daylabel {
     height: 5%;
     width: 18%;
     text-align: center;
+}
+
+td.daylabel > a {
+    color: $color;
 }
 
 td.specialday {
@@ -308,18 +320,6 @@ td.controls.links {
     transform: translate(-50%, -50%);
 }
 
-$icons: (
-    1: #ffce51,
-    2: #a67fb9,
-    3: #e67326,
-    4: #00abbd,
-    5: #aac02c,
-    6: #ef4957,
-    7: #ff75f2,
-    activity: #c0c0c0,
-    free: #ffffff
-);
-
 /* @include transition(all,2s,ease-out); */
 @mixin transition($what: all, $time: 0.2s, $how: ease-in-out) {
     -webkit-transition: $what $time $how;
@@ -335,6 +335,8 @@ $icons: (
         background-color: $color;
 
         &.has-link {
+            cursor: pointer;
+
             &:hover {
                 background-color: mix($color, black, 90%);
             }

@@ -1,5 +1,5 @@
 window.addEventListener('load', () => {
-    let settings = localStorage.getItem('settings') || {};
+    let settings = JSON.parse(localStorage.getItem('settings')) || {};
 
     const openModal = () => document.getElementById('settings-modal').classList.add('is-active');
 
@@ -10,7 +10,7 @@ window.addEventListener('load', () => {
         settings = {
           theme: document.getElementById('theme').value.toLowerCase()
         };
-        localStorage.setItem('settings', settings);
+        localStorage.setItem('settings', JSON.stringify(settings));
         closeModal();
     });
     [document.getElementsByClassName('modal-background')[0], document.getElementById('cancel-settings')].forEach(
