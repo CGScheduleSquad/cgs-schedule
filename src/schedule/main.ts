@@ -23,12 +23,6 @@ const appendBlankSchedule = (text: string, bgcolor: string, link: string = ''): 
 const format12HourTime = (date: ScheduleTime): string =>
     ((date.hours - 1) % 12) + 1 + ':' + (date.minutes < 10 ? '0' : '') + date.minutes;
 
-// @ts-ignore
-const openModal: any = (target: string) => document.getElementById(target).classList.add('is-active');
-
-// @ts-ignore
-const closeModal: any = (target: string) => document.getElementById(target).classList.remove('is-active');
-
 const colorClasses = {
     0: 'blk-activity',
     1: 'blk-1',
@@ -131,15 +125,6 @@ Promise.all([
             }
         });
     });
-    // @ts-ignore
-    document.getElementById('settings').addEventListener('click', () => openModal('settings-modal'));
-    [
-        document.getElementsByClassName('modal-background')[0],
-        document.getElementById('cancel-settings'),
-        document.getElementById('save-settings')
-    ].forEach(
-        (el: Element | null): any => el !== null && el.addEventListener('click', () => closeModal('settings-modal'))
-    );
 });
 
 const scheduleLinksGAPI = (): Promise<string> =>
