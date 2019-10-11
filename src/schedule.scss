@@ -330,6 +330,8 @@ body {
         background-color: $color;
 
         &.has-link {
+            cursor: pointer;
+
             &:hover {
                 background-color: mix($color, black, 90%);
             }
