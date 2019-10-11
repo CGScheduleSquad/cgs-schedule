@@ -30,10 +30,10 @@ const colorClasses = {
     free: 'blk-free'
 };
 
-function modifyUrlProperty(key: string, value: string) {
-    let newUrl = new URL(window.location.href);
+function modifyUrlProperty(key: string, value: string, url: string) {
+    let newUrl = new URL(url);
     newUrl.searchParams.set(key, value);
-    window.location.href = newUrl.href;
+    return newUrl.href;
 }
 
 export class ScheduleRenderer {
@@ -62,27 +62,19 @@ export class ScheduleRenderer {
         // left/right arrows
         let navigationArrows = document.querySelectorAll('td.arrows a');
         // @ts-ignore
-        navigationArrows[0].addEventListener("click", () => modifyUrlProperty("date", range.previousDate.toString()));
+        navigationArrows[0].addEventListener("click", () => window.location.href = modifyUrlProperty("date", range.previousDate.toString(), window.location.href));
         // @ts-ignore
-        navigationArrows[1].addEventListener("click", () => modifyUrlProperty("date", range.nextDate.toString()));
+        navigationArrows[1].addEventListener("click", () => window.location.href = modifyUrlProperty("date", range.nextDate.toString(), window.location.href));
 
         // this week
         let otherViewMode = range.viewMode === ViewMode.Day ? 'week' : 'day';
         let otherViewText = range.viewMode === ViewMode.Day ? 'This Week' : 'Today';
         // @ts-ignore
-        let viewToggle = document.getElementById('view-toggle').firstElementChild;
-        viewToggle.addEventListener("click", () => modifyUrlProperty("range", otherViewMode));
-        viewToggle.textContent = otherViewText;
+        let viewToggle = document.getElementById('today').firstElementChild
+            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", "", modifyUrlProperty("range", "day", window.location.href)));
         // @ts-ignore
-        let myPortalLink = document.getElementById('my-portal').firstElementChild;
-        myPortalLink.setAttribute(
-                'href',
-                `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${range.startDate.toString()}`
-            );
-        myPortalLink.setAttribute(
-                'target',
-                `blank`
-            );
+        let viewToggle = document.getElementById('this-week').firstElementChild
+            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", "", modifyUrlProperty("range", "week", window.location.href)));
     }
 
     private static renderSchedule(range: ScheduleRange, schedule: { dayMap: { [p: string]: any }; compressionList: any }) {

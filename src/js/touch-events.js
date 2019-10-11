@@ -20,7 +20,7 @@ let swipeDirection = null;
 
 window.touchStart = (event, passedName) => {
     // disable the standard ability to select the touched object
-    event.preventDefault();
+    // event.preventDefault();
     // get the total number of fingers touching the screen
     fingerCount = event.touches.length;
     // since we're looking for a swipe (single finger) and not a gesture (multiple fingers),
@@ -48,7 +48,7 @@ window.touchMove = event => {
 };
 
 window.touchEnd = event => {
-    event.preventDefault();
+    // event.preventDefault();
     // check to see if more than one finger was used and that there is an ending coordinate
     if (fingerCount === 1 && curX !== 0) {
         // use the Distance Formula to determine the length of the swipe
@@ -111,8 +111,18 @@ window.determineSwipeDirection = () => {
 
 window.processingRoutine = () => {
     if (swipeDirection === 'left') {
-        window.location.href = document.getElementsByClassName('arrows')[1].childNodes[0].getAttribute('href');
+        eventFire(document.getElementsByClassName('arrows')[1].childNodes[0], 'click');
     } else if (swipeDirection === 'right') {
-        window.location.href = document.getElementsByClassName('arrows')[0].childNodes[0].getAttribute('href');
+        eventFire(document.getElementsByClassName('arrows')[0].childNodes[0], 'click');
     }
 };
+
+function eventFire(el, etype){
+    if (el.fireEvent) {
+        el.fireEvent('on' + etype);
+    } else {
+        var evObj = document.createEvent('Events');
+        evObj.initEvent(etype, true, false);
+        el.dispatchEvent(evObj);
+    }
+}

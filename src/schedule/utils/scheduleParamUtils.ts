@@ -15,7 +15,7 @@ export default class ScheduleParamUtils {
 
     static getSeedDate(): ScheduleDate {
         const dateString = ScheduleParamUtils.getUrlParam('date');
-        return dateString !== null ? ScheduleDate.fromString(dateString) : (ScheduleTime.now().hours < 3 ? ScheduleDate.now() : ScheduleDate.now().setDate(ScheduleDate.now().getDate()+1));
+        return dateString !== null && dateString !== "" ? ScheduleDate.fromString(dateString) : (ScheduleTime.now().hours < 3 ? ScheduleDate.now() : ScheduleDate.now().setDate(ScheduleDate.now().getDate()+1));
     }
 
     static getViewMode(): ViewMode {
