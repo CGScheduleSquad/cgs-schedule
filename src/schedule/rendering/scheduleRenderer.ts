@@ -30,9 +30,13 @@ const colorClasses = {
     free: 'blk-free'
 };
 
-function modifyUrlProperty(key: string, value: string, url: string) {
+function modifyUrlProperty(key: string, value: string | null | undefined, url: string) {
     let newUrl = new URL(url);
-    newUrl.searchParams.set(key, value);
+    if (value === null || value === undefined) {
+        newUrl.searchParams.delete(key);
+    } else {
+        newUrl.searchParams.set(key, value);
+    }
     return newUrl.href;
 }
 
@@ -69,10 +73,10 @@ export class ScheduleRenderer {
         // this week
         // @ts-ignore
         let viewToggle = document.getElementById('today').firstElementChild
-            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", "", modifyUrlProperty("range", "day", window.location.href)));
+            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", null, modifyUrlProperty("range", "day", window.location.href)));
         // @ts-ignore
         let viewToggle = document.getElementById('this-week').firstElementChild
-            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", "", modifyUrlProperty("range", "week", window.location.href)));
+            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", null, modifyUrlProperty("range", "week", window.location.href)));
     }
 
     private static renderSchedule(range: ScheduleRange, schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
@@ -94,7 +98,7 @@ export class ScheduleRenderer {
             );
             a.setAttribute(
                 'target',
-                `blank`
+                `_blank`
             );
             b.innerText = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
             (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
