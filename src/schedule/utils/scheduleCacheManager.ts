@@ -6,26 +6,23 @@ import JSONRawBlockSource from '../json/jsonRawBlockSource';
 export default class ScheduleCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'scheduleEvents';
 
-    static async getSchedule(calendarUUID: string): Promise<any> {
+    static getSchedule(calendarUUID: string): Promise<any> {
         if (localStorage === undefined) {
             // not supported
             console.log('Local storage is not supported! Loading schedule...');
-            const jsonString = await this.reloadSchedulePromise(calendarUUID);
-            return JSON.parse(jsonString);
+            return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
         }
 
         let scheduleString = localStorage.getItem(ScheduleCacheManager.LOCAL_STORAGE_KEY);
         if (scheduleString === null) {
             console.log('Schedule cache does not exist! Loading schedule...');
-            const jsonString_1 = await this.reloadSchedulePromise(calendarUUID);
-            return JSON.parse(jsonString_1);
+            return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
         }
 
         let scheduleObject = JSON.parse(scheduleString);
         if (scheduleObject.versionNumber !== ScheduleAll.CURRENT_VERSION_NUMBER || scheduleObject.id !== calendarUUID) {
             console.log('Schedule cache is invalid! Loading schedule...');
-            const jsonString_2 = await this.reloadSchedulePromise(calendarUUID);
-            return JSON.parse(jsonString_2);
+            return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
         }
 
         if (new Date().getTime() - scheduleObject.creationTime > 1000 * 60 * 60 * 24) {

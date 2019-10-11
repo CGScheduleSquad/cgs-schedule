@@ -9,7 +9,8 @@ import ScheduleCacheManager from './utils/scheduleCacheManager';
 const getClassAsArray = (cl: string): Array<any> => Array.from(document.getElementsByClassName(cl));
 
 const appendBlankSchedule = (text: string, bgcolor: string, link: string = ''): void => {
-    let [td, a] = [document.createElement('td'), document.createElement(link === '' ? 'span' : 'a')];
+    let td = document.createElement('td');
+    let a = document.createElement(link === '' ? 'span' : 'a');
     td.setAttribute('rowspan', '12');
     td.setAttribute('class', `period specialday ${bgcolor}`);
     a.setAttribute('class', 'coursename');
@@ -58,7 +59,9 @@ Promise.all([
         let rawDay = schedule.dayMap[date.toString()];
 
         // append the header with a link to the veracross page
-        let [td, a, b] = [document.createElement('td'), document.createElement('a'), document.createElement('b')];
+        let td = document.createElement('td');
+        let a = document.createElement('a');
+        let b = document.createElement('b');
         td.setAttribute('class', 'daylabel');
         a.setAttribute(
             'href',
