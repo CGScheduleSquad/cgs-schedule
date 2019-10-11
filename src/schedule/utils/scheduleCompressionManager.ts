@@ -1,4 +1,4 @@
-export default class CompressionManager {
+export default class ScheduleCompressionManager { // TODO: Should not be static
     static compressionList: Array<string>;
 
     static processCompressString(inString: string): number {

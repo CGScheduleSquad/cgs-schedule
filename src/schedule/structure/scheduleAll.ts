@@ -1,5 +1,5 @@
 import { ScheduleDay } from './scheduleDay';
-import CompressionManager from '../compressionManager';
+import ScheduleCompressionManager from '../utils/scheduleCompressionManager';
 
 export class ScheduleAll {
     public static readonly CURRENT_VERSION_NUMBER = 3;
@@ -25,12 +25,12 @@ export class ScheduleAll {
         return Object.assign({}, this, {
             // convert fields that need converting
             dayMap: ScheduleAll.dayMapToObj(this.dayMap),
-            compressionList: CompressionManager.compressionList
+            compressionList: ScheduleCompressionManager.compressionList
         });
     }
 
     static dayMapToObj(strMap: Map<string, ScheduleDay>): object {
-        CompressionManager.resetCompressionList();
+        ScheduleCompressionManager.resetCompressionList();
         let obj = {};
         strMap.forEach((day: ScheduleDay, dateString: string) => {
             // @ts-ignore

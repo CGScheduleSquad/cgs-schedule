@@ -1,6 +1,6 @@
 import ScheduleTime from '../time/scheduleTime';
 import { ScheduleDayMeta } from './scheduleDay';
-import CompressionManager from '../compressionManager';
+import ScheduleCompressionManager from '../utils/scheduleCompressionManager';
 import ScheduleDate from '../time/scheduleDate';
 
 class ScheduleBlock {
@@ -63,8 +63,8 @@ export class RegularDayBlock extends ScheduleBlock {
     toJSON(): any {
         // copy all fields from `this` to an empty object and return in
         return [
-            CompressionManager.processCompressString(this.title),
-            CompressionManager.processCompressString(this.location),
+            ScheduleCompressionManager.processCompressString(this.title),
+            ScheduleCompressionManager.processCompressString(this.location),
             this.label,
             this.timeIndex,
             this.rowSpan,
@@ -99,8 +99,8 @@ export class InlineDayBlock extends ScheduleBlock {
     toJSON(): any {
         // copy all fields from `this` to an empty object and return in
         return [
-            CompressionManager.processCompressString(this.title),
-            CompressionManager.processCompressString(this.location),
+            ScheduleCompressionManager.processCompressString(this.title),
+            ScheduleCompressionManager.processCompressString(this.location),
             this.label,
             this.startTime,
             this.endTime,

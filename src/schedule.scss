@@ -289,30 +289,45 @@ td.controls.links {
     transform: translate(-50%, -50%);
 }
 
+:root {
+    --block-1: #9d7c33;
+    --block-2: #634c6f;
+    --block-3: #974c19;
+    --block-4: #005f69;
+    --block-5: #6a771b;
+    --block-6: #9d303a;
+    --block-7: #9c4895;
+    --block-activity: #515151;
+    --block-free: #202020;
+    --text: #eeeeee;
+    --border: #a7a7a7;
+    --background-color: #202020;
+}
+
 $icons: (
-        1: #9d7c33,
-        2: #634c6f,
-        3: #974c19,
-        4: #005f69,
-        5: #6a771b,
-        6: #9d303a,
-        7: #9c4895,
-        activity: #515151,
-        free: #202020
+        1: var(--block-1),
+        2: var(--block-2),
+        3: var(--block-3),
+        4: var(--block-4),
+        5: var(--block-5),
+        6: var(--block-6),
+        7: var(--block-7),
+        activity: var(--block-activity),
+        free: var(--block-free)
 );
 
 .sched.main td,
 a,
 a:visited {
-  color: #eeeeee;
+  color: var(--text);
 }
 
 .sched.main td, #schedule hr {
-  border-color: #a7a7a7;
+  border-color: var(--border);
 }
 
 body {
-  background-color: #202020;
+  background-color: var(--background-color);
 }
 
 /* @include transition(all,2s,ease-out); */
@@ -333,11 +348,13 @@ body {
             cursor: pointer;
 
             &:hover {
-                background-color: mix($color, black, 90%);
+                filter: brightness(90%);
+                //background-color: mix($color, black, 90%);
             }
 
             &:active {
-                background-color: mix($color, black, 70%);
+                filter: brightness(65%);
+                //background-color: mix($color, black, 70%);
             }
         }
     }

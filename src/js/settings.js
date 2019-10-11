@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
 
     document.getElementById('settings').addEventListener('click', () => openModal());
     document.getElementById('save-settings').addEventListener('click', () => {
+        document.documentElement.style.setProperty('--block-1', "white");
         settings = {
           theme: document.getElementById('theme').value.toLowerCase()
         };

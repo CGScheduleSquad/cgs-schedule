@@ -41,7 +41,7 @@ export default class ScheduleCacheManager {
             new JSONRawBlockSource()
         ).then((schedule: ScheduleAll) => {
             let jsonString = JSON.stringify(schedule);
-            localStorage.setItem('scheduleEvents', jsonString);
+            localStorage.setItem(ScheduleCacheManager.LOCAL_STORAGE_KEY, jsonString);
             console.log('Schedule reloaded from Veracross and saved to localStorage!');
             return jsonString;
         });
