@@ -107,9 +107,9 @@ Promise.all([
     ScheduleRenderer.updateLinks(calendarUUID, range);
 
     scheduleLinksGAPI().then(value => {
-        let thing = JSON.parse(value);
+        let globalSettingsObject = JSON.parse(value);
         let linkObject = {};
-        thing.forEach((thing: any) => {
+        globalSettingsObject.dayLinks.forEach((thing: any) => {
             if (thing.length > 1) {
                 // @ts-ignore
                 linkObject[thing[0]] = thing.slice(1);
