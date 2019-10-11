@@ -37,7 +37,7 @@ function modifyUrlProperty(key: string, value: string, url: string) {
 }
 
 export class ScheduleRenderer {
-    static render(schedule: { dayMap: { [p: string]: any }; compressionList: any }, calendarUUID: string) {
+    static render(schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
         let seedDate = ScheduleParamUtils.getSeedDate();
         let viewMode = ScheduleParamUtils.getViewMode();
         let range = new ScheduleRange(seedDate, viewMode);
@@ -47,10 +47,10 @@ export class ScheduleRenderer {
         // @ts-ignore
         document.getElementById('schedarea').style.display = 'block';
 
-        ScheduleRenderer.updateLinks(calendarUUID, range);
+        ScheduleRenderer.updateLinks(range);
     }
 
-    static updateLinks(calendarUUID: string, range: ScheduleRange): void {
+    static updateLinks(range: ScheduleRange): void {
         // @ts-ignore
         let schedarea = document.getElementById('schedarea').firstElementChild;
         // @ts-ignore
@@ -67,8 +67,6 @@ export class ScheduleRenderer {
         navigationArrows[1].addEventListener("click", () => window.location.href = modifyUrlProperty("date", range.nextDate.toString(), window.location.href));
 
         // this week
-        let otherViewMode = range.viewMode === ViewMode.Day ? 'week' : 'day';
-        let otherViewText = range.viewMode === ViewMode.Day ? 'This Week' : 'Today';
         // @ts-ignore
         let viewToggle = document.getElementById('today').firstElementChild
             .addEventListener("click", () => window.location.href = modifyUrlProperty("date", "", modifyUrlProperty("range", "day", window.location.href)));

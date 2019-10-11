@@ -14,7 +14,7 @@ let scheduleAndDomLoaded = Promise.all([
 ]).then((schedule: any) => schedule[0]);
 
 let scheduleRendered = scheduleAndDomLoaded.then((schedule: any) => {
-    ScheduleRenderer.render(schedule, calendarUUID);
+    ScheduleRenderer.render(schedule);
 });
 
 let scheduleAndGlobalSettingsLoaded = Promise.all([
@@ -100,6 +100,7 @@ function loadSettingsModal(globalSettingsObject: any) {
     // @ts-ignore
     document.getElementById('save-settings').addEventListener('click', () => {
         let newUrl = new URL(window.location.href);
+        // @ts-ignore
         newUrl.searchParams.set('theme', document.getElementById('theme').value);
         window.location.href = newUrl.href;
         closeModal();
