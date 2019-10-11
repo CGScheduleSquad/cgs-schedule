@@ -30,6 +30,12 @@ const colorClasses = {
     free: 'blk-free'
 };
 
+function modifyUrlProperty(key: string, value: string) {
+    let newUrl = new URL(window.location.href);
+    newUrl.searchParams.set(key, value);
+    window.location.href = newUrl.href;
+}
+
 export class ScheduleRenderer {
     static render(schedule: { dayMap: { [p: string]: any }; compressionList: any }, calendarUUID: string) {
         let seedDate = ScheduleParamUtils.getSeedDate();
@@ -45,7 +51,6 @@ export class ScheduleRenderer {
     }
 
     static updateLinks(calendarUUID: string, range: ScheduleRange): void {
-        let viewMode = range.viewMode === ViewMode.Day ? 'day' : 'week';
         // @ts-ignore
         let schedarea = document.getElementById('schedarea').firstElementChild;
         // @ts-ignore
@@ -57,28 +62,27 @@ export class ScheduleRenderer {
         // left/right arrows
         let navigationArrows = document.querySelectorAll('td.arrows a');
         // @ts-ignore
-        navigationArrows[0].setAttribute(
-            'href',
-            `?date=${range.previousDate.toString()}&range=${viewMode}&cal=${calendarUUID}`
-        );
+        navigationArrows[0].addEventListener("click", () => modifyUrlProperty("date", range.previousDate.toString()));
         // @ts-ignore
-        navigationArrows[1].setAttribute(
-            'href',
-            `?date=${range.nextDate.toString()}&range=${viewMode}&cal=${calendarUUID}`
-        );
+        navigationArrows[1].addEventListener("click", () => modifyUrlProperty("date", range.nextDate.toString()));
 
         // this week
+        let otherViewMode = range.viewMode === ViewMode.Day ? 'week' : 'day';
+        let otherViewText = range.viewMode === ViewMode.Day ? 'This Week' : 'Today';
         // @ts-ignore
-        document.getElementById('today').firstElementChild.setAttribute('href', `?range=day&cal=${calendarUUID}`);
+        let viewToggle = document.getElementById('view-toggle').firstElementChild;
+        viewToggle.addEventListener("click", () => modifyUrlProperty("range", otherViewMode));
+        viewToggle.textContent = otherViewText;
         // @ts-ignore
-        document.getElementById('this-week').firstElementChild.setAttribute('href', `?range=week&cal=${calendarUUID}`);
-        // @ts-ignore
-        // document
-        //     .getElementById('my-portal')
-        //     .setAttribute(
-        //         'href',
-        //         `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${range.startDate.toString()}`
-        //     );
+        let myPortalLink = document.getElementById('my-portal').firstElementChild;
+        myPortalLink.setAttribute(
+                'href',
+                `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${range.startDate.toString()}`
+            );
+        myPortalLink.setAttribute(
+                'target',
+                `blank`
+            );
     }
 
     private static renderSchedule(range: ScheduleRange, schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
@@ -97,6 +101,10 @@ export class ScheduleRenderer {
             a.setAttribute(
                 'href',
                 `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}`
+            );
+            a.setAttribute(
+                'target',
+                `blank`
             );
             b.innerText = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
             (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;

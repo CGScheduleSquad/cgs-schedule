@@ -30,5 +30,12 @@ export default class ScheduleParamUtils {
         }
     }
 
-    private static getUrlParam = (key: string) => new URL(window.location.href).searchParams.get(key);
+    static getTheme(): string {
+        let themeString = ScheduleParamUtils.getUrlParam('theme');
+        return themeString == null ? 'classic' : themeString;
+    }
+
+    private static getUrlParam(key: string) {
+        return new URL(window.location.href).searchParams.get(key);
+    }
 }

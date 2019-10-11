@@ -20,12 +20,12 @@ export default class ScheduleCacheManager {
         }
 
         let scheduleObject = JSON.parse(scheduleString);
-        if (scheduleObject.versionNumber !== ScheduleAll.CURRENT_VERSION_NUMBER || scheduleObject.id !== calendarUUID) {
+        if (scheduleObject.versionNumber === undefined || scheduleObject.versionNumber !== ScheduleAll.CURRENT_VERSION_NUMBER || scheduleObject.id !== calendarUUID) {
             console.log('Schedule cache is invalid! Loading schedule...');
             return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
         }
 
-        if (new Date().getTime() - scheduleObject.creationTime > 1000 * 60 * 60 * 24) {
+        if (scheduleObject.creationTime === undefined || new Date().getTime() - scheduleObject.creationTime > 1000 * 60 * 60 * 24) {
             console.log('Schedule cache is outdated! Loading in the background...');
             this.reloadSchedulePromise(calendarUUID); // save in the background
         }
