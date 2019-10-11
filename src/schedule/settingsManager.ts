@@ -76,9 +76,10 @@ function parseThemesObject(globalSettingsObject: any) {
     var colorPattern = /^#([0-9a-f]{3})([0-9a-f]{3})?$/i;
     let themesObject = {};
     globalSettingsObject.themes.forEach((themeArray: any) => {
-        if (themeArray.length == themeCssVariables.length + 1 && themeArray[0].length >= 1) {
+        if (themeArray.length >= themeCssVariables.length + 1 && themeArray[0].length >= 1) {
             // @ts-ignore
-            let textValues = themeArray.slice(1);
+            let textValues = themeArray.slice(1, themeCssVariables.length + 1);
+            debugger;
             if (textValues.every((value: string) => colorPattern.test(value))) {
                 // @ts-ignore
                 themesObject[themeArray[0].toLowerCase()] = textValues;
