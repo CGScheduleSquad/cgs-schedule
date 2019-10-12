@@ -1,10 +1,10 @@
-import { ScheduleRenderer } from './rendering/scheduleRenderer';
 import ScheduleParamUtils from './utils/scheduleParamUtils';
 import ScheduleCacheManager from './utils/scheduleCacheManager';
 import WindowUtils from '../utils/windowUtils';
 import GlobalSettingsCacheManager from '../globalSettings/globalSettingsCacheManager';
 import { loadAllSettings } from './settingsManager';
 import { toast } from 'bulma-toast';
+import ScheduleRenderer from './rendering/scheduleRenderer';
 
 let calendarUUID = ScheduleParamUtils.getCalendarUUID();
 
