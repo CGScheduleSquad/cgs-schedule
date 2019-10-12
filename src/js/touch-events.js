@@ -38,7 +38,9 @@ window.touchStart = (event, passedName) => {
 };
 
 window.touchMove = event => {
-    event.preventDefault();
+    if ($(document).height() <= $(window).height()) { // if there is no scrollbar, prevent touch scrolling
+        event.preventDefault();
+    }
     if (event.touches.length === 1) {
         curX = event.touches[0].pageX;
         curY = event.touches[0].pageY;
