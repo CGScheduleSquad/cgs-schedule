@@ -138,6 +138,22 @@ function parseLinkObject(globalSettingsObject: any) {
     return linkObject;
 }
 
+function forceOpenTabIfSafari(href: string) {
+    var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    if (isSafari) {
+        var a = document.createElement('a');
+        a.setAttribute("href", href);
+        a.setAttribute("target", "_blank");
+
+        var dispatch = document.createEvent("HTMLEvents");
+        dispatch.initEvent("click", true, true);
+        a.dispatchEvent(dispatch);
+    } else {
+        window.open(href, "_blank")
+    }
+}
+
 function applyClassLinks(linkObject: any) {
 
     let linkObjectKeys = Object.keys(linkObject);
@@ -151,7 +167,7 @@ function applyClassLinks(linkObject: any) {
 
 
             // @ts-ignore
-            htmlElement.addEventListener('click', () => window.open(linkObject[el.innerText][0], '_blank'));
+            htmlElement.addEventListener('click', () => forceOpenTabIfSafari(linkObject[el.innerText][0]));
         }
     });
 
