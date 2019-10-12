@@ -137,13 +137,33 @@ function parseLinkObject(globalSettingsObject: any) {
 
 function applyClassLinks(linkObject: any) {
 
+    let linkObjectKeys = Object.keys(linkObject);
+
     Array.from(document.getElementsByClassName('coursename')).forEach((el: any): any => {
         // @ts-ignore
         if (linkObject[el.innerText] !== undefined) {
             let htmlElement = el.parentElement;
             htmlElement.classList.add('has-link');
+            htmlElement.classList.add('link-index-'+linkObjectKeys.indexOf(el.innerText));
+
+
             // @ts-ignore
             htmlElement.addEventListener('click', () => window.open(linkObject[el.innerText][0], '_blank'));
         }
     });
+
+    linkObjectKeys.forEach(((className, classNameIndex) => {
+        let items = {};
+        linkObject[className].forEach((link, linkIndex) => {
+            items[link] = {name: link.substring(0, 50).replace("https://", '').replace("http://", '')+(link.length>50?'...':'')}
+        });
+        $.contextMenu({
+            selector: ".link-index-"+classNameIndex,
+            callback: function(key: string | undefined) {
+                window.open(key, '_blank');
+            },
+            items: items
+        });
+    }))
+
 }
