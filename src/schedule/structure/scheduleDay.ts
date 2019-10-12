@@ -291,6 +291,38 @@ class LateStartDay extends ScheduleDay {
             timeIndex += rowSpan;
             return true;
         });
+
+        while ( // TODO: Duplicated code!!!!!!!!
+            timeIndex < lateStartTimes.length
+            ) {
+            let title = 'Free';
+            let label = '';
+            switch (timeIndex) {
+                case 0:
+                    title = 'Late Start';
+                    break;
+                case 2:
+                    label = 'Early Flex';
+                    break;
+                case 6:
+                    label = 'AM Flex';
+                    break;
+                case 8:
+                    label = 'PM Flex';
+                    break;
+            }
+            let rowSpan = 1; // TODO: free block merging
+            let durationMins = Math.min(
+                Math.max(
+                    lateStartAllTimes[timeIndex + rowSpan].totalMinutes - lateStartAllTimes[timeIndex].totalMinutes,
+                    5
+                ),
+                90
+            ); // double sided constrain
+            regularDayBlocks.push(new RegularDayBlock(title, '', label, timeIndex, rowSpan, durationMins, true));
+            timeIndex++;
+        }
+
         if (!result) {
             return null;
         }

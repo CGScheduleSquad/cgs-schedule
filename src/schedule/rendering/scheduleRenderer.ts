@@ -40,7 +40,7 @@ function modifyUrlProperty(key: string, value: string | null | undefined, url: s
     return newUrl.href;
 }
 
-export class ScheduleRenderer {
+export default class ScheduleRenderer {
     static render(schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
         let seedDate = ScheduleParamUtils.getSeedDate();
         let viewMode = ScheduleParamUtils.getViewMode();

@@ -40,7 +40,7 @@ export class ScheduleBuilder {
 
     private static contextBlockFilter(rawBlock: RawBlock, index: number, otherRawBlocks: RawBlock[]): boolean {
         let startHours = rawBlock.startTime.hours;
-        if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3) return false;
+        if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3) return false; // TODO: 3:15 not 3
 
         // TODO: Add block keeping preferences
         return otherRawBlocks.findIndex((value: RawBlock) => rawBlock.startTime.equals(value.startTime)) >= index;

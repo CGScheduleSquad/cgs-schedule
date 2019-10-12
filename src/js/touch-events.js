@@ -87,7 +87,6 @@ window.touchCancel = event => {
 window.caluculateAngle = () => {
     const X = startX - curX;
     const Y = curY - startY;
-    const Z = Math.round(Math.sqrt(Math.pow(X, 2) + Math.pow(Y, 2))); //the distance - rounded - in pixels
     const r = Math.atan2(Y, X); //angle in radians (Cartesian system)
     swipeAngle = Math.round((r * 180) / Math.PI); //angle in degrees
     if (swipeAngle < 0) {
@@ -95,19 +94,17 @@ window.caluculateAngle = () => {
     }
 };
 
-window.determineSwipeDirection = () => {
-    if (swipeAngle <= 45 && swipeAngle >= 0) {
-        swipeDirection = 'left';
-    } else if (swipeAngle <= 360 && swipeAngle >= 315) {
-        swipeDirection = 'left';
-    } else if (swipeAngle >= 135 && swipeAngle <= 225) {
-        swipeDirection = 'right';
-    } else if (swipeAngle > 45 && swipeAngle < 135) {
-        swipeDirection = 'down';
-    } else {
-        swipeDirection = 'up';
-    }
-};
+window.determineSwipeDirection = () =>
+    swipeDirection =
+        swipeAngle <= 45 && swipeAngle >= 0
+            ? 'left'
+            : swipeAngle <= 360 && swipeAngle >= 315
+            ? 'left'
+            : swipeAngle >= 135 && swipeAngle <= 225
+            ? 'right'
+            : swipeAngle > 45 && swipeAngle < 135
+            ? 'down'
+            : 'up';
 
 window.processingRoutine = () => {
     if (swipeDirection === 'left') {
