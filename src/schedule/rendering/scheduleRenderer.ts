@@ -49,7 +49,7 @@ export default class ScheduleRenderer {
         this.renderSchedule(range, schedule);
 
         // @ts-ignore
-        document.getElementById('schedarea').style.display = 'block';
+        // document.getElementById('schedarea').style.display = 'block';
 
         ScheduleRenderer.updateLinks(range);
     }
