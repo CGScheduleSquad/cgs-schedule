@@ -1,5 +1,6 @@
 import ScheduleParamUtils from './utils/scheduleParamUtils';
 import { capitalize } from '../utils/formattingUtils';
+import { toast } from 'bulma-toast';
 
 let themeCssVariables = [
     '--block-1',
@@ -33,6 +34,20 @@ function getParameterCaseInsensitive(object: { [x: string]: any; }, key: string)
 }
 
 export function loadAllSettings(globalSettingsObject: any) {
+    if (new URL(window.location.href).hash === "#updated") {
+
+        toast({
+            message: "Settings updated successfully. Please bookmark the new link.",
+            type: "is-info",
+            duration: 5000,
+            position: 'top-center',
+            dismissible: true,
+            pauseOnHover: true,
+            animate: { in: "fadeInDown", out: "fadeOutUp" }
+        });
+
+        window.location.hash = '';
+    }
 
     let themesObject = parseThemesObject(globalSettingsObject);
     let linkObject = parseLinkObject(globalSettingsObject);
@@ -40,7 +55,7 @@ export function loadAllSettings(globalSettingsObject: any) {
     loadSettingsModal(themesObject);
 
     applyThemes(themesObject);
-    applyClassLinks(linkObject);
+    if (ScheduleParamUtils.getLinksEnabled()) applyClassLinks(linkObject);
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -53,6 +68,11 @@ function loadSettingsModal(themesObject: {}) {
     sel.value = ScheduleParamUtils.getTheme();
 
     // @ts-ignore
+    let linksCheckbox = document.getElementById('class-links');
+    // @ts-ignore
+    linksCheckbox.checked = ScheduleParamUtils.getLinksEnabled();
+
+    // @ts-ignore
     const openModal = () => document.getElementById('settings-modal').classList.add('is-active');
     // @ts-ignore
     const closeModal = () => document.getElementById('settings-modal').classList.remove('is-active');
@@ -61,10 +81,16 @@ function loadSettingsModal(themesObject: {}) {
     document.getElementById('settings').addEventListener('click', () => openModal());
     // @ts-ignore
     document.getElementById('save-settings').addEventListener('click', () => {
-        let newUrl = new URL(window.location.href);
         // @ts-ignore
-        newUrl.searchParams.set('theme', document.getElementById('theme').value);
-        window.location.href = newUrl.href;
+        if (linksCheckbox.checked !== ScheduleParamUtils.getLinksEnabled() || sel.value !== ScheduleParamUtils.getTheme()) {
+            let newUrl = new URL(window.location.href);
+            // @ts-ignore
+            newUrl.searchParams.set('links', linksCheckbox.checked);
+            // @ts-ignore
+            newUrl.searchParams.set('theme', sel.value);
+            newUrl.hash = "#updated";
+            window.location.href = newUrl.href;
+        }
         closeModal();
     });
     [document.getElementsByClassName('modal-background')[0], document.getElementById('cancel-settings')].forEach(
@@ -79,7 +105,6 @@ function parseThemesObject(globalSettingsObject: any) {
         if (themeArray.length >= themeCssVariables.length + 1 && themeArray[0].length >= 1) {
             // @ts-ignore
             let textValues = themeArray.slice(1, themeCssVariables.length + 1);
-            debugger;
             if (textValues.every((value: string) => colorPattern.test(value))) {
                 // @ts-ignore
                 themesObject[themeArray[0].toLowerCase()] = textValues;
@@ -111,6 +136,7 @@ function parseLinkObject(globalSettingsObject: any) {
 }
 
 function applyClassLinks(linkObject: any) {
+
     Array.from(document.getElementsByClassName('coursename')).forEach((el: any): any => {
         // @ts-ignore
         if (linkObject[el.innerText] !== undefined) {

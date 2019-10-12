@@ -6,7 +6,7 @@ export default class ScheduleParamUtils {
     static getCalendarUUID(): string {
         let calendarUUID = ScheduleParamUtils.getUrlParam('cal');
         if (calendarUUID == null) {
-            alert('Invalid URL! Please check that you have followed the instructions correctly.');
+            alert('Invalid URL! Please double-check the instructions and try again.');
             window.location.href = './index.html'; // exits the page
             return '';
         }
@@ -37,5 +37,10 @@ export default class ScheduleParamUtils {
 
     private static getUrlParam(key: string) {
         return new URL(window.location.href).searchParams.get(key);
+    }
+
+    static getLinksEnabled() {
+        let linksString = ScheduleParamUtils.getUrlParam('links');
+        return linksString == null ? true : linksString !== 'false';
     }
 }

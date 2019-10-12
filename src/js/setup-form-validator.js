@@ -28,7 +28,7 @@ window.addEventListener('load', () => {
     document.getElementsByClassName('generate-link')[0].addEventListener('click', () => {
         localStorage.removeItem('scheduleEvents');
         window.open(
-            `./schedule.html?cal=${uuidFromWebcalLink(document.getElementById('allClassesUrl').value)}`,
+            `./schedule.html?cal=${uuidFromWebcalLink(document.getElementById('allClassesUrl').value)}#new`,
             '_blank'
         );
     });

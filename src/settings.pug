@@ -1,18 +1,24 @@
-.modal-wrapper
+.modal-wrapper.bulma
     .modal#settings-modal
         .modal-background
         .modal-card
             header.modal-card-head
                 p.modal-card-title Settings
             section.modal-card-body
-                .field.is-horizontal
-                    .field-label.is-normal
-                        label.label Theme
-                    .field-body
-                        .field.is-narrow
-                            .control
-                                .select.is-fullwidth
-                                    select#theme
+                .field
+                    label.label Theme
+                    .control
+                        .select.is-fullwidth
+                            select#theme
+                    p.help Select a color theme for the schedule. #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1757467265' ) Create a new theme.]
+                .field
+                    label.label Class Homepage Links
+                    .control
+                        input#class-links.switch.is-rounded.is-info(type='checkbox' name='class-links' checked='checked')
+                        label(for='class-links')
+                    p.help
+                        | Enable or disable clickable class links.
+                        | #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=0' ) Add more links.]
             footer.modal-card-foot
                 button.button.is-success#save-settings Save changes
                 button.button#cancel-settings Cancel
