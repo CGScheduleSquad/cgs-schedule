@@ -10,8 +10,8 @@ html, body {
 }
 
 #schedule {
-  height: calc(100% - calc(8px + 8px)); // top padding plus bottom padding
-  padding: 8px 8px 8px 8px;
+  height: calc(100% - calc(64px + 8px)); // top padding plus bottom padding
+  padding: 8px 8px 64px 8px;
 }
 
 #schedarea {
@@ -226,6 +226,11 @@ td.mins5 {
         #schedarea {
             font-size: 1.3em;
         }
+    }
+
+    #schedule {
+        height: calc(100% - calc(8px + 8px)); // top padding plus bottom padding
+        padding: 8px 8px 8px 8px;
     }
 }
 @media screen and (orientation: landscape) {
