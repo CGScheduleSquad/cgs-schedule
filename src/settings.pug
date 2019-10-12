@@ -1,0 +1,49 @@
+.modal-wrapper.bulma
+    .modal#settings-modal
+        .modal-background
+        .modal-card
+            header.modal-card-head
+                p.modal-card-title CGS Schedule Settings
+            section.modal-card-body
+                .field
+                    label.label
+                        | Theme
+                        i.fas.fa-palette.p-l-sm
+                    .control
+                        .select.is-fullwidth
+                            select#theme
+                    p.help Selects a color theme for the schedule. #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1757467265' ) Create a new theme.]
+                .field
+                    label.label
+                        | Class Homepage Links
+                        i.fas.fa-link.p-l-sm
+                    .control
+                        input#class-links.switch.is-rounded.is-info(type='checkbox' name='class-links' checked='checked')
+                        label(for='class-links')
+                    p.help
+                        | Enables or disables clickable class links.
+                        | #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=0' ) Add more links.]
+                .field
+                    label.label
+                        | Tips
+                        i.fas.fa-lightbulb.p-l-sm
+                    p.help
+                        | - #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=0' ) Add links]
+                        | to the homework calendar for each of your classes
+                        br
+                        | - Left-click on class blocks to open the first link for your class
+                        br
+                        | - Right-click on class blocks to see a list of all the links for your class
+                        br
+                        | - Click on any date label (Mon Oct 14) to view the day's schedule in Veracross
+                        br
+                        | - On touchscreen devices, swipe left and right to navigate between days
+                        br
+                        | - The schedule is mobile-friendly, just click on the "Today" view and text the link to your phone
+
+            footer.modal-card-foot
+                button.button.is-info#save-settings Save changes
+                button.button#cancel-settings Cancel
+                div(style="text-align: right; width: 100%")
+                    a(target="_blank" href="https://github.com/CGScheduleSquad/cgs-schedule")
+                        | CGS Schedule is open-source on GitHub

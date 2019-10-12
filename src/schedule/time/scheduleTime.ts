@@ -16,9 +16,19 @@ export default class ScheduleTime {
         return (this.totalMinutes - (this.totalMinutes % 60)) / 60;
     }
 
-    equals = (other: ScheduleTime): boolean => other.totalMinutes === this.totalMinutes;
+    equals(other: ScheduleTime): boolean {
+        return other.totalMinutes === this.totalMinutes;
+    }
 
-    compareTo = (other: ScheduleTime): number => this.totalMinutes - other.totalMinutes;
+    compareTo(other: ScheduleTime): number {
+        return this.totalMinutes - other.totalMinutes;
+    }
 
-    toJSON = (): number => this.totalMinutes;
+    toJSON(): number {
+        return this.totalMinutes;
+    }
+
+    to12HourString(): string {
+        return ((this.hours - 1) % 12) + 1 + ':' + (this.minutes < 10 ? '0' : '') + this.minutes;
+    }
 }
