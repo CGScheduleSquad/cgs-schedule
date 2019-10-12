@@ -127,9 +127,12 @@ function applyThemes(themesObject: { [x: string]: any; }) {
 function parseLinkObject(globalSettingsObject: any) {
     let linkObject = {};
     globalSettingsObject.dayLinks.forEach((thing: any) => {
-        if (thing.length > 1) {
-            // @ts-ignore
-            linkObject[thing[0]] = thing.slice(1);
+        if (thing.length > 1 && thing[0].length >= 1) {
+            let filteredLinks = thing.slice(1).filter((link: string) => link.length >= 1);
+            if (filteredLinks.length >= 1) {
+                // @ts-ignore
+                linkObject[thing[0]] = filteredLinks;
+            }
         }
     });
     return linkObject;
@@ -154,9 +157,11 @@ function applyClassLinks(linkObject: any) {
 
     linkObjectKeys.forEach(((className, classNameIndex) => {
         let items = {};
-        linkObject[className].forEach((link, linkIndex) => {
+        linkObject[className].forEach((link: string | number) => {
+            // @ts-ignore
             items[link] = {name: link.substring(0, 50).replace("https://", '').replace("http://", '')+(link.length>50?'...':'')}
         });
+        // @ts-ignore
         $.contextMenu({
             selector: ".link-index-"+classNameIndex,
             callback: function(key: string | undefined) {
