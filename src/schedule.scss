@@ -208,7 +208,9 @@ td.controls.arrows {
 
 td.controls.links {
     width: 28%;
-    text-decoration: underline;
+    a {
+        text-decoration: underline;
+    }
 }
 
 .coursename {
