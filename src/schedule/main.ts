@@ -6,17 +6,15 @@ import { loadAllSettings } from './settingsManager';
 import { toast } from 'bulma-toast';
 import ScheduleRenderer from './rendering/scheduleRenderer';
 
-let calendarUUID = ScheduleParamUtils.getCalendarUUID();
-
 // start loading schedule before dom content has loaded, but only draw when the dom has loaded and the schedule has also
-let domContentLoaded = WindowUtils.waitForScheduleEvent('DOMContentLoaded');
-
-let scheduleAndDomLoaded = Promise.all([
+let scheduleAndDomLoaded = new Promise<string>((resolve) => resolve(ScheduleParamUtils.getCalendarUUID()))
+    .then((calendarUUID: string) => Promise.all([
     ScheduleCacheManager.getSchedule(calendarUUID),
-    domContentLoaded
-])
+        WindowUtils.waitForScheduleEvent('DOMContentLoaded')
+    ]))
     .then((schedule: any) => schedule[0])
     .catch((reason: any) => {
+        console.error(reason);
         alert(reason);
         window.location.href = './index.html'; // exits the page
     });

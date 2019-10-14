@@ -6,9 +6,7 @@ export default class ScheduleParamUtils {
     static getCalendarUUID(): string {
         let calendarUUID = ScheduleParamUtils.getUrlParam('cal');
         if (calendarUUID == null) {
-            alert('Invalid URL! Please double-check the instructions and try again.');
-            window.location.href = './index.html'; // exits the page
-            return '';
+            throw new Error('No calendar link provided! Please double-check the instructions and try again.');
         }
         return calendarUUID;
     }

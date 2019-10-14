@@ -40,7 +40,7 @@ export class VeracrossICSRawBlockSource implements RawBlockSource {
                 })
                 .filter((rawBlock: any) => rawBlock !== null);
             if (filteredBlocks.length === 0) {
-                return Promise.reject('Found 0 class blocks from the provided calendar link! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!');
+                return Promise.reject('Found zero classes from the provided calendar link! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!');
             }
             return filteredBlocks;
         });
