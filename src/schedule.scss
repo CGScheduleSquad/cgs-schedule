@@ -14,8 +14,20 @@ html, body {
     padding: 8px 8px 8px 8px;
 }
 
+td.controls.arrows img {
+    height: 28px;
+}
+
 #schedarea {
-  height: calc(100% - 52px); // height of controls
+  height: calc(100% - 38px); // height of controls
+}
+
+#schedarea {
+    font-size: calc(1.45vmin + 0.35em);
+}
+
+.main.sched.today {
+    font-size: calc(4vmin + 0.25em);
 }
 
 table.sched {
@@ -60,6 +72,7 @@ td.controls.arrows {
 td.controls.links {
     width: 28%;
     text-decoration: underline;
+    font-size: 0.8em
 }
 
 .coursename {
@@ -74,19 +87,15 @@ td {
     -webkit-print-color-adjust: exact;
 }
 
-td.times {
-    border-style: solid;
-    border-width: 2px;
-    text-align: center;
-}
 
 .main > tbody > tr > .times {
     width: 7%;
 }
 
+td.times,
 td.period {
     border-style: solid;
-    border-width: 2px;
+    border-width: calc(0.2vmin + 0.5px);
     text-align: center;
 }
 
@@ -192,58 +201,6 @@ td.mins5 {
     font-size: 0.75em;
 }
 
-#schedarea {
-    font-size: 1.2em;
-}
-
-.main.sched.today {
-    font-size: 1.3em;
-}
-
-@media print {
-    .controls {
-        display: none;
-    }
-}
-
-@media screen and (orientation: portrait) {
-    @media (max-height: 700px) {
-        #schedarea {
-            font-size: 0.77em;
-        }
-    }
-    @media (min-height: 700px) and (max-height: 800px) {
-        #schedarea {
-            font-size: 0.9em;
-        }
-    }
-    @media (min-height: 800px) and (max-height: 1000px) {
-        .main.sched.week {
-            font-size: 0.75em;
-        }
-    }
-    @media (min-height: 1000px) {
-        #schedarea {
-            font-size: 1.3em;
-        }
-    }
-}
-@media screen and (orientation: landscape) {
-
-    @media (max-height: 600px) {
-        #schedarea {
-            font-size: 0.9em;
-        }
-    }
-
-    @media (min-height: 600px) {
-        #schedule {
-            height: calc(100% - calc(64px + 8px)); // top padding plus bottom padding
-            padding: 8px 8px 64px 8px;
-        }
-    }
-}
-
 .specialday > .sched {
     height: 100%;
     width: 100%;
@@ -262,6 +219,33 @@ td.mins5 {
 
     tr td:last-child {
         border-right: 0;
+    }
+}
+
+@media print {
+    .controls {
+        display: none;
+    }
+}
+
+@media screen and (orientation: landscape) {
+    @media (min-height: 600px) {
+        .main.sched.today {
+            font-size: 1.4em;
+        }
+        td.controls.links {
+            font-size: 1em;
+        }
+        td.controls.arrows img {
+            height: 42px;
+        }
+        #schedule {
+            height: calc(100% - calc(64px + 8px)); // top padding plus bottom padding
+            padding: 8px 8px 64px 8px;
+        }
+        #schedarea {
+            height: calc(100% - 52px); // height of controls
+        }
     }
 }
 
