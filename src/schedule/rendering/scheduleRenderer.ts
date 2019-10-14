@@ -48,8 +48,10 @@ export default class ScheduleRenderer {
 
         this.renderSchedule(range, schedule);
 
-        // @ts-ignore
-        document.getElementById('schedarea').style.display = 'block';
+        let loading = document.getElementById('loading');
+        if (loading !== null) loading.style.display = 'none';
+        let schedArea = document.getElementById('schedarea');
+        if (schedArea !== null) schedArea.style.display = 'block';
 
         ScheduleRenderer.updateLinks(range);
     }

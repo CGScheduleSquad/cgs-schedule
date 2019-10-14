@@ -27,17 +27,19 @@ export default class ScheduleCacheManager {
 
         if (scheduleObject.creationTime === undefined || new Date().getTime() - scheduleObject.creationTime > 1000 * 60 * 60 * 24) {
             console.log('Schedule cache is outdated! Loading in the background...');
-            this.reloadSchedulePromise(calendarUUID, true); // save in the background
+            this.reloadSchedulePromise(calendarUUID).catch((reason: any) => {// save in the background
+                console.warn(reason); // if the cache is just outdated and unable to get the schedule, just use the cached schedule and warn in the debugger;
+            });
         }
 
         console.log('Schedule loaded successfully from cache!');
         return Promise.resolve(scheduleObject);
     }
 
-    private static reloadSchedulePromise(calendarUUID: string, loadingInBackground: boolean = false): Promise<string> {
+    private static reloadSchedulePromise(calendarUUID: string): Promise<string> {
         return ScheduleBuilder.generateScheduleFromBlockSources(
             calendarUUID,
-            new VeracrossICSRawBlockSource(calendarUUID, loadingInBackground),
+            new VeracrossICSRawBlockSource(calendarUUID),
             new JSONRawBlockSource()
         ).then((schedule: ScheduleAll) => {
             let jsonString = JSON.stringify(schedule);

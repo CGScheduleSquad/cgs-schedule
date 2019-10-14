@@ -5,15 +5,15 @@ import { VeracrossICalUtils } from './veracrossICalUtils';
 
 export class VeracrossICSRawBlockSource implements RawBlockSource {
     private readonly _calendarUUID: string;
-    private _loadingInBackground: boolean;
 
-    constructor(calendarUUID: string, loadingInBackground: boolean) {
+    constructor(calendarUUID: string) {
         this._calendarUUID = calendarUUID;
-        this._loadingInBackground = loadingInBackground;
     }
 
     getBlocksPromise(): Promise<RawBlock[]> {
-        return VeracrossICalUtils.getVeracrossCalendarFromUUID(this._calendarUUID).then(calendarEvents => {
+        return VeracrossICalUtils.getVeracrossCalendarFromUUID(this._calendarUUID).catch(() => {
+            return Promise.reject('Calendar link returned 404! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!');
+        }).then(calendarEvents => {
             let filteredBlocks = calendarEvents
                 .map((event: any) => {
                     try {
@@ -40,25 +40,9 @@ export class VeracrossICSRawBlockSource implements RawBlockSource {
                 })
                 .filter((rawBlock: any) => rawBlock !== null);
             if (filteredBlocks.length === 0) {
-                let message = 'Found 0 class blocks from the provided calendar link! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!';
-                if (this._loadingInBackground) {
-                    console.warn(message);
-                } else {
-                    alert(message);
-                    window.location.href = './index.html'; // exits the page
-                    throw new Error(message);
-                }
+                return Promise.reject('Found 0 class blocks from the provided calendar link! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!');
             }
             return filteredBlocks;
-        }).catch(() => {
-            let message = 'Calendar link returned 404! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!';
-            if (this._loadingInBackground) {
-                console.warn(message);
-            } else {
-                alert(message);
-                window.location.href = './index.html'; // exits the page
-                throw new Error(message);
-            }
         });
     }
 }
