@@ -78,7 +78,7 @@ function loadSettingsModal(themesObject: {}) {
     const closeModal = () => document.getElementById('settings-modal').classList.remove('is-active');
 
     // @ts-ignore
-    document.getElementById('settings').addEventListener('click', () => openModal());
+    document.getElementById('settings').firstElementChild.addEventListener('click', () => openModal());
     // @ts-ignore
     document.getElementById('save-settings').addEventListener('click', () => {
         // @ts-ignore
