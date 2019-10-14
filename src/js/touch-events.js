@@ -38,7 +38,7 @@ window.touchStart = (event, passedName) => {
 };
 
 window.touchMove = event => {
-    if ($(document).height() <= $(window).height()) { // if there is no scrollbar, prevent touch scrolling
+    if ($(document).height() <= $(window).height()+30) { // if there is no scrollbar, prevent touch scrolling
         event.preventDefault();
     }
     if (event.touches.length === 1) {
