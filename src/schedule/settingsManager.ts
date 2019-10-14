@@ -127,7 +127,7 @@ function applyThemes(themesObject: { [x: string]: any; }) {
 function parseLinkObject(globalSettingsObject: any) {
     let linkObject = {};
     globalSettingsObject.dayLinks.forEach((thing: any) => {
-        if (thing.length > 1 && thing[0].length >= 1) {
+        if (thing.length > 1 && thing[0].length >= 1 && thing[1].length == 1 && thing[1] >= 1 && thing[1] <= 7) {
             let filteredLinks = thing.slice(1).filter((link: string) => link.length >= 1);
             if (filteredLinks.length >= 1) {
                 // @ts-ignore
@@ -135,6 +135,7 @@ function parseLinkObject(globalSettingsObject: any) {
             }
         }
     });
+    debugger;
     return linkObject;
 }
 
@@ -160,20 +161,20 @@ function applyClassLinks(linkObject: any) {
 
     Array.from(document.getElementsByClassName('coursename')).forEach((el: any): any => {
         // @ts-ignore
-        if (linkObject[el.innerText] !== undefined) {
+        let linkObjectElement = linkObject[el.innerText + el.classList.contains()];
+        if (linkObjectElement !== undefined && el.parentElement.classList.contains('blk-' + linkObjectElement[0])) {
             let htmlElement = el.parentElement;
             htmlElement.classList.add('has-link');
             htmlElement.classList.add('link-index-'+linkObjectKeys.indexOf(el.innerText));
 
-
             // @ts-ignore
-            htmlElement.addEventListener('click', () => forceOpenTabIfSafari(linkObject[el.innerText][0]));
+            htmlElement.addEventListener('click', () => forceOpenTabIfSafari(linkObjectElement[0]));
         }
     });
 
     linkObjectKeys.forEach(((className, classNameIndex) => {
         let items = {};
-        linkObject[className].forEach((link: string | number) => {
+        linkObject[className].slice(1).forEach((link: string | number) => {
             // @ts-ignore
             items[link] = {name: link.substring(0, 50).replace("https://", '').replace("http://", '')+(link.length>50?'...':'')}
         });
@@ -185,6 +186,6 @@ function applyClassLinks(linkObject: any) {
             },
             items: items
         });
-    }))
-
+    }));
+    debugger;
 }
