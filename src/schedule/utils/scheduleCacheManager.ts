@@ -27,7 +27,9 @@ export default class ScheduleCacheManager {
 
         if (scheduleObject.creationTime === undefined || new Date().getTime() - scheduleObject.creationTime > 1000 * 60 * 60 * 24) {
             console.log('Schedule cache is outdated! Loading in the background...');
-            this.reloadSchedulePromise(calendarUUID); // save in the background
+            this.reloadSchedulePromise(calendarUUID).catch((reason: any) => {// save in the background
+                console.warn(reason); // if the cache is just outdated and unable to get the schedule, just use the cached schedule and warn in the debugger;
+            });
         }
 
         console.log('Schedule loaded successfully from cache!');
