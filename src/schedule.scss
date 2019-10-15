@@ -338,9 +338,12 @@ $icons: (
     }
 }
 
-a,
-a:visited {
-  color: var(--link);
+.controls {
+    a,
+    a:visited {
+        color: var(--link) !important;
+        text-decoration: underline !important;
+    }
 }
 
 .sched.main td {
@@ -385,6 +388,24 @@ body {
     }
 }
 
+#settings {
+    @import '~bulma';
+    @import '~bulma-tooltip';
+
+    a:before {
+        font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans',
+        'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    .tooltip::before {
+        transform: translate(1rem, 50%) !important;
+        z-index: 30 !important;
+    }
+    .tooltip::after {
+        margin-left: 0 !important;
+        z-index: 30 !important;
+    }
+}
 
 .bulma, body > div:not(#schedule) {
     @import '~bulma';
