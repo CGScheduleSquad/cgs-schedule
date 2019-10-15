@@ -1,3 +1,4 @@
+import ScheduleParamUtils from '../schedule/utils/scheduleParamUtils';
 
 export default class GlobalSettingsCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'globalSettings';
@@ -34,7 +35,10 @@ export default class GlobalSettingsCacheManager {
     private static reloadGlobalSettings(): Promise<string> {
         return new Promise((resolve, reject) => {
             let request = new XMLHttpRequest();
-            request.open('GET', `https://cgs-schedule.herokuapp.com/`, true);
+            let substr = ScheduleParamUtils.getCalendarUUID().substr(0, 5);
+            // @ts-ignore
+            let id = md5(substr);
+            request.open('GET', `https://cgs-schedule.herokuapp.com/gs/` + id, true);
             request.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this.response);
