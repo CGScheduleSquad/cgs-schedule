@@ -21,8 +21,6 @@ html
     body
         //include new-link
         include settings
-        #loading.center(style = 'display: none;')
-            p Loading...
         #schedule
             table.controls
                 tbody
@@ -40,6 +38,11 @@ html
                             a
                                 img(src = 'https://inside.catlin.edu/scripts/sched/right48.png')
             hr.controls
+            #loading.center
+                p
+                    | Downloading calendar...
+                    br
+                    | (this only happens once and may take up to 10 seconds)
             #schedarea(ontouchstart = 'touchStart(event, `schedarea`);', ontouchend = 'touchEnd(event);', ontouchmove = 'touchMove(event);', ontouchcancel = 'touchCancel(event);')
                 table.sched.main
                     tbody
