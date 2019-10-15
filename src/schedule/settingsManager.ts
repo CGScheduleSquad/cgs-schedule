@@ -127,11 +127,13 @@ function applyThemes(themesObject: { [x: string]: any; }) {
 function parseLinkObject(globalSettingsObject: any) {
     let linkObject = {};
     globalSettingsObject.dayLinks.forEach((thing: any) => {
-        if (thing.length > 1 && thing[0].length >= 1) {
-            let filteredLinks = thing.slice(1).filter((link: string) => link.length >= 1);
+        let className = thing[0];
+        let blockNumber = thing[1];
+        if (thing.length > 1 && className.length >= 1 && blockNumber.length == 1 && blockNumber >= 1 && blockNumber <= 7) {
+            let filteredLinks = thing.slice(2).filter((link: string) => link.length >= 1);
             if (filteredLinks.length >= 1) {
                 // @ts-ignore
-                linkObject[thing[0]] = filteredLinks;
+                linkObject[className+blockNumber] = filteredLinks;
             }
         }
     });
@@ -158,33 +160,34 @@ function applyClassLinks(linkObject: any) {
 
     let linkObjectKeys = Object.keys(linkObject);
 
-    Array.from(document.getElementsByClassName('coursename')).forEach((el: any): any => {
+    Array.from(document.getElementsByClassName('coursename')).forEach((courseName: Element): any => {
         // @ts-ignore
-        if (linkObject[el.innerText] !== undefined) {
-            let htmlElement = el.parentElement;
-            htmlElement.classList.add('has-link');
-            htmlElement.classList.add('link-index-'+linkObjectKeys.indexOf(el.innerText));
-
-
-            // @ts-ignore
-            htmlElement.addEventListener('click', () => forceOpenTabIfSafari(linkObject[el.innerText][0]));
-        }
+        let parentElement = courseName.parentElement;
+        if (parentElement === null) return;
+        let blocklabel = parentElement.getAttribute('blocklabel');
+        if (blocklabel === undefined) return;
+        // @ts-ignore
+        let workingKey = courseName.innerText + blocklabel;
+        let linkObjectElement = linkObject[workingKey];
+        if (linkObjectElement === undefined) return;
+        parentElement.classList.add('has-link');
+        parentElement.classList.add('link-index-'+linkObjectKeys.indexOf(workingKey));
+        parentElement.addEventListener('click', () => forceOpenTabIfSafari(linkObjectElement[0]));
     });
 
-    linkObjectKeys.forEach(((className, classNameIndex) => {
-        let items = {};
-        linkObject[className].forEach((link: string | number) => {
+    linkObjectKeys.forEach((className, classNameIndex) => {
+        let items: {} = {};
+        linkObject[className].forEach((link: string) => {
             // @ts-ignore
-            items[link] = {name: link.substring(0, 50).replace("https://", '').replace("http://", '')+(link.length>50?'...':'')}
+            items[link] = { name: link.substring(0, 50).replace("https://", '').replace("http://", '') + (link.length > 50 ? '...' : '') }
         });
         // @ts-ignore
         $.contextMenu({
-            selector: ".link-index-"+classNameIndex,
+            selector: ".link-index-" + classNameIndex,
             callback: function(key: string | undefined) {
                 window.open(key, '_blank');
             },
             items: items
         });
-    }))
-
+    });
 }
