@@ -17,5 +17,7 @@
     <orderEntry type="library" name="jquery.contextMenu" level="application" />
     <orderEntry type="library" name="jquery.ui.position" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="jquery.ui.position" level="application" />
+    <orderEntry type="library" name="md5" level="application" />
   </component>
 </module>
