@@ -22,7 +22,7 @@ export default class GlobalSettingsCacheManager {
             return this.reloadGlobalSettings().then(jsonString => JSON.parse(jsonString));
         }
 
-        if (globalSettingsObject.creationTime === undefined || new Date().getTime() - globalSettingsObject.creationTime > 1000 * 60 * 60 * 24) {
+        if (globalSettingsObject.creationTime === undefined || new Date().getTime() - new Date(globalSettingsObject.creationTime).getTime() > 1000 * 60 * 60 * 24) {
             console.log('Global settings cache is outdated! Loading in the background...');
             this.reloadGlobalSettings(); // save in the background
         }
