@@ -34,7 +34,7 @@ export default class GlobalSettingsCacheManager {
     private static reloadGlobalSettings(): Promise<string> {
         return new Promise((resolve, reject) => {
             let request = new XMLHttpRequest();
-            request.open('GET', `http://localhost:8080`, true);
+            request.open('GET', `https://cgs-schedule.herokuapp.com/`, true);
             request.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this.response);
