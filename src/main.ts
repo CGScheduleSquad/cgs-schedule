@@ -1,10 +1,11 @@
-import ScheduleParamUtils from './utils/scheduleParamUtils';
-import ScheduleCacheManager from './utils/scheduleCacheManager';
-import WindowUtils from '../utils/windowUtils';
-import GlobalSettingsCacheManager from '../globalSettings/globalSettingsCacheManager';
-import { loadAllSettings } from './settingsManager';
+import ScheduleParamUtils from './schedule/utils/scheduleParamUtils';
+import ScheduleCacheManager from './schedule/utils/scheduleCacheManager';
+import WindowUtils from './utils/windowUtils';
+import GlobalSettingsCacheManager from './globalSettings/globalSettingsCacheManager';
+import { loadAllSettings } from './schedule/settingsManager';
 import { toast } from 'bulma-toast';
-import ScheduleRenderer from './rendering/scheduleRenderer';
+import ScheduleRenderer from './schedule/rendering/scheduleRenderer';
+import { CookieManager } from './cookieManager';
 
 // start loading schedule before dom content has loaded, but only draw when the dom has loaded and the schedule has also
 let scheduleAndDomLoaded = new Promise<string>((resolve) => resolve(ScheduleParamUtils.getCalendarUUID()))
@@ -46,6 +47,10 @@ let scheduleAndGlobalSettingsLoaded = Promise.all([
 
 scheduleAndGlobalSettingsLoaded.then((globalSettingsObject => {
     loadAllSettings(globalSettingsObject);
+    if (CookieManager.isSettingsAdDismissed()) {
+        let settingsAd = document.getElementById('settings-ad');
+        if (settingsAd !== null) settingsAd.classList.add('hidden');
+    }
 }));
 
 

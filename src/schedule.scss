@@ -398,13 +398,19 @@ body {
     }
 
     .tooltip::before {
-        transform: translate(1rem, 50%) !important;
         z-index: 30 !important;
+        transform: translate(1rem, 50%) !important;
     }
     .tooltip::after {
-        margin-left: 0 !important;
         z-index: 30 !important;
+        margin-left: 0 !important;
     }
+
+    .hidden.tooltip::before,
+    .hidden.tooltip::after {
+        display: none !important;
+    }
+
 }
 
 .bulma, body > div:not(#schedule) {

@@ -1,6 +1,7 @@
 import ScheduleParamUtils from './utils/scheduleParamUtils';
 import { capitalize } from '../utils/formattingUtils';
 import { toast } from 'bulma-toast';
+import { CookieManager } from '../cookieManager';
 
 let themeCssVariables = [
     '--block-1',
@@ -72,8 +73,13 @@ function loadSettingsModal(themesObject: {}) {
     // @ts-ignore
     linksCheckbox.checked = ScheduleParamUtils.getLinksEnabled();
 
-    // @ts-ignore
-    const openModal = () => document.getElementById('settings-modal').classList.add('is-active');
+    const openModal = () => {
+        let settingsAd = document.getElementById('settings-ad');
+        if (settingsAd !== null) settingsAd.classList.add('hidden');
+        CookieManager.dismissSettingsAd();
+        // @ts-ignore
+        return document.getElementById('settings-modal').classList.add('is-active');
+    };
     // @ts-ignore
     const closeModal = () => document.getElementById('settings-modal').classList.remove('is-active');
 
