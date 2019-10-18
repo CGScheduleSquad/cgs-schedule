@@ -25,6 +25,15 @@
                         | #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=0' ) Add more links.]
                 .field
                     label.label
+                        | Next Day Highlighting
+                        i.fas.fa-highlighter.p-l-sm
+                    .control
+                        input#day-highlight.switch.is-rounded(type='checkbox' name='day-highlight' checked='checked')
+                        label(for='day-highlight')
+                    p.help
+                        | Enables or disables highlighting of the current day in week view.
+                .field
+                    label.label
                         | Tips
                         i.fas.fa-lightbulb.p-l-sm
                     p.help
