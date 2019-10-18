@@ -47,7 +47,7 @@ let scheduleAndGlobalSettingsLoaded = Promise.all([
 
 scheduleAndGlobalSettingsLoaded.then((globalSettingsObject => {
     loadAllSettings(globalSettingsObject);
-    if (CookieManager.isSettingsAdDismissed()) {
+    if (CookieManager.isSettingsAdDismissed() || ScheduleParamUtils.areSettingsSet()) {
         let settingsAd = document.getElementById('settings-ad');
         if (settingsAd !== null) settingsAd.classList.add('hidden');
     }
