@@ -2,6 +2,7 @@ import ScheduleParamUtils from './utils/scheduleParamUtils';
 import { capitalize } from '../utils/formattingUtils';
 import { toast } from 'bulma-toast';
 import { CookieManager } from '../cookieManager';
+import { ViewMode } from './rendering/scheduleRange';
 
 let themeCssVariables = [
     '--block-1',
@@ -34,6 +35,14 @@ function getParameterCaseInsensitive(object: { [x: string]: any; }, key: string)
         ];
 }
 
+function applyHighlight() {
+    let viewMode = ScheduleParamUtils.getViewMode();
+    if (viewMode !== ViewMode.Day) {
+        let labelDay = ScheduleParamUtils.getCurrentDate();
+        $('.daylabel[date=\'' + labelDay.toString() + '\']').addClass('day-highlight');
+    }
+}
+
 export function loadAllSettings(globalSettingsObject: any) {
     if (new URL(window.location.href).hash === "#updated") {
 
@@ -57,6 +66,7 @@ export function loadAllSettings(globalSettingsObject: any) {
 
     applyThemes(themesObject);
     if (ScheduleParamUtils.getLinksEnabled()) applyClassLinks(linkObject);
+    if (ScheduleParamUtils.getHighlightEnabled()) applyHighlight();
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -72,6 +82,10 @@ function loadSettingsModal(themesObject: {}) {
     let linksCheckbox = document.getElementById('class-links');
     // @ts-ignore
     linksCheckbox.checked = ScheduleParamUtils.getLinksEnabled();
+    // @ts-ignore
+    let highlightCheckbox = document.getElementById('day-highlight');
+    // @ts-ignore
+    highlightCheckbox.checked = ScheduleParamUtils.getHighlightEnabled();
 
     const openModal = () => {
         let settingsAd = document.getElementById('settings-ad');
@@ -87,9 +101,17 @@ function loadSettingsModal(themesObject: {}) {
     document.getElementById('settings').firstElementChild.addEventListener('click', () => openModal());
     // @ts-ignore
     document.getElementById('save-settings').addEventListener('click', () => {
-        // @ts-ignore
-        if (linksCheckbox.checked !== ScheduleParamUtils.getLinksEnabled() || sel.value !== ScheduleParamUtils.getTheme()) {
+        if (
+            // @ts-ignore
+            highlightCheckbox.checked !== ScheduleParamUtils.getHighlightEnabled()
+            // @ts-ignore
+            || linksCheckbox.checked !== ScheduleParamUtils.getLinksEnabled()
+            // @ts-ignore
+            || sel.value !== ScheduleParamUtils.getTheme()
+        ) {
             let newUrl = new URL(window.location.href);
+            // @ts-ignore
+            newUrl.searchParams.set('highlight', highlightCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('links', linksCheckbox.checked);
             // @ts-ignore

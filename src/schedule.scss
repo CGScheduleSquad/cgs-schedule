@@ -77,6 +77,12 @@ td.daylabel {
     height: 5%;
     width: 18%;
     text-align: center;
+
+    &.day-highlight {
+        background-color: var(--block-activity);
+        border-radius: 15px 15px 0 0;
+        filter: brightness(115%);
+    }
 }
 
 td.specialday {
@@ -186,6 +192,7 @@ hr.controls {
     width: 100%;
     padding: 0px;
     margin: 0px;
+    margin-bottom: 5px;
 }
 
 td.controls {
