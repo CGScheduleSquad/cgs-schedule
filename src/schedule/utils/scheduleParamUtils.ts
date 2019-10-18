@@ -13,7 +13,11 @@ export default class ScheduleParamUtils {
 
     static getSeedDate(): ScheduleDate {
         const dateString = ScheduleParamUtils.getUrlParam('date');
-        return dateString !== null && dateString !== "" ? ScheduleDate.fromString(dateString) : (ScheduleTime.now().compareTo(new ScheduleTime(12 + 3, 15)) <= 0 ? ScheduleDate.now() : ScheduleDate.now().setDate(ScheduleDate.now().getDate() + 1));
+        return dateString !== null && dateString !== "" ? ScheduleDate.fromString(dateString) : this.getCurrentDate();
+    }
+
+    static getCurrentDate() {
+        return ScheduleTime.now().compareTo(new ScheduleTime(12 + 3, 15)) <= 0 ? ScheduleDate.now() : ScheduleDate.now().setDate(ScheduleDate.now().getDate() + 1);
     }
 
     static getViewMode(): ViewMode {
@@ -50,5 +54,10 @@ export default class ScheduleParamUtils {
     static getLinksEnabled() {
         let linksString = ScheduleParamUtils.getUrlParam('links');
         return linksString == null ? true : linksString !== 'false';
+    }
+
+    static getHighlightEnabled() {
+        let linksString = ScheduleParamUtils.getUrlParam('highlight');
+        return linksString == null ? false : linksString !== 'false';
     }
 }

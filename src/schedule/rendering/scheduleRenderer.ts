@@ -94,6 +94,7 @@ export default class ScheduleRenderer {
             let a = document.createElement('a');
             let b = document.createElement('b');
             td.setAttribute('class', 'daylabel');
+            td.setAttribute('date', date.toString());
             a.setAttribute(
                 'href',
                 `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}`
