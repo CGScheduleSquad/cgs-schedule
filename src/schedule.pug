@@ -16,7 +16,7 @@ html
         script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js')
         script(src = 'https://cdnjs.cloudflare.com/ajax/libs/ical.js/1.3.0/ical.min.js')
-        script(src = 'schedule/main.ts')
+        script(src = 'main.ts')
         script(src = 'js/touch-events.js')
         title CGS Schedule
     body
@@ -34,7 +34,8 @@ html
                         td#this-week.controls.links
                             a This Week
                         td#settings.controls.links
-                            a Settings
+                            a#settings-ad.tooltip.tooltip.is-tooltip-right.is-tooltip-active(data-tooltip="New!")
+                                | Settings
                         td.controls.arrows
                             a
                                 img(src = 'https://inside.catlin.edu/scripts/sched/right48.png')

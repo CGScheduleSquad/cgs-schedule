@@ -60,4 +60,8 @@ export default class ScheduleParamUtils {
         let linksString = ScheduleParamUtils.getUrlParam('highlight');
         return linksString == null ? false : linksString !== 'false';
     }
+
+    static areSettingsSet() {
+        return ScheduleParamUtils.getUrlParam('links') !== null;
+    }
 }
