@@ -1,30 +1,17 @@
 import ScheduleTime from '../time/scheduleTime';
 import ScheduleDate from '../time/scheduleDate';
+import { VeracrossICalUtils } from './veracrossICalUtils';
 
-export class VeracrossICalUtils {
-    static getVeracrossCalendarFromUUID = (calendarUUID: string): Promise<any> =>
-        VeracrossICalUtils.corsGetPromise(`http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics`).then(
+export class GenericICalUtils {
+    static getCalendarEventsFromUUID = (calendarURL: string): Promise<any> =>
+        VeracrossICalUtils.corsGetPromise(calendarURL).then(
             icsFile => {
                 // @ts-ignore
-                return ICAL.parse(icsFile)[2].filter((a: any) => a[1].length === 8);
+                let parsedPath = ICAL.parse(icsFile);
+                console.log(parsedPath);
+                return parsedPath[2];
             }
         );
-
-    public static corsGetPromise(url: string): Promise<string> {
-        return new Promise((resolve, reject) => {
-            let request = new XMLHttpRequest();
-            request.open('GET', `https://cgs-schedule-cors.herokuapp.com/${url}`, true);
-            request.onload = function() {
-                if (this.status >= 200 && this.status < 400) {
-                    resolve(this.response);
-                } else {
-                    reject();
-                }
-            };
-            request.onerror = () => reject();
-            request.send();
-        });
-    }
 
     private static inMatrix(query: any, matrix: [[]]): number {
         let res = -1;
@@ -35,7 +22,7 @@ export class VeracrossICalUtils {
     }
 
     private static getDescription(matrix: any): any {
-        let i = VeracrossICalUtils.inMatrix('description', matrix);
+        let i = GenericICalUtils.inMatrix('description', matrix);
         let description = [];
         if (i > -1) {
             let raw = matrix[i][3];
@@ -51,7 +38,7 @@ export class VeracrossICalUtils {
     }
 
     static getLocation(event: any): string {
-        let location = VeracrossICalUtils.getDescription(event)[2].Room;
+        let location = GenericICalUtils.getDescription(event)[2].Room;
         let replacements = {
             'Math: ': '',
             'Science Lab ': '',
@@ -64,15 +51,15 @@ export class VeracrossICalUtils {
     }
 
     static getLetter(event: any): string {
-        let letter = VeracrossICalUtils.getDescription(event)[1].Day.match(/US Day [A-Z]/);
+        let letter = GenericICalUtils.getDescription(event)[1].Day.match(/US Day [A-Z]/);
         letter = letter !== null ? letter[0].charAt(letter[0].length - 1) : '';
         return letter;
     }
 
-    static getLabel = (event: any): string => VeracrossICalUtils.getDescription(event)[0].Block;
+    static getLabel = (event: any): string => GenericICalUtils.getDescription(event)[0].Block;
 
     private static getDT(time: string, matrix: any): ScheduleTime | null {
-        let i = VeracrossICalUtils.inMatrix(`dt${time}`, matrix);
+        let i = GenericICalUtils.inMatrix(`dt${time}`, matrix);
         return i > -1 ? ScheduleTime.fromDate(new Date(matrix[i][3])) : null;
     }
 
@@ -85,12 +72,12 @@ export class VeracrossICalUtils {
     }
 
     static getDate(matrix: any): ScheduleDate | null {
-        let i = VeracrossICalUtils.inMatrix(`dtstart`, matrix);
+        let i = GenericICalUtils.inMatrix(`dtstart`, matrix);
         return i > -1 ? ScheduleDate.fromDate(new Date(matrix[i][3])) : null;
     }
 
     static getTitle(matrix: any): any {
-        let i = VeracrossICalUtils.inMatrix('summary', matrix);
-        return i > -1 ? matrix[i][3].split(' - ')[0] : 'N/A';
+        let i = GenericICalUtils.inMatrix('summary', matrix);
+        return i > -1 ? matrix[i][3] : null;
     }
 }

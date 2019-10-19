@@ -3,6 +3,8 @@ import { capitalize } from '../utils/formattingUtils';
 import { toast } from 'bulma-toast';
 import { CookieManager } from '../cookieManager';
 import { ViewMode } from './rendering/scheduleRange';
+import { GenericICalUtils } from './veracross/genericICalUtils';
+import { VeracrossICalUtils } from './veracross/veracrossICalUtils';
 
 let themeCssVariables = [
     '--block-1',
@@ -61,12 +63,14 @@ export function loadAllSettings(globalSettingsObject: any) {
 
     let themesObject = parseThemesObject(globalSettingsObject);
     let linkObject = parseLinkObject(globalSettingsObject);
+    let calendarFeedObject = parseCalendarFeedObject(globalSettingsObject);
 
     loadSettingsModal(themesObject);
 
     applyThemes(themesObject);
     if (ScheduleParamUtils.getLinksEnabled()) applyClassLinks(linkObject);
     if (ScheduleParamUtils.getHighlightEnabled()) applyHighlight();
+    if (true) applyCalendarFeeds(calendarFeedObject);
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -168,6 +172,22 @@ function parseLinkObject(globalSettingsObject: any) {
     return linkObject;
 }
 
+function parseCalendarFeedObject(globalSettingsObject: any) {
+    let calFeedsObject = {};
+    globalSettingsObject.calFeeds.forEach((thing: any) => {
+        let className = thing[0];
+        let blockNumber = thing[1];
+        if (thing.length > 1 && className.length >= 1 && blockNumber.length == 1 && blockNumber >= 1 && blockNumber <= 7) {
+            let filteredFeeds = thing.slice(2).filter((link: string) => link.length >= 1);
+            if (filteredFeeds.length >= 1) {
+                // @ts-ignore
+                calFeedsObject[className + blockNumber] = filteredFeeds;
+            }
+        }
+    });
+    return calFeedsObject;
+}
+
 function forceOpenTabIfSafari(href: string) {
     var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
@@ -219,3 +239,36 @@ function applyClassLinks(linkObject: any) {
         });
     });
 }
+
+function applyCalendarFeeds(calendarFeedObject: any) {
+    console.log(calendarFeedObject);
+    for (let calendarFeedObjectKey in calendarFeedObject) {
+        let entry = calendarFeedObject[calendarFeedObjectKey];
+        GenericICalUtils.getCalendarEventsFromUUID(entry[1]).catch(() => {
+            return Promise.reject('Calendar link returned 404!');
+        }).then(calendarEvents => {
+            return calendarEvents
+                .map((event: any) => {
+                    try {
+                        let date = VeracrossICalUtils.getDate(event[1]);
+                        let title = VeracrossICalUtils.getTitle(event[1]);
+                        let splitTitle = title.split(' [');
+                        let description = splitTitle[0].replace(/\(.+\)/, '').trim();
+                        let canvasId = splitTitle[1].slice(0, -1);
+
+                        if (
+                            date === null || canvasId !== entry[0]
+                        )
+                            return null;
+
+                        return { date, description, canvasId };
+                    } catch (e) {
+                        return null;
+                    }
+                })
+                .filter((rawBlock: any) => rawBlock !== null);
+        }).then(result => console.log(result));
+
+    }
+}
+
