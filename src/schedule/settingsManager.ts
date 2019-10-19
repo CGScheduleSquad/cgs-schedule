@@ -127,16 +127,19 @@ function loadSettingsModal(themesObject: {}) {
 }
 
 function parseThemesObject(globalSettingsObject: any) {
+    var namePattern = /^[\w| ]+$/i;
     var colorPattern = /^#([0-9a-f]{3})([0-9a-f]{3})?$/i;
     let themesObject = {};
-    globalSettingsObject.themes.forEach((themeArray: any) => {
-        if (themeArray.length >= themeCssVariables.length + 1 && themeArray[0].length >= 1) {
+    globalSettingsObject.themes.forEach((theme: any) => {
+        if (theme.length < themeCssVariables.length + 1) return;
+        // @ts-ignore
+        let textValues = theme.slice(1, themeCssVariables.length + 1);
+        if (namePattern.test(theme[0]) && textValues.every((value: string) => colorPattern.test(value))) {
             // @ts-ignore
-            let textValues = themeArray.slice(1, themeCssVariables.length + 1);
-            if (textValues.every((value: string) => colorPattern.test(value))) {
-                // @ts-ignore
-                themesObject[themeArray[0].toLowerCase()] = textValues;
-            }
+            themesObject[theme[0].toLowerCase()] = textValues;
+        } else {
+            console.log("Ignored theme entry: ");
+            console.log(theme);
         }
     });
     return themesObject;
@@ -153,16 +156,23 @@ function applyThemes(themesObject: { [x: string]: any; }) {
 }
 
 function parseLinkObject(globalSettingsObject: any) {
+    var classNamePattern = /^[^<>\n\\"'`=]+$/;
+    var blockNumberPattern = /^[1-7]$/;
+    var urlPattern = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+    var minLength = 3;
+
     let linkObject = {};
-    globalSettingsObject.dayLinks.forEach((thing: any) => {
-        let className = thing[0];
-        let blockNumber = thing[1];
-        if (thing.length > 1 && className.length >= 1 && blockNumber.length == 1 && blockNumber >= 1 && blockNumber <= 7) {
-            let filteredLinks = thing.slice(2).filter((link: string) => link.length >= 1);
-            if (filteredLinks.length >= 1) {
-                // @ts-ignore
-                linkObject[className+blockNumber] = filteredLinks;
-            }
+    globalSettingsObject.dayLinks.forEach((linkEntry: any) => {
+        if (linkEntry.length < minLength) return;
+        let className = linkEntry[0];
+        let blockNumber = linkEntry[1];
+        let filteredLinks = linkEntry.slice(2).filter((link: string) => urlPattern.test(link));
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && filteredLinks.length >= 1) {
+            // @ts-ignore
+            linkObject[className+blockNumber] = filteredLinks;
+        } else {
+            console.log("Ignored link entry: ");
+            console.log(linkEntry);
         }
     });
     return linkObject;
