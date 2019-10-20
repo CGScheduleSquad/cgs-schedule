@@ -2,7 +2,7 @@ import ScheduleParamUtils from './utils/scheduleParamUtils';
 import { capitalize } from '../utils/formattingUtils';
 import { toast } from 'bulma-toast';
 import { CookieManager } from '../cookieManager';
-import { ViewMode } from './rendering/scheduleRange';
+import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
 
 let themeCssVariables = [
     '--block-1',
@@ -38,8 +38,9 @@ function getParameterCaseInsensitive(object: { [x: string]: any; }, key: string)
 function applyHighlight() {
     let viewMode = ScheduleParamUtils.getViewMode();
     if (viewMode !== ViewMode.Day) {
-        let labelDay = ScheduleParamUtils.getCurrentDate();
-        $('.daylabel[date=\'' + labelDay.toString() + '\']').addClass('day-highlight');
+        let highlightDay = new ScheduleRange(ScheduleParamUtils.getCurrentDate(), ViewMode.Day).startDate;
+        console.log(highlightDay);
+        $('.daylabel[date=\'' + highlightDay.toString() + '\']').addClass('day-highlight');
     }
 }
 
@@ -203,10 +204,11 @@ function applyClassLinks(linkObject: any) {
         let parentElement = courseName.parentElement;
         if (parentElement === null) return;
         let blocklabel = parentElement.getAttribute('blocklabel');
-        if (blocklabel === undefined) return;
         // @ts-ignore
         let workingKey = courseName.innerText + blocklabel;
         let linkObjectElement = linkObject[workingKey];
+        // @ts-ignore // TODO: Remove
+        if (courseName.innerText === 'Lunch') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
         if (linkObjectElement === undefined) return;
         parentElement.classList.add('has-link');
         parentElement.classList.add('link-index-'+linkObjectKeys.indexOf(workingKey));
