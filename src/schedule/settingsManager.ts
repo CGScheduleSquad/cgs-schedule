@@ -204,10 +204,11 @@ function applyClassLinks(linkObject: any) {
         let parentElement = courseName.parentElement;
         if (parentElement === null) return;
         let blocklabel = parentElement.getAttribute('blocklabel');
-        if (blocklabel === undefined) return;
         // @ts-ignore
         let workingKey = courseName.innerText + blocklabel;
         let linkObjectElement = linkObject[workingKey];
+        // @ts-ignore // TODO: Remove
+        if (courseName.innerText === 'Lunch') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
         if (linkObjectElement === undefined) return;
         parentElement.classList.add('has-link');
         parentElement.classList.add('link-index-'+linkObjectKeys.indexOf(workingKey));
