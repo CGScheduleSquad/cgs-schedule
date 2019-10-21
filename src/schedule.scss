@@ -260,8 +260,10 @@ td.controls.links {
         font-size: 200%;
     }
 
+  @media (max-aspect-ratio: 2/3) {
     td.controls {
-        font-size: 150%;
+      font-size: 150%;
+    }
     }
 }
 
