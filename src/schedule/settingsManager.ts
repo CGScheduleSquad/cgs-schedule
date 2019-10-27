@@ -2,9 +2,9 @@ import ScheduleParamUtils from './utils/scheduleParamUtils';
 import { capitalize } from '../utils/formattingUtils';
 import { toast } from 'bulma-toast';
 import { CookieManager } from '../cookieManager';
-import { ViewMode } from './rendering/scheduleRange';
-import { GenericICalUtils } from './veracross/genericICalUtils';
+import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
 import { VeracrossICalUtils } from './veracross/veracrossICalUtils';
+import GenericCacheManager from '../globalSettings/genericCacheManager';
 
 let themeCssVariables = [
     '--block-1',
@@ -40,22 +40,22 @@ function getParameterCaseInsensitive(object: { [x: string]: any; }, key: string)
 function applyHighlight() {
     let viewMode = ScheduleParamUtils.getViewMode();
     if (viewMode !== ViewMode.Day) {
-        let labelDay = ScheduleParamUtils.getCurrentDate();
-        $('.daylabel[date=\'' + labelDay.toString() + '\']').addClass('day-highlight');
+        let highlightDay = new ScheduleRange(ScheduleParamUtils.getCurrentDate(), ViewMode.Day).startDate;
+        $('.daylabel[date=\'' + highlightDay.toString() + '\']').addClass('day-highlight');
     }
 }
 
 export function loadAllSettings(globalSettingsObject: any) {
-    if (new URL(window.location.href).hash === "#updated") {
+    if (new URL(window.location.href).hash === '#updated') {
 
         toast({
-            message: "Settings updated successfully. Please bookmark the new link.",
-            type: "is-info",
+            message: 'Settings updated successfully. Please bookmark the new link.',
+            type: 'is-info',
             duration: 5000,
             position: 'top-center',
             dismissible: true,
             pauseOnHover: true,
-            animate: { in: "fadeInDown", out: "fadeOutUp" }
+            animate: { in: 'fadeInDown', out: 'fadeOutUp' }
         });
 
         window.location.hash = '';
@@ -120,7 +120,7 @@ function loadSettingsModal(themesObject: {}) {
             newUrl.searchParams.set('links', linksCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('theme', sel.value);
-            newUrl.hash = "#updated";
+            newUrl.hash = '#updated';
             window.location.href = newUrl.href;
         }
         closeModal();
@@ -142,7 +142,7 @@ function parseThemesObject(globalSettingsObject: any) {
             // @ts-ignore
             themesObject[theme[0].toLowerCase()] = textValues;
         } else {
-            console.log("Ignored theme entry: ");
+            console.log('Ignored theme entry: ');
             console.log(theme);
         }
     });
@@ -160,7 +160,7 @@ function applyThemes(themesObject: { [x: string]: any; }) {
 }
 
 function parseLinkObject(globalSettingsObject: any) {
-    var classNamePattern = /^[^<>\n\\"'`=]+$/;
+    var classNamePattern = /^[^<>\n\\=]+$/;
     var blockNumberPattern = /^[1-7]$/;
     var urlPattern = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     var minLength = 3;
@@ -173,9 +173,9 @@ function parseLinkObject(globalSettingsObject: any) {
         let filteredLinks = linkEntry.slice(2).filter((link: string) => urlPattern.test(link));
         if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && filteredLinks.length >= 1) {
             // @ts-ignore
-            linkObject[className+blockNumber] = filteredLinks;
+            linkObject[className + blockNumber] = filteredLinks;
         } else {
-            console.log("Ignored link entry: ");
+            console.log('Ignored link entry: ');
             console.log(linkEntry);
         }
     });
@@ -183,15 +183,17 @@ function parseLinkObject(globalSettingsObject: any) {
 }
 
 function parseCalendarFeedObject(globalSettingsObject: any) {
+    let allClassIds = getAllClassIds();
     let calFeedsObject = {};
     globalSettingsObject.calFeeds.forEach((thing: any) => {
         let className = thing[0];
         let blockNumber = thing[1];
         if (thing.length > 1 && className.length >= 1 && blockNumber.length == 1 && blockNumber >= 1 && blockNumber <= 7) {
             let filteredFeeds = thing.slice(2).filter((link: string) => link.length >= 1);
-            if (filteredFeeds.length >= 1) {
+            let classKey = className + blockNumber;
+            if (filteredFeeds.length >= 1 && allClassIds.has(classKey)) {
                 // @ts-ignore
-                calFeedsObject[className + blockNumber] = filteredFeeds;
+                calFeedsObject[classKey] = filteredFeeds;
             }
         }
     });
@@ -203,14 +205,14 @@ function forceOpenTabIfSafari(href: string) {
 
     if (isSafari) {
         var a = document.createElement('a');
-        a.setAttribute("href", href);
-        a.setAttribute("target", "_blank");
+        a.setAttribute('href', href);
+        a.setAttribute('target', '_blank');
 
-        var dispatch = document.createEvent("HTMLEvents");
-        dispatch.initEvent("click", true, true);
+        var dispatch = document.createEvent('HTMLEvents');
+        dispatch.initEvent('click', true, true);
         a.dispatchEvent(dispatch);
     } else {
-        window.open(href, "_blank")
+        window.open(href, '_blank');
     }
 }
 
@@ -223,13 +225,14 @@ function applyClassLinks(linkObject: any) {
         let parentElement = courseName.parentElement;
         if (parentElement === null) return;
         let blocklabel = parentElement.getAttribute('blocklabel');
-        if (blocklabel === undefined) return;
         // @ts-ignore
         let workingKey = courseName.innerText + blocklabel;
         let linkObjectElement = linkObject[workingKey];
+        // @ts-ignore // TODO: Remove
+        if (courseName.innerText === 'Lunch') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
         if (linkObjectElement === undefined) return;
         parentElement.classList.add('has-link');
-        parentElement.classList.add('link-index-'+linkObjectKeys.indexOf(workingKey));
+        parentElement.classList.add('link-index-' + linkObjectKeys.indexOf(workingKey));
         parentElement.addEventListener('click', () => forceOpenTabIfSafari(linkObjectElement[0]));
     });
 
@@ -237,11 +240,11 @@ function applyClassLinks(linkObject: any) {
         let items: {} = {};
         linkObject[className].forEach((link: string) => {
             // @ts-ignore
-            items[link] = { name: link.substring(0, 50).replace("https://", '').replace("http://", '') + (link.length > 50 ? '...' : '') }
+            items[link] = { name: link.substring(0, 50).replace('https://', '').replace('http://', '') + (link.length > 50 ? '...' : '') };
         });
         // @ts-ignore
         $.contextMenu({
-            selector: ".link-index-" + classNameIndex,
+            selector: '.link-index-' + classNameIndex,
             callback: function(key: string | undefined) {
                 window.open(key, '_blank');
             },
@@ -250,35 +253,58 @@ function applyClassLinks(linkObject: any) {
     });
 }
 
+function getAllClassIds() {
+    let listOfClasses = new Set();
+    Array.from(document.getElementsByClassName('coursename')).forEach((courseName: Element): any => {
+        // @ts-ignore
+        let parentElement = courseName.parentElement;
+        if (parentElement === null) return;
+        let blocklabel = parentElement.getAttribute('blocklabel');
+        // @ts-ignore
+        let workingKey = courseName.innerText + blocklabel;
+        listOfClasses.add(workingKey);
+    });
+    return listOfClasses;
+}
+
 function applyCalendarFeeds(calendarFeedObject: any) {
     console.log(calendarFeedObject);
-    for (let calendarFeedObjectKey in calendarFeedObject) {
-        let entry = calendarFeedObject[calendarFeedObjectKey];
-        GenericICalUtils.getCalendarEventsFromUUID(entry[1]).catch(() => {
-            return Promise.reject('Calendar link returned 404!');
-        }).then(calendarEvents => {
-            return calendarEvents
-                .map((event: any) => {
-                    try {
-                        let date = VeracrossICalUtils.getDate(event[1]);
-                        let title = VeracrossICalUtils.getTitle(event[1]);
-                        let splitTitle = title.split(' [');
-                        let description = splitTitle[0].replace(/\(.+\)/, '').trim();
-                        let canvasId = splitTitle[1].slice(0, -1);
 
-                        if (
-                            date === null || canvasId !== entry[0]
-                        )
-                            return null;
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, calendarFeedObject[key]).then(icsString => {
+        // @ts-ignore
+        let parsedPath = ICAL.parse(icsString);
+        console.log(parsedPath);
+        return parsedPath[2];
+    }).then(calendarEvents => {
+        return calendarEvents
+            .map((event: any) => {
+                try {
+                    let date = VeracrossICalUtils.getDate(event[1]);
+                    let title = VeracrossICalUtils.getTitle(event[1]);
+                    let splitTitle = title.split(' [');
+                    let description = splitTitle[0].replace(/\(.+\)/, '').trim();
+                    let canvasId = splitTitle[1].slice(0, -1);
 
-                        return { date, description, canvasId };
-                    } catch (e) {
+                    if (
+                        date === null || canvasId !== calendarFeedObject[key][0]
+                    )
                         return null;
-                    }
-                })
-                .filter((rawBlock: any) => rawBlock !== null);
+
+                    return { date, description, canvasId };
+                } catch (e) {
+                    return null;
+                }
+            })
+            .filter((rawBlock: any) => rawBlock !== null);
+    });
+    off.catch(() => {
+        console.warn('Calendar link returned 404!');
+        return null;
         }).then(result => console.log(result));
 
-    }
+    let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
+    Promise.all(allCalPromises).then(calendars => {
+        console.log('done');
+    });
 }
 
