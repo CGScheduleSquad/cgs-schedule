@@ -9,26 +9,29 @@
                     label.label
                         | Theme
                         i.fas.fa-palette.p-l-sm
-                    .control
-                        .select.is-fullwidth
-                            select#theme
-                    p.help Selects a user-created color theme for the schedule. #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1757467265' ) Create a new theme.]
+                    .field.has-addons
+                        .control.is-expanded
+                            .select.is-fullwidth
+                                select#theme
+                        .control
+                            a.button( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1757467265' ) Create New Theme
+                    p.help Selects a user-created color theme for the schedule.
                 .field
                     label.label
                         | Class Homepage Links
                         i.fas.fa-link.p-l-sm
                     .control
-                        input#class-links.switch.is-rounded.is-info(type='checkbox' name='class-links' checked='checked')
+                        input#class-links.switch.is-rounded.is-medium.is-info(type='checkbox' name='class-links' checked='checked')
                         label(for='class-links')
+                        a.button( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=0' ) Add More Links
                     p.help
                         | Enables or disables user-added class links. Useful for homework calendars.
-                        | #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=0' ) Add more links.]
                 .field
                     label.label
                         | Next Day Highlighting
                         i.fas.fa-highlighter.p-l-sm
                     .control
-                        input#day-highlight.switch.is-rounded(type='checkbox' name='day-highlight' checked='checked')
+                        input#day-highlight.switch.is-rounded.is-medium(type='checkbox' name='day-highlight' checked='checked')
                         label(for='day-highlight')
                     p.help
                         | Enables or disables highlighting of the current day in week view.

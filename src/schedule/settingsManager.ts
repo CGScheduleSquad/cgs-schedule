@@ -39,7 +39,6 @@ function applyHighlight() {
     let viewMode = ScheduleParamUtils.getViewMode();
     if (viewMode !== ViewMode.Day) {
         let highlightDay = new ScheduleRange(ScheduleParamUtils.getCurrentDate(), ViewMode.Day).startDate;
-        console.log(highlightDay);
         $('.daylabel[date=\'' + highlightDay.toString() + '\']').addClass('day-highlight');
     }
 }
