@@ -5,11 +5,11 @@ html
         meta(name = 'apple-mobile-web-app-capable', content = 'yes')
         // reload the page every 30 mins
         meta(http-equiv="refresh" content="1800")
-        link(rel = 'shortcut icon', href = 'https://inside.catlin.edu/scripts/sched/favicon.ico')
-        link(rel = 'apple-touch-icon-precomposed', sizes = '144x144', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-144x144-precomposed.png')
-        link(rel = 'apple-touch-icon-precomposed', sizes = '114x114', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-114x114-precomposed.png')
-        link(rel = 'apple-touch-icon-precomposed', sizes = '72x72', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-72x72-precomposed.png')
-        link(rel = 'apple-touch-icon-precomposed', href = 'https://inside.catlin.edu/scripts/sched/apple-touch-icon-precomposed.png')
+        link(rel = 'shortcut icon', href = 'favicon.ico')
+        link(rel = 'apple-touch-icon-precomposed', sizes = '144x144', href = 'img/apple-touch-icon-144x144-precomposed.png')
+        link(rel = 'apple-touch-icon-precomposed', sizes = '114x114', href = 'img/apple-touch-icon-114x114-precomposed.png')
+        link(rel = 'apple-touch-icon-precomposed', sizes = '72x72', href = 'img/apple-touch-icon-72x72-precomposed.png')
+        link(rel = 'apple-touch-icon-precomposed', href = 'img/apple-touch-icon-precomposed.png')
         link(href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css", rel="stylesheet")
         link(rel = 'stylesheet', href = 'schedule.scss')
         script(src='https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.12.0/js/md5.min.js')
@@ -30,7 +30,7 @@ html
                     tr
                         td.controls.arrows
                             a
-                                img(src = 'https://inside.catlin.edu/scripts/sched/left48.png')
+                                img(src = 'img/left48.png')
                         td#today.controls.links
                             a Today
                         td#this-week.controls.links
@@ -40,7 +40,7 @@ html
                                 | Settings
                         td.controls.arrows
                             a
-                                img(src = 'https://inside.catlin.edu/scripts/sched/right48.png')
+                                img(src = 'img/right48.png')
             hr.controls
             #loading.center
                 p
