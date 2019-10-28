@@ -9,13 +9,13 @@ export default class GenericCacheManager {
                                   versionNumber: number = GenericCacheManager.DEFAULT_VERSION_NUMBER): Promise<any> {
         if (localStorage === undefined) {
             console.warn('Local storage is not supported! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber).then(jsonString => JSON.parse(jsonString).content);
+            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber);
         }
 
         let globalSettingsString = localStorage.getItem(localStorageKey);
         if (globalSettingsString === null) {
             console.log(localStorageKey + ' cache does not exist! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber).then(jsonString => JSON.parse(jsonString).content);
+            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber);
         }
 
         let globalSettingsObject;
@@ -26,7 +26,7 @@ export default class GenericCacheManager {
         }
         if (globalSettingsObject === undefined || globalSettingsObject.versionNumber === undefined || globalSettingsObject.versionNumber !== versionNumber) {
             console.log(localStorageKey + ' cache is invalid! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber).then(jsonString => JSON.parse(jsonString).content);
+            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber);
         }
 
         if (globalSettingsObject.creationTime === undefined || new Date().getTime() - new Date(globalSettingsObject.creationTime).getTime() > expireTime) {

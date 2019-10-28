@@ -314,7 +314,6 @@ function applyCalendarFeeds(calendarFeedObject: any) {
     let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
     Promise.all(allCalPromises).then((calendars: Array<any>) => {
         calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
-            console.log(calendarEvents);
             calendarEvents.forEach((value: any) => {
                 let htmlElements = $( `td[blocklabel="${value.blocklabel}"][title="${value.title}"][date="${value.date}"]` );
                 htmlElements.children(".subtitle").text(" "+value.description+" ").addClass("calendar-feed-subtitle");
