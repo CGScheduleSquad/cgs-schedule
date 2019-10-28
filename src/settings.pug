@@ -25,6 +25,16 @@
                         | #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=0' ) Add more links.]
                 .field
                     label.label
+                        | Canvas Calendar Events
+                        i.far.fa-calendar-alt.p-l-sm
+                    .control
+                        input#calendar-events.switch.is-rounded.is-success(type='checkbox' name='calendar-events' checked='checked')
+                        label(for='calendar-events')
+                    p.help
+                        | Enables or disables inline canvas calendar events.
+                        | #[a( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1673690997' ) Add more calendars.]
+                .field
+                    label.label
                         | Next Day Highlighting
                         i.fas.fa-highlighter.p-l-sm
                     .control

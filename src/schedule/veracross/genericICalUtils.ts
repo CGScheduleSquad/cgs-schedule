@@ -8,7 +8,6 @@ export class GenericICalUtils {
             icsFile => {
                 // @ts-ignore
                 let parsedPath = ICAL.parse(icsFile);
-                console.log(parsedPath);
                 return parsedPath[2];
             }
         );

@@ -70,7 +70,7 @@ export function loadAllSettings(globalSettingsObject: any) {
     applyThemes(themesObject);
     if (ScheduleParamUtils.getLinksEnabled()) applyClassLinks(linkObject);
     if (ScheduleParamUtils.getHighlightEnabled()) applyHighlight();
-    if (true) applyCalendarFeeds(calendarFeedObject);
+    if (ScheduleParamUtils.getCalendarEventsEnabled()) applyCalendarFeeds(calendarFeedObject);
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -86,6 +86,10 @@ function loadSettingsModal(themesObject: {}) {
     let linksCheckbox = document.getElementById('class-links');
     // @ts-ignore
     linksCheckbox.checked = ScheduleParamUtils.getLinksEnabled();
+    // @ts-ignore
+    let calendarCheckbox = document.getElementById('calendar-events');
+    // @ts-ignore
+    calendarCheckbox.checked = ScheduleParamUtils.getCalendarEventsEnabled();
     // @ts-ignore
     let highlightCheckbox = document.getElementById('day-highlight');
     // @ts-ignore
@@ -111,6 +115,8 @@ function loadSettingsModal(themesObject: {}) {
             // @ts-ignore
             || linksCheckbox.checked !== ScheduleParamUtils.getLinksEnabled()
             // @ts-ignore
+            || calendarCheckbox.checked !== ScheduleParamUtils.getCalendarEventsEnabled()
+            // @ts-ignore
             || sel.value !== ScheduleParamUtils.getTheme()
         ) {
             let newUrl = new URL(window.location.href);
@@ -118,6 +124,8 @@ function loadSettingsModal(themesObject: {}) {
             newUrl.searchParams.set('highlight', highlightCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('links', linksCheckbox.checked);
+            // @ts-ignore
+            newUrl.searchParams.set('calendars', calendarCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('theme', sel.value);
             newUrl.hash = '#updated';
@@ -159,10 +167,10 @@ function applyThemes(themesObject: { [x: string]: any; }) {
     }
 }
 
+var urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+var classNamePattern = /^[^<>\n\\=]+$/;
+var blockNumberPattern = /^[1-7]$/;
 function parseLinkObject(globalSettingsObject: any) {
-    var classNamePattern = /^[^<>\n\\=]+$/;
-    var blockNumberPattern = /^[1-7]$/;
-    var urlPattern = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     var minLength = 3;
 
     let linkObject = {};
@@ -183,17 +191,21 @@ function parseLinkObject(globalSettingsObject: any) {
 }
 
 function parseCalendarFeedObject(globalSettingsObject: any) {
+    let length = 4;
+
     let allClassIds = getAllClassIds();
     let calFeedsObject = {};
     globalSettingsObject.calFeeds.forEach((thing: any) => {
+        if (thing.length !== length) return;
         let className = thing[0];
         let blockNumber = thing[1];
-        if (thing.length > 1 && className.length >= 1 && blockNumber.length == 1 && blockNumber >= 1 && blockNumber <= 7) {
-            let filteredFeeds = thing.slice(2).filter((link: string) => link.length >= 1);
+        let canvasId = thing[2];
+        let calendarUrl = thing[3];
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && classNamePattern.test(canvasId) && urlPattern.test(calendarUrl)) {
             let classKey = className + blockNumber;
-            if (filteredFeeds.length >= 1 && allClassIds.has(classKey)) {
+            if (allClassIds.has(classKey)) {
                 // @ts-ignore
-                calFeedsObject[classKey] = filteredFeeds;
+                calFeedsObject[classKey] = [canvasId, calendarUrl];
             }
         }
     });
@@ -268,12 +280,9 @@ function getAllClassIds() {
 }
 
 function applyCalendarFeeds(calendarFeedObject: any) {
-    console.log(calendarFeedObject);
-
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, calendarFeedObject[key]).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, calendarFeedObject[key][1]).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
-        console.log(parsedPath);
         return parsedPath[2];
     }).then(calendarEvents => {
         return calendarEvents
@@ -290,21 +299,27 @@ function applyCalendarFeeds(calendarFeedObject: any) {
                     )
                         return null;
 
-                    return { date, description, canvasId };
+                    return { date, description, canvasId, title: key.slice(0, -1), blocklabel: key.slice(-1)};
                 } catch (e) {
                     return null;
                 }
             })
             .filter((rawBlock: any) => rawBlock !== null);
-    });
-    off.catch(() => {
+    }).catch((e: Error) => {
+        console.warn(e);
         console.warn('Calendar link returned 404!');
         return null;
-        }).then(result => console.log(result));
+    });
 
     let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
-    Promise.all(allCalPromises).then(calendars => {
-        console.log('done');
+    Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
+            console.log(calendarEvents);
+            calendarEvents.forEach((value: any) => {
+                let htmlElements = $( `td[blocklabel="${value.blocklabel}"][title="${value.title}"][date="${value.date}"]` );
+                htmlElements.children(".subtitle").text(" "+value.description+" ").addClass("calendar-feed-subtitle");
+            })
+        });
     });
 }
 

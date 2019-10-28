@@ -86,7 +86,9 @@ export class VeracrossICalUtils {
 
     static getDate(matrix: any): ScheduleDate | null {
         let i = VeracrossICalUtils.inMatrix(`dtstart`, matrix);
-        return i > -1 ? ScheduleDate.fromDate(new Date(matrix[i][3])) : null;
+        let dateString = matrix[i][3];
+        if (/^\d\d\d\d-\d\d-\d\d$/.test(dateString)) dateString = dateString.concat("T00:00");
+        return i > -1 ? ScheduleDate.fromDate(new Date(dateString)) : null;
     }
 
     static getTitle(matrix: any): any {

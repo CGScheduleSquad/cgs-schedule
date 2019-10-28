@@ -8,36 +8,42 @@ export default class GenericCacheManager {
                                   expireTime: number = GenericCacheManager.DEFAULT_EXPIRE_SECONDS,
                                   versionNumber: number = GenericCacheManager.DEFAULT_VERSION_NUMBER): Promise<any> {
         if (localStorage === undefined) {
-            console.log('Local storage is not supported! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url).then(jsonString => JSON.parse(jsonString));
+            console.warn('Local storage is not supported! Loading ' + localStorageKey + '...');
+            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber).then(jsonString => JSON.parse(jsonString).content);
         }
 
         let globalSettingsString = localStorage.getItem(localStorageKey);
         if (globalSettingsString === null) {
-            console.log('Global settings cache does not exist! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url).then(jsonString => JSON.parse(jsonString));
+            console.log(localStorageKey + ' cache does not exist! Loading ' + localStorageKey + '...');
+            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber).then(jsonString => JSON.parse(jsonString).content);
         }
 
-        let globalSettingsObject = JSON.parse(globalSettingsString);
-        if (globalSettingsObject.versionNumber === undefined || globalSettingsObject.versionNumber !== versionNumber) {
-            console.log('Global settings cache is invalid! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url).then(jsonString => JSON.parse(jsonString));
+        let globalSettingsObject;
+        try {
+             globalSettingsObject = JSON.parse(globalSettingsString);
+        } catch (e) {
+            globalSettingsObject = undefined;
+        }
+        if (globalSettingsObject === undefined || globalSettingsObject.versionNumber === undefined || globalSettingsObject.versionNumber !== versionNumber) {
+            console.log(localStorageKey + ' cache is invalid! Loading ' + localStorageKey + '...');
+            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber).then(jsonString => JSON.parse(jsonString).content);
         }
 
         if (globalSettingsObject.creationTime === undefined || new Date().getTime() - new Date(globalSettingsObject.creationTime).getTime() > expireTime) {
-            console.log('Global settings cache is outdated! Loading ' + localStorageKey + ' in the background...');
-            GenericCacheManager.reloadGlobalSettings(localStorageKey, url); // save in the background
+            console.log(localStorageKey + ' cache is outdated! Loading ' + localStorageKey + ' in the background...');
+            GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber); // save in the background
         }
 
-        console.log('Global settings loaded successfully from cache!');
-        return Promise.resolve(globalSettingsObject);
+        console.log(localStorageKey + ' loaded successfully from cache!');
+        return Promise.resolve(globalSettingsObject.content);
     }
 
-    private static reloadGlobalSettings(localStorageKey: string, url: string): Promise<string> {
-        return GenericCacheManager.corsGetPromise(url).then((jsonString: any) => {
-            localStorage.setItem(localStorageKey, jsonString);
+    private static reloadGlobalSettings(localStorageKey: string, url: string, versionNumber: number): Promise<string> {
+        return GenericCacheManager.corsGetPromise(url).then((cacheResultsString: any) => {
+            let storageJson = {content: cacheResultsString, versionNumber: versionNumber, creationTime: new Date().getTime()};
+            localStorage.setItem(localStorageKey, JSON.stringify(storageJson));
             console.log(localStorageKey + ' reloaded and saved to localStorage!');
-            return jsonString;
+            return cacheResultsString;
         });
     }
 
