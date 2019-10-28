@@ -330,7 +330,7 @@ abstract class ParsedBlock {
         tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor}`);
         let colorString = bgcolor.split("-");
         if (colorString.length === 2) tableData.setAttribute('blocklabel', colorString[1]);
-        tableData.setAttribute('title', title);
+        tableData.setAttribute('classtitle', title);
         tableData.setAttribute('date', date.toString());
         let titleSpan = document.createElement('span');
         titleSpan.setAttribute('class', 'coursename');

@@ -315,8 +315,8 @@ function applyCalendarFeeds(calendarFeedObject: any) {
     Promise.all(allCalPromises).then((calendars: Array<any>) => {
         calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
             calendarEvents.forEach((value: any) => {
-                let htmlElements = $( `td[blocklabel="${value.blocklabel}"][title="${value.title}"][date="${value.date}"]` );
-                htmlElements.children(".subtitle").text(" "+value.description+" ").addClass("calendar-feed-subtitle");
+                let htmlElements = $(`td[blocklabel="${value.blocklabel}"][classtitle="${value.title}"][date="${value.date}"]`);
+                htmlElements.children('.subtitle').text(value.description).addClass('calendar-feed-subtitle');
             })
         });
     });
