@@ -3,6 +3,8 @@ import { capitalize } from '../utils/formattingUtils';
 import { toast } from 'bulma-toast';
 import { CookieManager } from '../cookieManager';
 import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
+import { VeracrossICalUtils } from './veracross/veracrossICalUtils';
+import GenericCacheManager from '../globalSettings/genericCacheManager';
 
 let themeCssVariables = [
     '--block-1',
@@ -44,16 +46,16 @@ function applyHighlight() {
 }
 
 export function loadAllSettings(globalSettingsObject: any) {
-    if (new URL(window.location.href).hash === "#updated") {
+    if (new URL(window.location.href).hash === '#updated') {
 
         toast({
-            message: "Settings updated successfully. Please bookmark the new link.",
-            type: "is-info",
+            message: 'Settings updated successfully. Please bookmark the new link.',
+            type: 'is-info',
             duration: 5000,
             position: 'top-center',
             dismissible: true,
             pauseOnHover: true,
-            animate: { in: "fadeInDown", out: "fadeOutUp" }
+            animate: { in: 'fadeInDown', out: 'fadeOutUp' }
         });
 
         window.location.hash = '';
@@ -61,12 +63,14 @@ export function loadAllSettings(globalSettingsObject: any) {
 
     let themesObject = parseThemesObject(globalSettingsObject);
     let linkObject = parseLinkObject(globalSettingsObject);
+    let calendarFeedObject = parseCalendarFeedObject(globalSettingsObject);
 
     loadSettingsModal(themesObject);
 
     applyThemes(themesObject);
     if (ScheduleParamUtils.getLinksEnabled()) applyClassLinks(linkObject);
     if (ScheduleParamUtils.getHighlightEnabled()) applyHighlight();
+    if (ScheduleParamUtils.getCalendarEventsEnabled()) applyCalendarFeeds(calendarFeedObject);
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -82,6 +86,10 @@ function loadSettingsModal(themesObject: {}) {
     let linksCheckbox = document.getElementById('class-links');
     // @ts-ignore
     linksCheckbox.checked = ScheduleParamUtils.getLinksEnabled();
+    // @ts-ignore
+    let calendarCheckbox = document.getElementById('calendar-events');
+    // @ts-ignore
+    calendarCheckbox.checked = ScheduleParamUtils.getCalendarEventsEnabled();
     // @ts-ignore
     let highlightCheckbox = document.getElementById('day-highlight');
     // @ts-ignore
@@ -107,6 +115,8 @@ function loadSettingsModal(themesObject: {}) {
             // @ts-ignore
             || linksCheckbox.checked !== ScheduleParamUtils.getLinksEnabled()
             // @ts-ignore
+            || calendarCheckbox.checked !== ScheduleParamUtils.getCalendarEventsEnabled()
+            // @ts-ignore
             || sel.value !== ScheduleParamUtils.getTheme()
         ) {
             let newUrl = new URL(window.location.href);
@@ -115,8 +125,10 @@ function loadSettingsModal(themesObject: {}) {
             // @ts-ignore
             newUrl.searchParams.set('links', linksCheckbox.checked);
             // @ts-ignore
+            newUrl.searchParams.set('calendars', calendarCheckbox.checked);
+            // @ts-ignore
             newUrl.searchParams.set('theme', sel.value);
-            newUrl.hash = "#updated";
+            newUrl.hash = '#updated';
             window.location.href = newUrl.href;
         }
         closeModal();
@@ -138,7 +150,7 @@ function parseThemesObject(globalSettingsObject: any) {
             // @ts-ignore
             themesObject[theme[0].toLowerCase()] = textValues;
         } else {
-            console.log("Ignored theme entry: ");
+            console.log('Ignored theme entry: ');
             console.log(theme);
         }
     });
@@ -155,10 +167,10 @@ function applyThemes(themesObject: { [x: string]: any; }) {
     }
 }
 
+var urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+var classNamePattern = /^[^<>\n\\=]+$/;
+var blockNumberPattern = /^[1-7]$/;
 function parseLinkObject(globalSettingsObject: any) {
-    var classNamePattern = /^[^<>\n\\=]+$/;
-    var blockNumberPattern = /^[1-7]$/;
-    var urlPattern = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
     var minLength = 3;
 
     let linkObject = {};
@@ -169,13 +181,35 @@ function parseLinkObject(globalSettingsObject: any) {
         let filteredLinks = linkEntry.slice(2).filter((link: string) => urlPattern.test(link));
         if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && filteredLinks.length >= 1) {
             // @ts-ignore
-            linkObject[className+blockNumber] = filteredLinks;
+            linkObject[className + blockNumber] = filteredLinks;
         } else {
-            console.log("Ignored link entry: ");
+            console.log('Ignored link entry: ');
             console.log(linkEntry);
         }
     });
     return linkObject;
+}
+
+function parseCalendarFeedObject(globalSettingsObject: any) {
+    let length = 4;
+
+    let allClassIds = getAllClassIds();
+    let calFeedsObject = {};
+    globalSettingsObject.calFeeds.forEach((thing: any) => {
+        if (thing.length !== length) return;
+        let className = thing[0];
+        let blockNumber = thing[1];
+        let canvasId = thing[2];
+        let calendarUrl = thing[3];
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && classNamePattern.test(canvasId) && urlPattern.test(calendarUrl)) {
+            let classKey = className + blockNumber;
+            if (allClassIds.has(classKey)) {
+                // @ts-ignore
+                calFeedsObject[classKey] = [canvasId, calendarUrl];
+            }
+        }
+    });
+    return calFeedsObject;
 }
 
 function forceOpenTabIfSafari(href: string) {
@@ -183,14 +217,14 @@ function forceOpenTabIfSafari(href: string) {
 
     if (isSafari) {
         var a = document.createElement('a');
-        a.setAttribute("href", href);
-        a.setAttribute("target", "_blank");
+        a.setAttribute('href', href);
+        a.setAttribute('target', '_blank');
 
-        var dispatch = document.createEvent("HTMLEvents");
-        dispatch.initEvent("click", true, true);
+        var dispatch = document.createEvent('HTMLEvents');
+        dispatch.initEvent('click', true, true);
         a.dispatchEvent(dispatch);
     } else {
-        window.open(href, "_blank")
+        window.open(href, '_blank');
     }
 }
 
@@ -210,7 +244,7 @@ function applyClassLinks(linkObject: any) {
         if (courseName.innerText === 'Lunch') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
         if (linkObjectElement === undefined) return;
         parentElement.classList.add('has-link');
-        parentElement.classList.add('link-index-'+linkObjectKeys.indexOf(workingKey));
+        parentElement.classList.add('link-index-' + linkObjectKeys.indexOf(workingKey));
         parentElement.addEventListener('click', () => forceOpenTabIfSafari(linkObjectElement[0]));
     });
 
@@ -218,11 +252,11 @@ function applyClassLinks(linkObject: any) {
         let items: {} = {};
         linkObject[className].forEach((link: string) => {
             // @ts-ignore
-            items[link] = { name: link.substring(0, 50).replace("https://", '').replace("http://", '') + (link.length > 50 ? '...' : '') }
+            items[link] = { name: link.substring(0, 50).replace('https://', '').replace('http://', '') + (link.length > 50 ? '...' : '') };
         });
         // @ts-ignore
         $.contextMenu({
-            selector: ".link-index-" + classNameIndex,
+            selector: '.link-index-' + classNameIndex,
             callback: function(key: string | undefined) {
                 window.open(key, '_blank');
             },
@@ -230,3 +264,61 @@ function applyClassLinks(linkObject: any) {
         });
     });
 }
+
+function getAllClassIds() {
+    let listOfClasses = new Set();
+    Array.from(document.getElementsByClassName('coursename')).forEach((courseName: Element): any => {
+        // @ts-ignore
+        let parentElement = courseName.parentElement;
+        if (parentElement === null) return;
+        let blocklabel = parentElement.getAttribute('blocklabel');
+        // @ts-ignore
+        let workingKey = courseName.innerText + blocklabel;
+        listOfClasses.add(workingKey);
+    });
+    return listOfClasses;
+}
+
+function applyCalendarFeeds(calendarFeedObject: any) {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, calendarFeedObject[key][1]).then(icsString => {
+        // @ts-ignore
+        let parsedPath = ICAL.parse(icsString);
+        return parsedPath[2];
+    }).then(calendarEvents => {
+        return calendarEvents
+            .map((event: any) => {
+                try {
+                    let date = VeracrossICalUtils.getDate(event[1]);
+                    let title = VeracrossICalUtils.getTitle(event[1]);
+                    let splitTitle = title.split(' [');
+                    let description = splitTitle[0].replace(/\(.+\)/, '').trim();
+                    let canvasId = splitTitle[1].slice(0, -1);
+
+                    if (
+                        date === null || canvasId !== calendarFeedObject[key][0]
+                    )
+                        return null;
+
+                    return { date, description, canvasId, title: key.slice(0, -1), blocklabel: key.slice(-1)};
+                } catch (e) {
+                    return null;
+                }
+            })
+            .filter((rawBlock: any) => rawBlock !== null);
+    }).catch((e: Error) => {
+        console.warn(e);
+        console.warn('Calendar link returned 404!');
+        return null;
+    });
+
+    let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
+    Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
+            calendarEvents.forEach((value: any) => {
+                let htmlElements = $( `td[blocklabel="${value.blocklabel}"][title="${value.title}"][date="${value.date}"]` );
+                htmlElements.children(".subtitle").text(" "+value.description+" ").addClass("calendar-feed-subtitle");
+            })
+        });
+    });
+}
+

@@ -28,6 +28,16 @@
                         | Enables or disables user-added class links. Useful for homework calendars.
                 .field
                     label.label
+                        | Canvas Calendar Events
+                        i.far.fa-calendar-alt.p-l-sm
+                    .control
+                        input#calendar-events.switch.is-rounded.is-medium.is-success(type='checkbox' name='calendar-events' checked='checked')
+                        label(for='calendar-events')
+                        a.button( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1673690997' ) Add More Calendars
+                    p.help
+                        | Enables or disables inline canvas calendar events.
+                .field
+                    label.label
                         | Next Day Highlighting
                         i.fas.fa-highlighter.p-l-sm
                     .control

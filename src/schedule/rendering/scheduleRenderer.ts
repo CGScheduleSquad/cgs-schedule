@@ -1,5 +1,6 @@
 import { ScheduleRange, ViewMode } from './scheduleRange';
 import ScheduleDate from '../time/scheduleDate';
+import scheduleDate from '../time/scheduleDate';
 import { lateStartAllTimes, ScheduleDayType } from '../structure/scheduleDay';
 import ScheduleTime from '../time/scheduleTime';
 import ScheduleParamUtils from '../utils/scheduleParamUtils';
@@ -119,19 +120,19 @@ export default class ScheduleRenderer {
                 case ScheduleDayType.LATE_START:
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
-                    LateStartScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
+                    LateStartScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList, date);
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => (el.style.width = '39%')); // TODO: Remove this
                     break;
                 case ScheduleDayType.INLINE:
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
-                    InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
+                    InlineScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList, date);
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => (el.style.width = '39%')); // TODO: Remove this
                     break;
                 case ScheduleDayType.REGULAR:
-                    RegularScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList);
+                    RegularScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList, date);
                     break;
             }
         });
@@ -153,7 +154,7 @@ class InlineScheduleRenderer {
 
     private constructor() {}
 
-    appendSchedule(rawDay: any, compressionList: Array<string>): void {
+    appendSchedule(rawDay: any, compressionList: Array<string>, date: ScheduleDate): void {
         let blocks: Array<Array<any>> = rawDay.blocks;
         let trElement = document.getElementById(`time-0`);
         if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
@@ -169,7 +170,7 @@ class InlineScheduleRenderer {
         trElement.appendChild(tableData);
 
         blocks.forEach((block: Array<any>) => {
-            let lateStartParseBlock = InlineParseBlock.parseRawBlock(block, compressionList);
+            let lateStartParseBlock = InlineParseBlock.parseRawBlock(block, compressionList, date);
             // @ts-ignore
             tbody.appendChild(lateStartParseBlock.generateBlockElement());
         });
@@ -186,7 +187,7 @@ class LateStartScheduleRenderer {
 
     private constructor() {}
 
-    appendSchedule(rawDay: any, compressionList: Array<string>) {
+    appendSchedule(rawDay: any, compressionList: Array<string>, date: ScheduleDate) {
         let blocks: Array<Array<any>> = rawDay.blocks;
         let trElement = document.getElementById(`time-0`);
         if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
@@ -202,7 +203,7 @@ class LateStartScheduleRenderer {
         trElement.appendChild(tableData);
 
         blocks.forEach((block: Array<any>) => {
-            let lateStartParseBlock = LateStartParseBlock.parseRawBlock(block, compressionList);
+            let lateStartParseBlock = LateStartParseBlock.parseRawBlock(block, compressionList, date);
             // @ts-ignore
             tbody.appendChild(lateStartParseBlock.generateBlockElement());
         });
@@ -228,10 +229,10 @@ class RegularScheduleRenderer {
         }
     }
 
-    appendSchedule(rawDay: any, compressionList: Array<string>): void {
+    appendSchedule(rawDay: any, compressionList: Array<string>, date: ScheduleDate): void {
         let blocks: Array<Array<any>> = rawDay.blocks;
         blocks.forEach((block: Array<any>) => {
-            let inlineParseBlock = RegularParseBlock.parseRawBlock(block, compressionList);
+            let inlineParseBlock = RegularParseBlock.parseRawBlock(block, compressionList, date);
             let trElement = this.mainTimeElements[inlineParseBlock.normalTimeIndex];
             trElement.appendChild(inlineParseBlock.generateBlockElement());
         });
@@ -255,11 +256,13 @@ abstract class ParsedBlock {
     protected readonly title: string;
     protected readonly mins: string;
     private readonly free: boolean;
+    protected readonly date: ScheduleDate;
 
-    protected constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean) {
+    protected constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean, date: ScheduleDate) {
         this.title = title;
         this.mins = mins;
         this.free = free;
+        this.date = date;
 
         this.generateBlockSubtitle(location, blockLabel);
     }
@@ -318,6 +321,7 @@ abstract class ParsedBlock {
         title: string,
         subtitle: string,
         newLine: boolean,
+        date: ScheduleDate,
         specialPeriod = false
     ): any {
         // What data type is tableData?
@@ -326,6 +330,8 @@ abstract class ParsedBlock {
         tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor}`);
         let colorString = bgcolor.split("-");
         if (colorString.length === 2) tableData.setAttribute('blocklabel', colorString[1]);
+        tableData.setAttribute('title', title);
+        tableData.setAttribute('date', date.toString());
         let titleSpan = document.createElement('span');
         titleSpan.setAttribute('class', 'coursename');
         titleSpan.appendChild(document.createTextNode(title));
@@ -340,7 +346,7 @@ abstract class ParsedBlock {
 }
 
 class RegularParseBlock extends ParsedBlock {
-    public static parseRawBlock(block: any, compressionList: Array<string>): RegularParseBlock {
+    public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate): RegularParseBlock {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
         let blockLabel = block[2];
@@ -349,7 +355,7 @@ class RegularParseBlock extends ParsedBlock {
         let mins = block[5];
         let free = block[6];
 
-        return new RegularParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan);
+        return new RegularParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan, date);
     }
 
     public readonly normalTimeIndex: number;
@@ -362,9 +368,10 @@ class RegularParseBlock extends ParsedBlock {
         mins: string,
         free: boolean,
         normalTimeIndex: number,
-        rowSpan: number
+        rowSpan: number,
+        date: scheduleDate
     ) {
-        super(title, location, blockLabel, mins, free);
+        super(title, location, blockLabel, mins, free, date);
         this.normalTimeIndex = normalTimeIndex;
         this.rowSpan = rowSpan;
     }
@@ -376,13 +383,14 @@ class RegularParseBlock extends ParsedBlock {
             this.bgcolor,
             this.title,
             this.subtitle,
-            this.addLineBreak
+            this.addLineBreak,
+            this.date
         );
     }
 }
 
 class LateStartParseBlock extends ParsedBlock {
-    public static parseRawBlock(block: any, compressionList: Array<string>) {
+    public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate) {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
         let blockLabel = block[2];
@@ -391,7 +399,7 @@ class LateStartParseBlock extends ParsedBlock {
         let mins = block[5];
         let free = block[6];
 
-        return new LateStartParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan);
+        return new LateStartParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan, date);
     }
 
     public readonly normalTimeIndex: number;
@@ -404,9 +412,10 @@ class LateStartParseBlock extends ParsedBlock {
         mins: string,
         free: boolean,
         normalTimeIndex: number,
-        rowSpan: number
+        rowSpan: number,
+        date: ScheduleDate
     ) {
-        super(title, location, blockLabel, mins, free);
+        super(title, location, blockLabel, mins, free, date);
         this.normalTimeIndex = normalTimeIndex;
         this.rowSpan = rowSpan;
     }
@@ -421,7 +430,8 @@ class LateStartParseBlock extends ParsedBlock {
             this.bgcolor,
             this.title,
             this.subtitle,
-            this.addLineBreak
+            this.addLineBreak,
+            this.date
         );
         if (!isLateStart) {
             let timeDataElement = document.createElement('td');
@@ -442,7 +452,7 @@ class LateStartParseBlock extends ParsedBlock {
 }
 
 class InlineParseBlock extends ParsedBlock {
-    public static parseRawBlock(block: any, compressionList: Array<string>): InlineParseBlock {
+    public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate): InlineParseBlock {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
         let blockLabel = block[2];
@@ -450,7 +460,7 @@ class InlineParseBlock extends ParsedBlock {
         let endTime = new ScheduleTime(0, block[4]);
         let mins = block[5];
         let free = block[6];
-        return new InlineParseBlock(title, location, blockLabel, mins, free, startTime, endTime);
+        return new InlineParseBlock(title, location, blockLabel, mins, free, startTime, endTime, date);
     }
 
     private readonly startTime: ScheduleTime;
@@ -463,9 +473,10 @@ class InlineParseBlock extends ParsedBlock {
         mins: string,
         free: boolean,
         startTime: ScheduleTime,
-        endTime: ScheduleTime
+        endTime: ScheduleTime,
+        date: ScheduleDate
     ) {
-        super(title, location, blockLabel, mins, free);
+        super(title, location, blockLabel, mins, free, date);
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -485,6 +496,7 @@ class InlineParseBlock extends ParsedBlock {
             this.title,
             this.subtitle,
             this.addLineBreak,
+            this.date,
             true
         );
         tableRowElement.appendChild(timeDataElement);

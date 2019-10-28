@@ -56,6 +56,11 @@ export default class ScheduleParamUtils {
         return linksString == null ? true : linksString !== 'false';
     }
 
+    static getCalendarEventsEnabled() {
+        let linksString = ScheduleParamUtils.getUrlParam('calendars');
+        return linksString == null ? true : linksString !== 'false';
+    }
+
     static getHighlightEnabled() {
         let linksString = ScheduleParamUtils.getUrlParam('highlight');
         return linksString == null ? false : linksString !== 'false';
