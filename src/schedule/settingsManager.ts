@@ -41,7 +41,7 @@ function applyHighlight() {
     let viewMode = ScheduleParamUtils.getViewMode();
     if (viewMode !== ViewMode.Day) {
         let highlightDay = new ScheduleRange(ScheduleParamUtils.getCurrentDate(), ViewMode.Day).startDate;
-        $('.daylabel[date=\'' + highlightDay.toString() + '\']').addClass('day-highlight');
+        Array.from(document.querySelectorAll(`.daylabel[date='${highlightDay.toString()}']`)).forEach((el: any) => el.classList.add('day-highlight'));
     }
 }
 
@@ -315,8 +315,10 @@ function applyCalendarFeeds(calendarFeedObject: any) {
     Promise.all(allCalPromises).then((calendars: Array<any>) => {
         calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
             calendarEvents.forEach((value: any) => {
-                let htmlElements = $( `td[blocklabel="${value.blocklabel}"][title="${value.title}"][date="${value.date}"]` );
-                htmlElements.children(".subtitle").text(" "+value.description+" ").addClass("calendar-feed-subtitle");
+                Array.from(document.querySelectorAll(`td[blocklabel='${value.blocklabel}'][title='${value.title}'][date='${value.date}'] > .subtitle`)).forEach((el: any) => {
+                   el.value = ` ${value.description} `;
+                   el.classList.add('calendar-feed-subtitle')
+                });
             })
         });
     });

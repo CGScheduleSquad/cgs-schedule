@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ts-cgs-schedule.iml" filepath="$PROJECT_DIR$/.idea/ts-cgs-schedule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/cgs-schedule.iml" filepath="$PROJECT_DIR$/.idea/cgs-schedule.iml" />
     </modules>
   </component>
 </project>
