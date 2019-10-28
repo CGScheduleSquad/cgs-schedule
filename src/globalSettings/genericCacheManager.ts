@@ -1,7 +1,7 @@
 export default class GenericCacheManager {
 
     private static DEFAULT_VERSION_NUMBER = 2;
-    private static DEFAULT_EXPIRE_SECONDS = 1000 * 60 * 60 * 7;
+    private static DEFAULT_EXPIRE_SECONDS = 1000 * 60 * 60 * 2;
 
     public static getCacheResults(localStorageKey: string,
                                   url: string,
