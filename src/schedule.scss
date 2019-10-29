@@ -459,4 +459,6 @@ body {
     background-color: var(--background-color);
     border-radius: 3px;
     padding: 2px 5px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
 }
