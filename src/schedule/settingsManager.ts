@@ -24,7 +24,7 @@ let themeCssVariables = [
 ];
 
 function createOption(text: string) {
-    var opt = document.createElement('option');
+    let opt = document.createElement('option');
     opt.appendChild(document.createTextNode(capitalize(text)));
     opt.value = text;
     return opt;
@@ -167,11 +167,12 @@ function applyThemes(themesObject: { [x: string]: any; }) {
     }
 }
 
-var urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
-var classNamePattern = /^[^<>\n\\=]+$/;
-var blockNumberPattern = /^[1-7]$/;
+const urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+const classNamePattern = /^[^<>\n\\=]+$/;
+const blockNumberPattern = /^[1-7]$/;
+
 function parseLinkObject(globalSettingsObject: any) {
-    var minLength = 3;
+    const minLength = 3;
 
     let linkObject = {};
     globalSettingsObject.dayLinks.forEach((linkEntry: any) => {
@@ -213,14 +214,14 @@ function parseCalendarFeedObject(globalSettingsObject: any) {
 }
 
 function forceOpenTabIfSafari(href: string) {
-    var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     if (isSafari) {
-        var a = document.createElement('a');
+        let a = document.createElement('a');
         a.setAttribute('href', href);
         a.setAttribute('target', '_blank');
 
-        var dispatch = document.createEvent('HTMLEvents');
+        let dispatch = document.createEvent('HTMLEvents');
         dispatch.initEvent('click', true, true);
         a.dispatchEvent(dispatch);
     } else {
@@ -243,9 +244,40 @@ function applyClassLinks(linkObject: any) {
         // @ts-ignore // TODO: Remove
         if (courseName.innerText === 'Lunch') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
         if (linkObjectElement === undefined) return;
-        parentElement.classList.add('has-link');
-        parentElement.classList.add('link-index-' + linkObjectKeys.indexOf(workingKey));
-        parentElement.addEventListener('click', () => forceOpenTabIfSafari(linkObjectElement[0]));
+        parentElement.classList.add('has-link', 'link-index-' + linkObjectKeys.indexOf(workingKey));
+        parentElement.addEventListener('click', event => {
+            if (event.shiftKey) {
+                event.preventDefault();
+                const modal = document.createElement('div');
+                const modalBackground = document.createElement('div');
+                const modalContent = document.createElement('div');
+                const modalClose = document.createElement('button');
+
+                modal.classList.add('bulma', 'modal', 'is-clipped');
+                modalBackground.classList.add('bulma', 'modal-background');
+                modalContent.classList.add('bulma', 'modal-card');
+                modalClose.classList.add('bulma', 'modal-close', 'is-large');
+
+                modal.append(modalBackground, modalContent, modalClose);
+                document.body.appendChild(modal);
+
+                modalContent.innerHTML = `
+                    <header class="modal-card-head">
+                      <p class="modal-card-title">Modal title</p>
+                    </header>
+                    <section class="modal-card-body">
+                      <!-- Content ... -->
+                    </section>
+                    <footer class="modal-card-foot">
+                      <button class="button is-success" id="modal-save">Save changes</button>
+                    </footer>
+                `;
+                modalContent.style.marginTop = '-90vh';
+                [modalClose, document.getElementById('modal-save')].forEach(e => e.addEventListener('click', () => document.body.removeChild(modal)));
+            } else {
+                forceOpenTabIfSafari(linkObjectElement[0]);
+            }
+        });
     });
 
     linkObjectKeys.forEach((className, classNameIndex) => {
