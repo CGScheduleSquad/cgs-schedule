@@ -9,13 +9,13 @@ export default class GenericCacheManager {
                                   versionNumber: number = GenericCacheManager.DEFAULT_VERSION_NUMBER): Promise<any> {
         if (localStorage === undefined) {
             console.warn('Local storage is not supported! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber);
+            return GenericCacheManager.reloadGenericCache(localStorageKey, url, versionNumber);
         }
 
         let globalSettingsString = localStorage.getItem(localStorageKey);
         if (globalSettingsString === null) {
             console.log(localStorageKey + ' cache does not exist! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber);
+            return GenericCacheManager.reloadGenericCache(localStorageKey, url, versionNumber);
         }
 
         let globalSettingsObject;
@@ -26,19 +26,19 @@ export default class GenericCacheManager {
         }
         if (globalSettingsObject === undefined || globalSettingsObject.versionNumber === undefined || globalSettingsObject.versionNumber !== versionNumber) {
             console.log(localStorageKey + ' cache is invalid! Loading ' + localStorageKey + '...');
-            return GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber);
+            return GenericCacheManager.reloadGenericCache(localStorageKey, url, versionNumber);
         }
 
         if (globalSettingsObject.creationTime === undefined || new Date().getTime() - new Date(globalSettingsObject.creationTime).getTime() > expireTime) {
             console.log(localStorageKey + ' cache is outdated! Loading ' + localStorageKey + ' in the background...');
-            GenericCacheManager.reloadGlobalSettings(localStorageKey, url, versionNumber); // save in the background
+            GenericCacheManager.reloadGenericCache(localStorageKey, url, versionNumber); // save in the background
         }
 
         console.log(localStorageKey + ' loaded successfully from cache!');
         return Promise.resolve(globalSettingsObject.content);
     }
 
-    private static reloadGlobalSettings(localStorageKey: string, url: string, versionNumber: number): Promise<string> {
+    private static reloadGenericCache(localStorageKey: string, url: string, versionNumber: number): Promise<string> {
         return GenericCacheManager.corsGetPromise(url).then((cacheResultsString: any) => {
             let storageJson = {content: cacheResultsString, versionNumber: versionNumber, creationTime: new Date().getTime()};
             localStorage.setItem(localStorageKey, JSON.stringify(storageJson));
@@ -50,7 +50,7 @@ export default class GenericCacheManager {
     private static corsGetPromise(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
             let request = new XMLHttpRequest();
-            request.open('GET', `https://cgs-schedule-cors.herokuapp.com/${url}`, true);
+            request.open('GET', url, true);
             request.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this.response);
