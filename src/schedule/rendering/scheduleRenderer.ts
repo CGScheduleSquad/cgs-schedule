@@ -327,8 +327,10 @@ abstract class ParsedBlock {
         // What data type is tableData?
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
-        tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor}`);
         let colorString = bgcolor.split("-");
+        let number = parseInt(colorString[1]);
+        let isClassBlock = !isNaN(number) && number <= 7 && number >= 1;
+        tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor} ${isClassBlock ? 'classblock' : 'notclassblock'}`);
         if (colorString.length === 2) tableData.setAttribute('blocklabel', colorString[1]);
         tableData.setAttribute('classtitle', title);
         tableData.setAttribute('date', date.toString());
