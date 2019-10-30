@@ -17,6 +17,7 @@ let themeCssVariables = [
     '--block-activity',
     '--block-free',
     '--text',
+    '--class-text',
     '--link',
     '--border',
     '--divider',
