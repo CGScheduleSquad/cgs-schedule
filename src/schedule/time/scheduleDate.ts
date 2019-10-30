@@ -27,6 +27,11 @@ export default class ScheduleDate {
 
     getFullYear = (): number => this.date.getFullYear();
 
+    setFullYear = (year: number) => {
+        this.date.setFullYear(year);
+        return this;
+    };
+
     getMonth = (): number => this.date.getMonth();
 
     toString = (): string => [this.date.getFullYear(), this.date.getMonth() + 1, this.date.getDate()].join('-');

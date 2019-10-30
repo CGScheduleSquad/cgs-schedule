@@ -5,6 +5,7 @@ import { CookieManager } from '../cookieManager';
 import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
 import { VeracrossICalUtils } from './veracross/veracrossICalUtils';
 import GenericCacheManager from '../globalSettings/genericCacheManager';
+import ScheduleDate from './time/scheduleDate';
 
 let themeCssVariables = [
     '--block-1',
@@ -65,13 +66,17 @@ export function loadAllSettings(globalSettingsObject: any) {
     let themesObject = parseThemesObject(globalSettingsObject);
     let linkObject = parseLinkObject(globalSettingsObject);
     let calendarFeedObject = parseCalendarFeedObject(globalSettingsObject);
+    let googleSheetObject = parseGoogleSheetsObject(globalSettingsObject);
 
     loadSettingsModal(themesObject);
 
     applyThemes(themesObject);
     if (ScheduleParamUtils.getLinksEnabled()) applyClassLinks(linkObject);
     if (ScheduleParamUtils.getHighlightEnabled()) applyHighlight();
-    if (ScheduleParamUtils.getCalendarEventsEnabled()) applyCalendarFeeds(calendarFeedObject);
+    if (ScheduleParamUtils.getCalendarEventsEnabled()) {
+        applyCalendarFeeds(calendarFeedObject);
+        applyGoogleSheets(googleSheetObject);
+    }
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -213,6 +218,28 @@ function parseCalendarFeedObject(globalSettingsObject: any) {
     return calFeedsObject;
 }
 
+function parseGoogleSheetsObject(globalSettingsObject: any) {
+    let length = 4;
+
+    let allClassIds = getAllClassIds();
+    let googleSheetsObject = {};
+    globalSettingsObject.googleSheets.forEach((thing: any) => {
+        if (thing.length !== length) return;
+        let className = thing[0];
+        let blockNumber = thing[1];
+        let sheetRange = thing[2];
+        let sheetId = thing[3];
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && classNamePattern.test(sheetRange) && /[a-zA-Z0-9-_]+/.test(sheetId)) {
+            let classKey = className + blockNumber;
+            if (allClassIds.has(classKey)) {
+                // @ts-ignore
+                googleSheetsObject[classKey] = [sheetRange, sheetId];
+            }
+        }
+    });
+    return googleSheetsObject;
+}
+
 function forceOpenTabIfSafari(href: string) {
     var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
@@ -280,8 +307,9 @@ function getAllClassIds() {
     return listOfClasses;
 }
 
+let maxSheetItemLength = 30;
 function applyCalendarFeeds(calendarFeedObject: any) {
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, calendarFeedObject[key][1]).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule-cors.herokuapp.com/' + calendarFeedObject[key][1]).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
         return parsedPath[2];
@@ -292,7 +320,7 @@ function applyCalendarFeeds(calendarFeedObject: any) {
                     let date = VeracrossICalUtils.getDate(event[1]);
                     let title = VeracrossICalUtils.getTitle(event[1]);
                     let splitTitle = title.split(' [');
-                    let description = splitTitle[0].replace(/\(.+\)/, '').trim();
+                    let description = splitTitle[0].replace(/\(.+\)/, '').trim().substring(0, maxSheetItemLength) + (splitTitle[0].length > maxSheetItemLength ? '...' : '');
                     let canvasId = splitTitle[1].slice(0, -1);
 
                     if (
@@ -323,3 +351,50 @@ function applyCalendarFeeds(calendarFeedObject: any) {
     });
 }
 
+function applyGoogleSheets(googleSheetsObject: any) {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `http://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][1]}&range=${googleSheetsObject[key][0]}`).then(icsString => {
+        return JSON.parse(icsString);
+    }).then(calendarEvents => {
+        return calendarEvents.map((event: any) => {
+            if (event.length < 1) {
+                return null;
+            }
+            let dateMatcher = /\b(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\b/;
+            let dates = event.map((cell: string) => dateMatcher.exec(cell));
+            let indexOfDate = dates.findIndex((date: any) => date !== null && date !== undefined);
+            let eventDescription = event[indexOfDate + 1];
+            if (indexOfDate === -1 || eventDescription === undefined || eventDescription.trim().length <= 2) {
+                return null;
+            }
+
+            let currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let startYear = currentMonth > 7 ? currentDate.getFullYear() : currentDate.getFullYear() - 1;
+
+            let date = ScheduleDate.fromDate(new Date(dates[indexOfDate][0]));
+            if (date.getMonth() > 7) {
+                date.setFullYear(startYear);
+            } else {
+                date.setFullYear(startYear + 1);
+            }
+            let description = eventDescription.trim().substring(0, maxSheetItemLength) + (eventDescription.length > maxSheetItemLength ? '...' : '');
+
+            return { date, description, title: key.slice(0, -1), blocklabel: key.slice(-1) };
+        })
+            .filter((rawBlock: any) => rawBlock !== null);
+    }).catch((e: Error) => {
+        console.warn(e);
+        console.warn('Calendar link returned 404!');
+        return null;
+    });
+
+    let allCalPromises = Object.keys(googleSheetsObject).map(feedKeyToCalendar);
+    Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
+            calendarEvents.forEach((value: any) => {
+                let htmlElements = $(`td[blocklabel="${value.blocklabel}"][classtitle="${value.title}"][date="${value.date}"]`);
+                htmlElements.children('.subtitle').text(value.description).addClass('calendar-feed-subtitle');
+            });
+        });
+    });
+}
