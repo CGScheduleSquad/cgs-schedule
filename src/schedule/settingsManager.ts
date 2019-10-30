@@ -352,7 +352,7 @@ function applyCalendarFeeds(calendarFeedObject: any) {
 }
 
 function applyGoogleSheets(googleSheetsObject: any) {
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `http://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][1]}&range=${googleSheetsObject[key][0]}`).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `https://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][1]}&range=${googleSheetsObject[key][0]}`).then(icsString => {
         return JSON.parse(icsString);
     }).then(calendarEvents => {
         return calendarEvents.map((event: any) => {
