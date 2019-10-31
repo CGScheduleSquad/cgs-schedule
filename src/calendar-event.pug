@@ -2,9 +2,11 @@
     .modal#calendar-event-modal
         .modal-background#calendar-event-background
         .modal-content
-            .box
-                article.media
-                    .media-content
-                        .content
-                            h5#calendar-event-title
-                            p#calendar-event-body
+            .card(style='border-radius: 5px; font-size: 1.1em')
+                header.card-header
+                    p.card-header-title#calendar-event-header
+                .card-content(style='padding-top: 12px')
+                    p#calendar-event-body
+                //footer.card-footer
+                //    p.card-footer-item
+                //        span#calendar-event-footer

@@ -345,9 +345,9 @@ function applyCanvasCalendar(calendarFeedObject: any) {
                 try {
                     let date = VeracrossICalUtils.getDate(event[1]);
                     let splitTitle = VeracrossICalUtils.getSummary(event[1]).split(' [');
-                    let description = converter.makeHtml(VeracrossICalUtils.getDescriptionAsText(event[1]));
                     let title = splitTitle[0];
                     let canvasId = splitTitle[1].slice(0, -1);
+                    let description = '<h4>' + title + '</h4> ' + converter.makeHtml(VeracrossICalUtils.getDescriptionAsText(event[1]));
 
                     if (date === null || canvasId !== calendarFeedObject[key][0])
                         return null;
@@ -411,11 +411,11 @@ function applyGoogleSheets(googleSheetsObject: any) {
             let charsToReplace = ':-';
             let title = trimChars(eventDescription, charsToReplace);
 
-            let matchedLabels = labels.slice(indexOfDate + 2).map((string: string) => trimChars(string, charsToReplace));
-            let description = event.slice(indexOfDate + 2).map((string: string) => trimChars(string, charsToReplace)).map((contents: string, i: number) => {
+            let matchedLabels = labels.slice(indexOfDate + 1).map((string: string) => trimChars(string, charsToReplace));
+            let description = event.slice(indexOfDate + 1).map((string: string) => trimChars(string, charsToReplace)).map((contents: string, i: number) => {
                 if (contents.trim() === '') return '';
                 let label = matchedLabels[i];
-                if (label !== undefined && label !== '') {
+                if (googleSheetsObject[key][1] && label !== undefined && label !== '') {
                     return '<b>' + label + ':</b> ' + contents;
                 } else {
                     return contents;
@@ -485,12 +485,10 @@ function applyHaikuCalendar(calendarFeedObject: any) {
 }
 
 function openCalendarEventModal(value: ClassHomeworkEvent) {
-    // @ts-ignore
-    document.getElementById('calendar-event-title').innerHTML = value.title;
-    // @ts-ignore
-    document.getElementById('calendar-event-body').innerHTML = value.description;
-    // @ts-ignore
-    return document.getElementById('calendar-event-modal').classList.add('is-active');
+    $('#calendar-event-header').html(value.courseName + ' - Block ' + value.courseLabel + ' - ' + value.date.toHRStringLong());
+    $('#calendar-event-body').html(value.description);
+    $('#calendar-event-footer').html(value.courseName);
+    $('#calendar-event-modal').addClass('is-active');
 }
 
 function setupCalendarEventModal() {
@@ -546,6 +544,7 @@ class ClassHomeworkEvent {
     apply() {
         let htmlElements = $(`td[blocklabel="${this.courseLabel}"][classtitle="${this.courseName}"][date="${this.date}"]`);
         htmlElements.children('.subtitle').text(this.shortTitle).addClass('calendar-feed-subtitle');
+        htmlElements.addClass('has-link');
         htmlElements.off('click.links');
         htmlElements.on('click',() => openCalendarEventModal(this));
     }
