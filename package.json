@@ -1,6 +1,6 @@
 {
   "name": "cgs-schedule",
-  "eventTitle": "Recreating the old CGS Schedule with TypeScript",
+  "description": "Recreating the old CGS Schedule with TypeScript",
   "version": "1.0.0",
   "contributors": [
     "Tristan Peng <pengt@catlin.edu> (https://kizjkre.github.io)",
