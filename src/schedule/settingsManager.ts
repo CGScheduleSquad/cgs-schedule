@@ -67,6 +67,7 @@ export function loadAllSettings(globalSettingsObject: any) {
     let linkObject = parseLinkObject(globalSettingsObject);
     let calendarFeedObject = parseCalendarFeedObject(globalSettingsObject);
     let googleSheetObject = parseGoogleSheetsObject(globalSettingsObject);
+    let haikuCalendarObject = parseHaikuCalendarObject(globalSettingsObject);
 
     loadSettingsModal(themesObject);
 
@@ -76,6 +77,7 @@ export function loadAllSettings(globalSettingsObject: any) {
     if (ScheduleParamUtils.getCalendarEventsEnabled()) {
         applyCalendarFeeds(calendarFeedObject);
         applyGoogleSheets(googleSheetObject);
+        applyHaikuCalendar(haikuCalendarObject);
     }
 }
 
@@ -239,6 +241,26 @@ function parseGoogleSheetsObject(globalSettingsObject: any) {
     });
     return googleSheetsObject;
 }
+function parseHaikuCalendarObject(globalSettingsObject: any) {
+    let length = 3;
+
+    let allClassIds = getAllClassIds();
+    let haikuCalendarObject = {};
+    globalSettingsObject.haikuCal.forEach((thing: any) => {
+        if (thing.length !== length) return;
+        let className = thing[0];
+        let blockNumber = thing[1];
+        let calendarLink = thing[2];
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && urlPattern.test(calendarLink)) {
+            let classKey = className + blockNumber;
+            if (allClassIds.has(classKey)) {
+                // @ts-ignore
+                haikuCalendarObject[classKey] = [calendarLink];
+            }
+        }
+    });
+    return haikuCalendarObject;
+}
 
 function forceOpenTabIfSafari(href: string) {
     var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -318,7 +340,7 @@ function applyCalendarFeeds(calendarFeedObject: any) {
             .map((event: any) => {
                 try {
                     let date = VeracrossICalUtils.getDate(event[1]);
-                    let title = VeracrossICalUtils.getTitle(event[1]);
+                    let title = VeracrossICalUtils.getSummary(event[1]);
                     let splitTitle = title.split(' [');
                     let description = splitTitle[0].replace(/\(.+\)/, '').trim().substring(0, maxSheetItemLength) + (splitTitle[0].length > maxSheetItemLength ? '...' : '');
                     let canvasId = splitTitle[1].slice(0, -1);
@@ -395,6 +417,45 @@ function applyGoogleSheets(googleSheetsObject: any) {
                 let htmlElements = $(`td[blocklabel="${value.blocklabel}"][classtitle="${value.title}"][date="${value.date}"]`);
                 htmlElements.children('.subtitle').text(value.description).addClass('calendar-feed-subtitle');
             });
+        });
+    });
+}
+
+function applyHaikuCalendar(calendarFeedObject: any) {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', 'https://cgs-schedule-cors.herokuapp.com/' + calendarFeedObject[key][0]).then(icsString => {
+        // @ts-ignore
+        let parsedPath = ICAL.parse(icsString);
+        return parsedPath[2];
+    }).then(calendarEvents => {
+        return calendarEvents
+            .map((event: any) => {
+                try {
+                    let date = VeracrossICalUtils.getDate(event[1]);
+                    let rawTitle = VeracrossICalUtils.getSummary(event[1]);
+                    let abbTitle = rawTitle.replace(/\(.+\)/, '').trim().substring(0, maxSheetItemLength) + (rawTitle.length > maxSheetItemLength ? '...' : '');
+
+                    if (date === null)
+                        return null;
+
+                    return { date, description: abbTitle, title: key.slice(0, -1), blocklabel: key.slice(-1)};
+                } catch (e) {
+                    return null;
+                }
+            })
+            .filter((rawBlock: any) => rawBlock !== null);
+    }).catch((e: Error) => {
+        console.warn(e);
+        console.warn('Calendar link returned 404!');
+        return null;
+    });
+
+    let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
+    Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
+            calendarEvents.forEach((value: any) => {
+                let htmlElements = $(`td[blocklabel="${value.blocklabel}"][classtitle="${value.title}"][date="${value.date}"]`);
+                htmlElements.children('.subtitle').text(value.description).addClass('calendar-feed-subtitle');
+            })
         });
     });
 }
