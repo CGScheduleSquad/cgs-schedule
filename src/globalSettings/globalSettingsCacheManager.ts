@@ -2,7 +2,7 @@ import ScheduleParamUtils from '../schedule/utils/scheduleParamUtils';
 
 export default class GlobalSettingsCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'globalSettings';
-    private static CURRENT_VERSION_NUMBER = 4;
+    private static CURRENT_VERSION_NUMBER = 5;
 
     static getGlobalSettings(): Promise<any> {
         if (localStorage === undefined) {
@@ -23,7 +23,7 @@ export default class GlobalSettingsCacheManager {
             return this.reloadGlobalSettings().then(jsonString => JSON.parse(jsonString));
         }
 
-        if (globalSettingsObject.creationTime === undefined || new Date().getTime() - new Date(globalSettingsObject.creationTime).getTime() > 1000 * 60 * 60 * 7) {
+        if (globalSettingsObject.creationTime === undefined || new Date().getTime() - new Date(globalSettingsObject.creationTime).getTime() > 1000 * 60 * 60 * 10) {
             console.log('Global settings cache is outdated! Loading in the background...');
             this.reloadGlobalSettings(); // save in the background
         }
