@@ -222,6 +222,7 @@ function parseCalendarFeedObject(globalSettingsObject: any) {
     return calFeedsObject;
 }
 
+let googleSheetsMatcher = /[A-z0-9-_]{44}/;
 function parseGoogleSheetsObject(globalSettingsObject: any) {
     let length = 5;
 
@@ -233,8 +234,8 @@ function parseGoogleSheetsObject(globalSettingsObject: any) {
         let blockNumber = thing[1];
         let sheetRange = thing[2];
         let useLabels = thing[3] === 'yes';
-        let sheetId = thing[4];
-        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && classNamePattern.test(sheetRange) && /[a-zA-Z0-9-_]+/.test(sheetId)) {
+        let sheetId = thing[4].match(googleSheetsMatcher)[0];
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && classNamePattern.test(sheetRange) && sheetId !== undefined) {
             let classKey = className + blockNumber;
             if (allClassIds.has(classKey)) {
                 // @ts-ignore
