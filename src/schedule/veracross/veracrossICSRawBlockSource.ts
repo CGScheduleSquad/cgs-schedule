@@ -20,7 +20,7 @@ export class VeracrossICSRawBlockSource implements RawBlockSource {
                         let date = VeracrossICalUtils.getDate(event[1]);
                         let startTime = VeracrossICalUtils.getStartTime(event[1]);
                         let endTime = VeracrossICalUtils.getEndTime(event[1]);
-                        let title = VeracrossICalUtils.getTitle(event[1]);
+                        let title = VeracrossICalUtils.getSummary(event[1]);
                         let location = VeracrossICalUtils.getLocation(event[1]);
                         let letter = VeracrossICalUtils.getLetter(event[1]);
                         let label = VeracrossICalUtils.getLabel(event[1]);
