@@ -95,4 +95,9 @@ export class VeracrossICalUtils {
         let i = VeracrossICalUtils.inMatrix('summary', matrix);
         return i > -1 ? matrix[i][3].split(' - ')[0] : 'N/A';
     }
+
+    static getDescriptionAsText(matrix: any): any {
+        let i = VeracrossICalUtils.inMatrix('description', matrix);
+        return i > -1 ? matrix[i][3] : 'N/A';
+    }
 }

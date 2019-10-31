@@ -1,6 +1,6 @@
 {
   "name": "cgs-schedule",
-  "description": "Recreating the old CGS Schedule with TypeScript",
+  "eventTitle": "Recreating the old CGS Schedule with TypeScript",
   "version": "1.0.0",
   "contributors": [
     "Tristan Peng <pengt@catlin.edu> (https://kizjkre.github.io)",
@@ -33,6 +33,7 @@
     "typescript": "^2.9.2"
   },
   "dependencies": {
+    "@types/showdown": "^1.9.3",
     "animate.css": "^3.7.2",
     "bulma": "^0.7.5",
     "bulma-switch": "^2.0.0",
@@ -40,6 +41,7 @@
     "bulma-tooltip": "1.0.5",
     "cookie-storage": "^5.0.3",
     "ngrok": "^3.2.5",
-    "pug-cli": "^1.0.0-alpha6"
+    "pug-cli": "^1.0.0-alpha6",
+    "showdown": "^1.9.0"
   }
 }
