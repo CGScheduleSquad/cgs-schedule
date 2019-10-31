@@ -5,6 +5,8 @@ import { CookieManager } from '../cookieManager';
 import { ScheduleRange, ViewMode } from './rendering/scheduleRange';
 import { VeracrossICalUtils } from './veracross/veracrossICalUtils';
 import GenericCacheManager from '../globalSettings/genericCacheManager';
+import ScheduleDate from './time/scheduleDate';
+import { Converter } from 'showdown';
 
 let themeCssVariables = [
     '--block-1',
@@ -17,6 +19,7 @@ let themeCssVariables = [
     '--block-activity',
     '--block-free',
     '--text',
+    '--class-text',
     '--link',
     '--border',
     '--divider',
@@ -24,7 +27,7 @@ let themeCssVariables = [
 ];
 
 function createOption(text: string) {
-    let opt = document.createElement('option');
+    var opt = document.createElement('option');
     opt.appendChild(document.createTextNode(capitalize(text)));
     opt.value = text;
     return opt;
@@ -41,7 +44,7 @@ function applyHighlight() {
     let viewMode = ScheduleParamUtils.getViewMode();
     if (viewMode !== ViewMode.Day) {
         let highlightDay = new ScheduleRange(ScheduleParamUtils.getCurrentDate(), ViewMode.Day).startDate;
-        Array.from(document.querySelectorAll(`.daylabel[date='${highlightDay.toString()}']`)).forEach((el: any) => el.classList.add('day-highlight'));
+        $('.daylabel[date=\'' + highlightDay.toString() + '\']').addClass('day-highlight');
     }
 }
 
@@ -64,13 +67,20 @@ export function loadAllSettings(globalSettingsObject: any) {
     let themesObject = parseThemesObject(globalSettingsObject);
     let linkObject = parseLinkObject(globalSettingsObject);
     let calendarFeedObject = parseCalendarFeedObject(globalSettingsObject);
+    let googleSheetObject = parseGoogleSheetsObject(globalSettingsObject);
+    let haikuCalendarObject = parseHaikuCalendarObject(globalSettingsObject);
 
     loadSettingsModal(themesObject);
 
     applyThemes(themesObject);
     if (ScheduleParamUtils.getLinksEnabled()) applyClassLinks(linkObject);
     if (ScheduleParamUtils.getHighlightEnabled()) applyHighlight();
-    if (ScheduleParamUtils.getCalendarEventsEnabled()) applyCalendarFeeds(calendarFeedObject);
+    if (ScheduleParamUtils.getCalendarEventsEnabled()) {
+        applyCanvasCalendar(calendarFeedObject);
+        applyGoogleSheets(googleSheetObject);
+        applyHaikuCalendar(haikuCalendarObject);
+        setupCalendarEventModal();
+    }
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -167,12 +177,11 @@ function applyThemes(themesObject: { [x: string]: any; }) {
     }
 }
 
-const urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
-const classNamePattern = /^[^<>\n\\=]+$/;
-const blockNumberPattern = /^[1-7]$/;
-
+var urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+var classNamePattern = /^[^<>\n\\=]+$/;
+var blockNumberPattern = /^[1-7]$/;
 function parseLinkObject(globalSettingsObject: any) {
-    const minLength = 3;
+    var minLength = 3;
 
     let linkObject = {};
     globalSettingsObject.dayLinks.forEach((linkEntry: any) => {
@@ -213,15 +222,57 @@ function parseCalendarFeedObject(globalSettingsObject: any) {
     return calFeedsObject;
 }
 
+function parseGoogleSheetsObject(globalSettingsObject: any) {
+    let length = 4;
+
+    let allClassIds = getAllClassIds();
+    let googleSheetsObject = {};
+    globalSettingsObject.googleSheets.forEach((thing: any) => {
+        if (thing.length !== length) return;
+        let className = thing[0];
+        let blockNumber = thing[1];
+        let sheetRange = thing[2];
+        let sheetId = thing[3];
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && classNamePattern.test(sheetRange) && /[a-zA-Z0-9-_]+/.test(sheetId)) {
+            let classKey = className + blockNumber;
+            if (allClassIds.has(classKey)) {
+                // @ts-ignore
+                googleSheetsObject[classKey] = [sheetRange, sheetId];
+            }
+        }
+    });
+    return googleSheetsObject;
+}
+function parseHaikuCalendarObject(globalSettingsObject: any) {
+    let length = 3;
+
+    let allClassIds = getAllClassIds();
+    let haikuCalendarObject = {};
+    globalSettingsObject.haikuCal.forEach((thing: any) => {
+        if (thing.length !== length) return;
+        let className = thing[0];
+        let blockNumber = thing[1];
+        let calendarLink = thing[2];
+        if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && urlPattern.test(calendarLink)) {
+            let classKey = className + blockNumber;
+            if (allClassIds.has(classKey)) {
+                // @ts-ignore
+                haikuCalendarObject[classKey] = [calendarLink];
+            }
+        }
+    });
+    return haikuCalendarObject;
+}
+
 function forceOpenTabIfSafari(href: string) {
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     if (isSafari) {
-        let a = document.createElement('a');
+        var a = document.createElement('a');
         a.setAttribute('href', href);
         a.setAttribute('target', '_blank');
 
-        let dispatch = document.createEvent('HTMLEvents');
+        var dispatch = document.createEvent('HTMLEvents');
         dispatch.initEvent('click', true, true);
         a.dispatchEvent(dispatch);
     } else {
@@ -244,46 +295,9 @@ function applyClassLinks(linkObject: any) {
         // @ts-ignore // TODO: Remove
         if (courseName.innerText === 'Lunch') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
         if (linkObjectElement === undefined) return;
-        parentElement.classList.add('has-link', 'link-index-' + linkObjectKeys.indexOf(workingKey));
-        parentElement.addEventListener('click', event => {
-            if (event.shiftKey) {
-                event.preventDefault();
-                const modal = document.createElement('div');
-                const modalBackground = document.createElement('div');
-                const modalContent = document.createElement('div');
-                const modalClose = document.createElement('button');
-
-                modal.classList.add('bulma', 'modal', 'is-clipped');
-                modalBackground.classList.add('bulma', 'modal-background');
-                modalContent.classList.add('bulma', 'modal-card');
-                modalClose.classList.add('bulma', 'modal-close', 'is-large');
-
-                modal.append(modalBackground, modalContent, modalClose);
-                document.body.appendChild(modal);
-
-                modalContent.innerHTML = `
-                    <header class="modal-card-head">
-                      <p class="modal-card-title">Events</p>
-                    </header>
-                    <section class="modal-card-body">
-                      <div class="box">
-                        
-                      </div>
-                      <div class="box">
-                        
-                      </div>
-                    </section>
-                    <footer class="modal-card-foot">
-                      <button class="button is-success" id="modal-save">Save changes</button>
-                    </footer>
-                `;
-                modalContent.style.marginTop = '-90vh';
-                // @ts-ignore
-                [modalClose, document.getElementById('modal-save')].forEach(e => e.addEventListener('click', () => document.body.removeChild(modal)));
-            } else {
-                forceOpenTabIfSafari(linkObjectElement[0]);
-            }
-        });
+        parentElement.classList.add('has-link');
+        parentElement.classList.add('link-index-' + linkObjectKeys.indexOf(workingKey));
+        $(parentElement).on('click.links', () => forceOpenTabIfSafari(linkObjectElement[0]));
     });
 
     linkObjectKeys.forEach((className, classNameIndex) => {
@@ -317,8 +331,10 @@ function getAllClassIds() {
     return listOfClasses;
 }
 
-function applyCalendarFeeds(calendarFeedObject: any) {
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, calendarFeedObject[key][1]).then(icsString => {
+let maxSheetItemLength = 30;
+function applyCanvasCalendar(calendarFeedObject: any) {
+    var converter = new Converter();
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule-cors.herokuapp.com/' + calendarFeedObject[key][1]).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
         return parsedPath[2];
@@ -327,17 +343,17 @@ function applyCalendarFeeds(calendarFeedObject: any) {
             .map((event: any) => {
                 try {
                     let date = VeracrossICalUtils.getDate(event[1]);
-                    let title = VeracrossICalUtils.getTitle(event[1]);
-                    let splitTitle = title.split(' [');
-                    let description = splitTitle[0].replace(/\(.+\)/, '').trim();
+                    let splitTitle = VeracrossICalUtils.getSummary(event[1]).split(' [');
+                    let description = converter.makeHtml(VeracrossICalUtils.getDescriptionAsText(event[1]));
+                    let title = splitTitle[0];
                     let canvasId = splitTitle[1].slice(0, -1);
 
-                    if (
-                        date === null || canvasId !== calendarFeedObject[key][0]
-                    )
+                    if (date === null || canvasId !== calendarFeedObject[key][0])
                         return null;
 
-                    return { date, description, canvasId, title: key.slice(0, -1), blocklabel: key.slice(-1)};
+                    let courseName = key.slice(0, -1);
+                    let courseLabel = key.slice(-1);
+                    return new ClassHomeworkEvent(date, courseName, courseLabel, title, description);
                 } catch (e) {
                     return null;
                 }
@@ -351,14 +367,167 @@ function applyCalendarFeeds(calendarFeedObject: any) {
 
     let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
     Promise.all(allCalPromises).then((calendars: Array<any>) => {
-        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<object>) => {
-            calendarEvents.forEach((value: any) => {
-                Array.from(document.querySelectorAll(`td[blocklabel='${value.blocklabel}'][title='${value.title}'][date='${value.date}'] > .subtitle`)).forEach((el: any) => {
-                   el.value = ` ${value.description} `;
-                   el.classList.add('calendar-feed-subtitle')
-                });
+        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<ClassHomeworkEvent>) => {
+            calendarEvents.forEach((value: ClassHomeworkEvent) => {
+                value.apply();
             })
         });
     });
 }
 
+function applyGoogleSheets(googleSheetsObject: any) {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `https://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][1]}&range=${googleSheetsObject[key][0]}`).then(icsString => {
+        return JSON.parse(icsString);
+    }).then(calendarEvents => {
+        return calendarEvents.map((event: any) => {
+            if (event.length < 1) {
+                return null;
+            }
+            let dateMatcher = /\b(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\b/;
+            let dates = event.map((cell: string) => dateMatcher.exec(cell));
+            let indexOfDate = dates.findIndex((date: any) => date !== null && date !== undefined);
+            let eventDescription = event[indexOfDate + 1];
+            if (indexOfDate === -1 || eventDescription === undefined || eventDescription.trim().length <= 2) {
+                return null;
+            }
+
+            let currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let startYear = currentMonth > 7 ? currentDate.getFullYear() : currentDate.getFullYear() - 1;
+
+            let date = ScheduleDate.fromDate(new Date(dates[indexOfDate][0]));
+            if (date.getMonth() > 7) {
+                date.setFullYear(startYear);
+            } else {
+                date.setFullYear(startYear + 1);
+            }
+            let title = eventDescription;
+
+            let description = event.slice(indexOfDate+2).join('<br>');
+            let courseName = key.slice(0, -1);
+            let courseLabel = key.slice(-1);
+            return new ClassHomeworkEvent(date, courseName, courseLabel, title, description);
+        })
+            .filter((rawBlock: any) => rawBlock !== null);
+    }).catch((e: Error) => {
+        console.warn(e);
+        console.warn('Calendar link returned 404!');
+        return null;
+    });
+
+    let allCalPromises = Object.keys(googleSheetsObject).map(feedKeyToCalendar);
+    Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<ClassHomeworkEvent>) => {
+            calendarEvents.forEach((value: ClassHomeworkEvent) => {
+                value.apply();
+            });
+        });
+    });
+}
+
+function applyHaikuCalendar(calendarFeedObject: any) {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', 'https://cgs-schedule-cors.herokuapp.com/' + calendarFeedObject[key][0]).then(icsString => {
+        // @ts-ignore
+        let parsedPath = ICAL.parse(icsString);
+        return parsedPath[2];
+    }).then((calendarEvents: Array<ClassHomeworkEvent>) => {
+        return calendarEvents
+            .map((event: any) => {
+                try {
+                    let date = VeracrossICalUtils.getDate(event[1]);
+                    let title = VeracrossICalUtils.getSummary(event[1]);
+                    let description = VeracrossICalUtils.getDescriptionAsText(event[1]);
+
+                    if (date === null)
+                        return null;
+
+                    let courseName = key.slice(0, -1);
+                    let courseLabel = key.slice(-1);
+
+                    return new ClassHomeworkEvent(date, courseName, courseLabel, title, description);
+                } catch (e) {
+                    return null;
+                }
+            })
+            .filter((rawBlock: any) => rawBlock !== null);
+    }).catch((e: Error) => {
+        console.warn(e);
+        console.warn('Calendar link returned 404!');
+        return null;
+    });
+
+    let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
+
+    Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<ClassHomeworkEvent>) => {
+            calendarEvents.forEach((value: ClassHomeworkEvent) => {
+                value.apply();
+            })
+        });
+    });
+}
+
+function openCalendarEventModal(value: ClassHomeworkEvent) {
+    document.getElementById('calendar-event-title').innerHTML = value.title;
+    document.getElementById('calendar-event-body').innerHTML = value.description;
+    // @ts-ignore
+    return document.getElementById('calendar-event-modal').classList.add('is-active');
+}
+
+function setupCalendarEventModal() {
+
+    // @ts-ignore
+    const closeModal = () => document.getElementById('calendar-event-modal').classList.remove('is-active');
+
+    [document.getElementById('calendar-event-background')].forEach(
+        el => el !== null && el.addEventListener('click', () => closeModal())
+    );
+}
+
+class ClassHomeworkEvent {
+    private readonly _date: ScheduleDate;
+    private readonly _courseName: string;
+    private readonly _courseLabel: string;
+    private readonly _title: string;
+    private readonly _description: string;
+
+    constructor(date: ScheduleDate, courseName: string, courseLabel: string, title: string, description: string) {
+        this._date = date;
+        this._courseName = courseName;
+        this._courseLabel = courseLabel;
+        this._title = title;
+        this._description = description;
+    }
+
+    get date(): ScheduleDate {
+        return this._date;
+    }
+
+    get courseName(): string {
+        return this._courseName;
+    }
+
+    get courseLabel(): string {
+        return this._courseLabel;
+    }
+
+    get title(): string {
+        return this._title;
+    }
+
+    get shortTitle(): string {
+        return this._title.trim().substring(0, maxSheetItemLength)
+            + (this._title.length > maxSheetItemLength ? '...' : '');
+    }
+
+    get description(): string {
+        return this._description;
+    }
+
+    apply() {
+        let htmlElements = $(`td[blocklabel="${this.courseLabel}"][classtitle="${this.courseName}"][date="${this.date}"]`);
+        htmlElements.children('.subtitle').text(this.shortTitle).addClass('calendar-feed-subtitle');
+        htmlElements.off('click.links');
+        htmlElements.on('click',() => openCalendarEventModal(this));
+    }
+}

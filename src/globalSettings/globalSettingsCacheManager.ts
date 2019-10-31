@@ -2,7 +2,7 @@ import ScheduleParamUtils from '../schedule/utils/scheduleParamUtils';
 
 export default class GlobalSettingsCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'globalSettings';
-    private static CURRENT_VERSION_NUMBER = 2;
+    private static CURRENT_VERSION_NUMBER = 4;
 
     static getGlobalSettings(): Promise<any> {
         if (localStorage === undefined) {

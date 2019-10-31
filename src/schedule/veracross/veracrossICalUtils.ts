@@ -91,8 +91,13 @@ export class VeracrossICalUtils {
         return i > -1 ? ScheduleDate.fromDate(new Date(dateString)) : null;
     }
 
-    static getTitle(matrix: any): any {
+    static getSummary(matrix: any): any {
         let i = VeracrossICalUtils.inMatrix('summary', matrix);
         return i > -1 ? matrix[i][3].split(' - ')[0] : 'N/A';
+    }
+
+    static getDescriptionAsText(matrix: any): any {
+        let i = VeracrossICalUtils.inMatrix('description', matrix);
+        return i > -1 ? matrix[i][3] : 'N/A';
     }
 }

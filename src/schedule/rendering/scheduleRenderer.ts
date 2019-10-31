@@ -6,20 +6,17 @@ import ScheduleTime from '../time/scheduleTime';
 import ScheduleParamUtils from '../utils/scheduleParamUtils';
 import { getClassAsArray } from '../../utils/queryUtils';
 
-let dropdownCount = 0;
-
 function appendBlankSchedule(text: string, bgcolor: string, link: string = ''): void {
     let td = document.createElement('td');
     let a = document.createElement(link === '' ? 'span' : 'a');
     td.setAttribute('rowspan', '12');
-    td.classList.add('period', 'specialday', bgcolor);
-    a.classList.add('coursename');
+    td.setAttribute('class', `period specialday ${bgcolor}`);
+    a.setAttribute('class', 'coursename');
     if (link !== '') a.setAttribute('href', link);
     a.innerText = text;
     td.appendChild(a);
     // @ts-ignore
     document.querySelector('table.sched.main > tbody > tr:nth-child(2)').appendChild(td);
-    dropdownCount++;
 }
 
 const colorClasses = {
@@ -72,48 +69,20 @@ export default class ScheduleRenderer {
         // left/right arrows
         let navigationArrows = document.querySelectorAll('td.arrows a');
         // @ts-ignore
-        navigationArrows[0].addEventListener(
-            'click',
-            () =>
-                (window.location.href = modifyUrlProperty('date', range.previousDate.toString(), window.location.href))
-        );
+        navigationArrows[0].addEventListener("click", () => window.location.href = modifyUrlProperty("date", range.previousDate.toString(), window.location.href));
         // @ts-ignore
-        navigationArrows[1].addEventListener(
-            'click',
-            () => (window.location.href = modifyUrlProperty('date', range.nextDate.toString(), window.location.href))
-        );
+        navigationArrows[1].addEventListener("click", () => window.location.href = modifyUrlProperty("date", range.nextDate.toString(), window.location.href));
 
         // this week
         // @ts-ignore
-        let viewToggle = document
-            .getElementById('today')
-            .firstElementChild.addEventListener(
-                'click',
-                () =>
-                    (window.location.href = modifyUrlProperty(
-                        'date',
-                        null,
-                        modifyUrlProperty('range', 'day', window.location.href)
-                    ))
-            );
+        let viewToggle = document.getElementById('today').firstElementChild
+            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", null, modifyUrlProperty("range", "day", window.location.href)));
         // @ts-ignore
-        let viewToggle = document
-            .getElementById('this-week')
-            .firstElementChild.addEventListener(
-                'click',
-                () =>
-                    (window.location.href = modifyUrlProperty(
-                        'date',
-                        null,
-                        modifyUrlProperty('range', 'week', window.location.href)
-                    ))
-            );
+        let viewToggle = document.getElementById('this-week').firstElementChild
+            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", null, modifyUrlProperty("range", "week", window.location.href)));
     }
 
-    private static renderSchedule(
-        range: ScheduleRange,
-        schedule: { dayMap: { [p: string]: any }; compressionList: any }
-    ) {
+    private static renderSchedule(range: ScheduleRange, schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
         let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         let dates = range.getDatesForWeek();
@@ -131,9 +100,12 @@ export default class ScheduleRenderer {
                 'href',
                 `https://portals.veracross.com/catlin/student/student/daily-schedule?date=${date.toString()}`
             );
-            a.setAttribute('target', `_blank`);
+            a.setAttribute(
+                'target',
+                `_blank`
+            );
             b.innerText = `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate() +
-                (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
+            (rawDay === undefined || !rawDay.dayMeta ? '' : ` (${rawDay.dayMeta})`)}`;
             a.appendChild(b);
             td.appendChild(a);
             // @ts-ignore
@@ -286,14 +258,7 @@ abstract class ParsedBlock {
     private readonly free: boolean;
     protected readonly date: ScheduleDate;
 
-    protected constructor(
-        title: string,
-        location: string,
-        blockLabel: string,
-        mins: string,
-        free: boolean,
-        date: ScheduleDate
-    ) {
+    protected constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean, date: ScheduleDate) {
         this.title = title;
         this.mins = mins;
         this.free = free;
@@ -340,8 +305,8 @@ abstract class ParsedBlock {
             let blockNumMatchAttempt = blockLabel.match(/\d/);
             this.bgcolor =
                 blockNumMatchAttempt !== null
-                    ? // @ts-ignore
-                      colorClasses[parseInt(blockNumMatchAttempt[0].slice(-1))]
+                    // @ts-ignore
+                    ? colorClasses[parseInt(blockNumMatchAttempt[0].slice(-1))]
                     : colorClasses[0];
         } else {
             this.bgcolor = colorClasses[0];
@@ -362,10 +327,12 @@ abstract class ParsedBlock {
         // What data type is tableData?
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
-        tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor}`);
-        let colorString = bgcolor.split('-');
+        let colorString = bgcolor.split("-");
+        let number = parseInt(colorString[1]);
+        let isClassBlock = !isNaN(number) && number <= 7 && number >= 1;
+        tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor} ${isClassBlock ? 'classblock' : 'notclassblock'}`);
         if (colorString.length === 2) tableData.setAttribute('blocklabel', colorString[1]);
-        tableData.setAttribute('title', title);
+        tableData.setAttribute('classtitle', title);
         tableData.setAttribute('date', date.toString());
         let titleSpan = document.createElement('span');
         titleSpan.setAttribute('class', 'coursename');

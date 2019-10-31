@@ -321,6 +321,7 @@ td.controls.links {
     --block-activity: #c0c0c0;
     --block-free: #ffffff;
     --text: #000000;
+    --class-text: #000000;
     --link: #0000EE;
     --border: #000000;
     --divider: #eeeeee;
@@ -344,6 +345,9 @@ $icons: (
     a,
     a:visited {
         color: var(--text);
+    }
+    td.classblock {
+        color: var(--class-text);
     }
 }
 
@@ -457,5 +461,9 @@ body {
 
 .calendar-feed-subtitle {
     background-color: var(--background-color);
-    white-space: pre;
+    color: var(--text);
+    border-radius: 3px;
+    padding: 2px 5px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
 }
