@@ -223,7 +223,7 @@ function parseCalendarFeedObject(globalSettingsObject: any) {
 }
 
 function parseGoogleSheetsObject(globalSettingsObject: any) {
-    let length = 4;
+    let length = 5;
 
     let allClassIds = getAllClassIds();
     let googleSheetsObject = {};
@@ -232,12 +232,13 @@ function parseGoogleSheetsObject(globalSettingsObject: any) {
         let className = thing[0];
         let blockNumber = thing[1];
         let sheetRange = thing[2];
-        let sheetId = thing[3];
+        let useLabels = thing[3] === 'yes';
+        let sheetId = thing[4];
         if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && classNamePattern.test(sheetRange) && /[a-zA-Z0-9-_]+/.test(sheetId)) {
             let classKey = className + blockNumber;
             if (allClassIds.has(classKey)) {
                 // @ts-ignore
-                googleSheetsObject[classKey] = [sheetRange, sheetId];
+                googleSheetsObject[classKey] = [sheetRange, useLabels, sheetId];
             }
         }
     });
@@ -376,9 +377,10 @@ function applyCanvasCalendar(calendarFeedObject: any) {
 }
 
 function applyGoogleSheets(googleSheetsObject: any) {
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `https://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][1]}&range=${googleSheetsObject[key][0]}`).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `https://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][2]}&range=${googleSheetsObject[key][0]}`).then(icsString => {
         return JSON.parse(icsString);
     }).then(calendarEvents => {
+        let labels = calendarEvents[0];
         return calendarEvents.map((event: any) => {
             if (event.length < 1) {
                 return null;
@@ -401,9 +403,24 @@ function applyGoogleSheets(googleSheetsObject: any) {
             } else {
                 date.setFullYear(startYear + 1);
             }
-            let title = eventDescription;
+            let trimChars = function(string: string, c: string) {
+                var re = new RegExp('^[' + c + ']+|[' + c + ']+$', 'g');
+                return string.replace(re, '');
+            };
 
-            let description = event.slice(indexOfDate+2).join('<br>');
+            let charsToReplace = ':-';
+            let title = trimChars(eventDescription, charsToReplace);
+
+            let matchedLabels = labels.slice(indexOfDate + 2).map((string: string) => trimChars(string, charsToReplace));
+            let description = event.slice(indexOfDate + 2).map((string: string) => trimChars(string, charsToReplace)).map((contents: string, i: number) => {
+                if (contents.trim() === '') return '';
+                let label = matchedLabels[i];
+                if (label !== undefined && label !== '') {
+                    return '<b>' + label + ':</b> ' + contents;
+                } else {
+                    return contents;
+                }
+            }).filter((string: string) => string !== '').join('<br>');
             let courseName = key.slice(0, -1);
             let courseLabel = key.slice(-1);
             return new ClassHomeworkEvent(date, courseName, courseLabel, title, description);
@@ -468,7 +485,9 @@ function applyHaikuCalendar(calendarFeedObject: any) {
 }
 
 function openCalendarEventModal(value: ClassHomeworkEvent) {
+    // @ts-ignore
     document.getElementById('calendar-event-title').innerHTML = value.title;
+    // @ts-ignore
     document.getElementById('calendar-event-body').innerHTML = value.description;
     // @ts-ignore
     return document.getElementById('calendar-event-modal').classList.add('is-active');
