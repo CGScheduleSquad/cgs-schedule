@@ -263,16 +263,22 @@ function applyClassLinks(linkObject: any) {
 
                 modalContent.innerHTML = `
                     <header class="modal-card-head">
-                      <p class="modal-card-title">Modal title</p>
+                      <p class="modal-card-title">Events</p>
                     </header>
                     <section class="modal-card-body">
-                      <!-- Content ... -->
+                      <div class="box">
+                        
+                      </div>
+                      <div class="box">
+                        
+                      </div>
                     </section>
                     <footer class="modal-card-foot">
                       <button class="button is-success" id="modal-save">Save changes</button>
                     </footer>
                 `;
                 modalContent.style.marginTop = '-90vh';
+                // @ts-ignore
                 [modalClose, document.getElementById('modal-save')].forEach(e => e.addEventListener('click', () => document.body.removeChild(modal)));
             } else {
                 forceOpenTabIfSafari(linkObjectElement[0]);
