@@ -44,7 +44,7 @@ function applyHighlight() {
     let viewMode = ScheduleParamUtils.getViewMode();
     if (viewMode !== ViewMode.Day) {
         let highlightDay = new ScheduleRange(ScheduleParamUtils.getCurrentDate(), ViewMode.Day).startDate;
-        $('.daylabel[date=\'' + highlightDay.toString() + '\']').addClass('day-highlight');
+        Array.from(document.querySelectorAll(`.daylabel[date='${highlightDay.toString()}']`)).forEach((e: any) => e.classList.add('day-highlight'));
     }
 }
 
@@ -525,9 +525,14 @@ class ClassHomeworkEvent {
     }
 
     apply() {
-        let htmlElements = $(`td[blocklabel="${this.courseLabel}"][classtitle="${this.courseName}"][date="${this.date}"]`);
-        htmlElements.children('.subtitle').text(this.shortTitle).addClass('calendar-feed-subtitle');
-        htmlElements.off('click.links');
-        htmlElements.on('click',() => openCalendarEventModal(this));
+        Array.from(document.querySelectorAll(`td[blocklabel="${this.courseLabel}"][classtitle="${this.courseName}"][date="${this.date}"]`)).forEach((e: any) => {
+            const func = () => openCalendarEventModal(this);
+            e.removeEventListener('click.links', func);
+            e.addEventListener('click', func);
+            Array.from(e.childNodes).filter((e1: any) => e1.classList.contains('subtitle')).forEach((e1: any) => {
+               e1.innerText = this.shortTitle;
+               e1.classList.add('calendar-feed-subtitle');
+            });
+        });
     }
 }

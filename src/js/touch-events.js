@@ -38,7 +38,7 @@ window.touchStart = (event, passedName) => {
 };
 
 window.touchMove = event => {
-    if ($(document).height() <= $(window).height()+30) { // if there is no scrollbar, prevent touch scrolling
+    if (document.innerHeight <= window.innerHeight + 30) { // if there is no scrollbar, prevent touch scrolling
         event.preventDefault();
     }
     if (event.touches.length === 1) {
@@ -120,7 +120,7 @@ function eventFire(el, etype){
     if (el.fireEvent) {
         el.fireEvent('on' + etype);
     } else {
-        var evObj = document.createEvent('Events');
+        let evObj = document.createEvent('Events');
         evObj.initEvent(etype, true, false);
         el.dispatchEvent(evObj);
     }
