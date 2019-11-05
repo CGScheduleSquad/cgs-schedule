@@ -7,6 +7,13 @@
             section.modal-card-body
                 .field
                     label.label
+                        | Bug report
+                        i.fas.fa-bug.p-l-sm
+                    .control
+                        a.button( onclick='window.open("https://docs.google.com/forms/d/e/1FAIpQLSe4TqGQyFUwILZ3Wq7rjUm9oLD5hAYq65ox6VHMJdXx10Zgpw/viewform?usp=pp_url&entry.2054812878="+encodeURIComponent(window.location.href), "_blank");' ) Submit Bug Report
+                    p.help Is your schedule not displaying correctly? Let us know!
+                .field
+                    label.label
                         | Theme
                         i.fas.fa-palette.p-l-sm
                     .field.has-addons
@@ -33,9 +40,9 @@
                     .control
                         input#calendar-events.switch.is-rounded.is-medium.is-success(type='checkbox' name='calendar-events' checked='checked')
                         label(for='calendar-events')
-                        a.button.m-l-sm( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1673690997' ) Add Canvas Calendar
-                        a.button.m-l-sm( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1636868429' ) Add Google Sheet
-                        a.button.m-l-sm( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=216143315' ) Add Haiku Calendar
+                        a.button.m-l-xs( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1673690997' ) Add Canvas Calendar
+                        a.button.m-l-xs( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=1636868429' ) Add Google Sheet
+                        a.button.m-l-xs( target = '_blank' href='https://docs.google.com/spreadsheets/d/1kfA4DS8-bV-ngZYRQwt4hAqMVSQDeGjU71BqfnR9MlY/edit#gid=216143315' ) Add Haiku Calendar
                     p.help
                         | Enables or disables inline homework calendar events from Canvas and Haiku iCal feeds and from Google Sheets schedules. To get to the class links for blocks with calendar events, right click on the block.
                 .field
