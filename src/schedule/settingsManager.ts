@@ -27,7 +27,7 @@ let themeCssVariables = [
 ];
 
 function createOption(text: string) {
-    var opt = document.createElement('option');
+    let opt = document.createElement('option');
     opt.appendChild(document.createTextNode(capitalize(text)));
     opt.value = text;
     return opt;
@@ -149,8 +149,8 @@ function loadSettingsModal(themesObject: {}) {
 }
 
 function parseThemesObject(globalSettingsObject: any) {
-    var namePattern = /^[\w| ]+$/i;
-    var colorPattern = /^#([0-9a-f]{3})([0-9a-f]{3})?$/i;
+    let namePattern = /^[\w| ]+$/i;
+    let colorPattern = /^#([0-9a-f]{3})([0-9a-f]{3})?$/i;
     let themesObject = {};
     globalSettingsObject.themes.forEach((theme: any) => {
         if (theme.length < themeCssVariables.length + 1) return;
@@ -177,9 +177,9 @@ function applyThemes(themesObject: { [x: string]: any; }) {
     }
 }
 
-var urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
-var classNamePattern = /^[^<>\n\\=]+$/;
-var blockNumberPattern = /^[1-7]$/;
+let urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+let classNamePattern = /^[^<>\n\\=]+$/;
+let blockNumberPattern = /^[1-7]$/;
 function parseLinkObject(globalSettingsObject: any) {
     var minLength = 3;
 
@@ -264,19 +264,21 @@ function parseHaikuCalendarObject(globalSettingsObject: any) {
     return haikuCalendarObject;
 }
 
-function forceOpenTabIfSafari(href: string) {
-    var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+function forceOpenTabIfSafari(href: string, index: number) {
+    let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     if (isSafari) {
-        var a = document.createElement('a');
+        let a = document.createElement('a');
         a.setAttribute('href', href);
         a.setAttribute('target', '_blank');
 
-        var dispatch = document.createEvent('HTMLEvents');
+        let dispatch = document.createEvent('HTMLEvents');
         dispatch.initEvent('click', true, true);
         a.dispatchEvent(dispatch);
     } else {
-        window.open(href, '_blank');
+        // window.open(href, '_blank');
+        // @ts-ignore
+        document.getElementById(`event-modal-${index}`).style.display = '';
     }
 }
 
@@ -284,7 +286,7 @@ function applyClassLinks(linkObject: any) {
 
     let linkObjectKeys = Object.keys(linkObject);
 
-    Array.from(document.getElementsByClassName('coursename')).forEach((courseName: Element): any => {
+    Array.from(document.getElementsByClassName('coursename')).forEach((courseName: Element, index: number): any => {
         // @ts-ignore
         let parentElement = courseName.parentElement;
         if (parentElement === null) return;
@@ -295,16 +297,69 @@ function applyClassLinks(linkObject: any) {
         // @ts-ignore // TODO: Remove
         if (courseName.innerText === 'Lunch') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
         if (linkObjectElement === undefined) return;
-        parentElement.classList.add('has-link');
-        parentElement.classList.add('link-index-' + linkObjectKeys.indexOf(workingKey));
-        $(parentElement).on('click.links', () => forceOpenTabIfSafari(linkObjectElement[0]));
+        parentElement.classList.add('has-link', 'link-index-' + linkObjectKeys.indexOf(workingKey));
+        parentElement.addEventListener('click', () => forceOpenTabIfSafari(linkObjectElement[0], index));
+
+        let modal = document.createElement('div');
+        modal.classList.add('bulma', 'modal');
+        modal.setAttribute('id', `event-modal-${index}`);
+        modal.style.display = 'none';
+        modal.innerHTML = `
+              <div class="bulma modal-background" style="z-index: 200;"></div>
+              <div class="bulma modal-card" style="margin-top: -90vh; z-index: 201;">
+                <header class="bulma modal-card-head">
+                  <p class="bulma modal-card-title">Events</p>
+                </header>
+                <section class="bulma modal-card-body">
+                  <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-title">Events this block</span>
+                    </div>
+                    <div class="card-content">
+                        <ul id="events-${index}"></ul>
+                    </div>
+                  </div>
+                  <br>
+                  <br>
+                  <div class="card">
+                    <div class="card-header">
+                        <span class="card-header-title">Add event</span>
+                    </div>
+                    <div class="card-content">
+                      <input class="input" type="text" placeholder="Event" id="event-text-${index}" style="width: 75%;">
+                      <br>
+                      <br>
+                      <button class="button" id="add-event-${index}">+ Add Event</button>
+                      <div id="iframe-${index}" style="display: none;"></div>
+                    </div>
+                  </div>
+                </section>
+                <footer class="bulma modal-card-foot">
+                  <button class="bulma button is-success bulma-modal-close-${index}">Save changes</button>
+                </footer>
+              </div>
+              <button class="bulma modal-close is-large bulma-modal-close-${index}" aria-label="close" style="z-index: 201;"></button>
+        `;
+        document.body.append(modal);
+        Array.from(document.getElementsByClassName(`bulma-modal-close-${index}`)).forEach((e: any) => e.addEventListener('click', () => modal.style.display = 'none'));
+        // @ts-ignore
+        document.getElementById(`add-event-${index}`).addEventListener('click', () => {
+            let code;
+            location.search.split('&').forEach(a => {
+                if (a.match(/\??cal=.+/g)) {
+                    code = a.split('=')[1];
+                }
+            });
+            // @ts-ignore
+            document.getElementById(`iframe-${index}`).innerHTML = `<iframe src='https://cgscomwww.catlin.edu/pengt/data/edit.php?add=["${code}",{"${parentElement.getAttribute('date')}":{"${parentElement.getAttribute('classtitle')}":"${document.getElementById(`event-text-${index}`).value}"}}]'></iframe>`;
+        });
     });
 
     linkObjectKeys.forEach((className, classNameIndex) => {
         let items: {} = {};
         linkObject[className].forEach((link: string) => {
             // @ts-ignore
-            items[link] = { name: link.substring(0, 50).replace('https://', '').replace('http://', '') + (link.length > 50 ? '...' : '') };
+            items[link] = { name: link.substring(0, 50).replace(/https?:\/\//g, '') + (link.length > 50 ? '...' : '') };
         });
         // @ts-ignore
         $.contextMenu({
@@ -333,7 +388,7 @@ function getAllClassIds() {
 
 let maxSheetItemLength = 30;
 function applyCanvasCalendar(calendarFeedObject: any) {
-    var converter = new Converter();
+    let converter = new Converter();
     let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule-cors.herokuapp.com/' + calendarFeedObject[key][1]).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
@@ -527,7 +582,7 @@ class ClassHomeworkEvent {
     apply() {
         Array.from(document.querySelectorAll(`td[blocklabel="${this.courseLabel}"][classtitle="${this.courseName}"][date="${this.date}"]`)).forEach((e: any) => {
             const func = () => openCalendarEventModal(this);
-            e.removeEventListener('click.links', func);
+            e.removeEventListener('click', func);
             e.addEventListener('click', func);
             Array.from(e.childNodes).filter((e1: any) => e1.classList.contains('subtitle')).forEach((e1: any) => {
                e1.innerText = this.shortTitle;
