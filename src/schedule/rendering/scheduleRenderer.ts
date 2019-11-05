@@ -1,7 +1,7 @@
 import { ScheduleRange, ViewMode } from './scheduleRange';
 import ScheduleDate from '../time/scheduleDate';
 import scheduleDate from '../time/scheduleDate';
-import { normalTimes, normalAllTimes, lateStartAllTimes, ScheduleDayType } from '../structure/scheduleDay';
+import { lateStartAllTimes, normalAllTimes, normalTimes, ScheduleDayType } from '../structure/scheduleDay';
 import ScheduleTime from '../time/scheduleTime';
 import ScheduleParamUtils from '../utils/scheduleParamUtils';
 import { getClassAsArray } from '../../utils/queryUtils';
@@ -322,7 +322,7 @@ abstract class ParsedBlock {
             blockLabel = 'Blk ' + blockLabel;
         }
 
-        let freeNames = ['Free', 'Late Start', 'Break', 'Lunch', 'Lunch (MS)']; // TODO: get rid of this
+        let freeNames = ['Free', 'Late Start', 'Break', 'Break (MS)', 'Lunch', 'Lunch (MS)']; // TODO: get rid of this
         if (this.free || freeNames.some(name => name === this.title)) {
             this.bgcolor = colorClasses.free;
         } else if (this.shouldBeColored) {
