@@ -15,9 +15,10 @@ window.addEventListener('load', () => {
                     document.getElementById('invalid').style.display = 'none';
                     document.getElementById('disclaimerModal').setAttribute('class', 'modal is-active is-clipped');
                     Array.from(document.getElementsByClassName('close-modal')).forEach(el =>
-                        el.addEventListener('click', () =>
-                            document.getElementById('disclaimerModal').setAttribute('class', 'modal')
-                        )
+                        el.addEventListener('click', () => {
+                            document.getElementById('disclaimerModal').setAttribute('class', 'modal');
+                            document.getElementById('schoolSelectorModal').setAttribute('class', 'modal');
+                        })
                     );
                 }
                 form.classList.add('was-validated');
@@ -26,9 +27,19 @@ window.addEventListener('load', () => {
         )
     );
     document.getElementsByClassName('generate-link')[0].addEventListener('click', () => {
+        document.getElementById('schoolSelectorModal').setAttribute('class', 'modal is-active is-clipped');
+    });
+    document.getElementById('ms-link').addEventListener('click', () => {
         localStorage.removeItem('scheduleEvents');
         window.open(
-            `./schedule.html?cal=${uuidFromWebcalLink(document.getElementById('allClassesUrl').value)}#new`,
+            `./schedule.html?cal=${uuidFromWebcalLink(document.getElementById('allClassesUrl').value)}&schooldiv=ms#new`,
+            '_blank'
+        );
+    });
+    document.getElementById('us-link').addEventListener('click', () => {
+        localStorage.removeItem('scheduleEvents');
+        window.open(
+            `./schedule.html?cal=${uuidFromWebcalLink(document.getElementById('allClassesUrl').value)}&schooldiv=us#new`,
             '_blank'
         );
     });

@@ -2,6 +2,7 @@ import { ScheduleAll } from '../structure/scheduleAll';
 import { ScheduleBuilder } from '../building/scheduleBuilder';
 import { VeracrossICSRawBlockSource } from '../veracross/veracrossICSRawBlockSource';
 import JSONRawBlockSource from '../json/jsonRawBlockSource';
+import scheduleParamUtils from './scheduleParamUtils';
 
 export default class ScheduleCacheManager {
     public static readonly LOCAL_STORAGE_KEY = 'scheduleEvents';
@@ -20,7 +21,7 @@ export default class ScheduleCacheManager {
         }
 
         let scheduleObject = JSON.parse(scheduleString);
-        if (scheduleObject.versionNumber === undefined || scheduleObject.versionNumber !== ScheduleAll.CURRENT_VERSION_NUMBER || scheduleObject.id !== calendarUUID) {
+        if (scheduleObject.versionNumber === undefined || scheduleObject.versionNumber !== ScheduleAll.CURRENT_VERSION_NUMBER || scheduleObject.id !== calendarUUID || scheduleObject.schoolDivision !== scheduleParamUtils.getSchoolDivision()) {
             console.log('Schedule cache is invalid! Loading schedule...');
             return this.reloadSchedulePromise(calendarUUID).then(jsonString => JSON.parse(jsonString));
         }
