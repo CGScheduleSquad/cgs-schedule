@@ -69,17 +69,17 @@ export default class ScheduleRenderer {
         // left/right arrows
         let navigationArrows = document.querySelectorAll('td.arrows a');
         // @ts-ignore
-        navigationArrows[0].addEventListener("click", () => window.location.href = modifyUrlProperty("date", range.previousDate.toString(), window.location.href));
+        navigationArrows[0].addEventListener('click', () => window.location.href = modifyUrlProperty('date', range.previousDate.toString(), window.location.href));
         // @ts-ignore
-        navigationArrows[1].addEventListener("click", () => window.location.href = modifyUrlProperty("date", range.nextDate.toString(), window.location.href));
+        navigationArrows[1].addEventListener('click', () => window.location.href = modifyUrlProperty('date', range.nextDate.toString(), window.location.href));
 
         // this week
         // @ts-ignore
         let viewToggle = document.getElementById('today').firstElementChild
-            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", null, modifyUrlProperty("range", "day", window.location.href)));
+            .addEventListener('click', () => window.location.href = modifyUrlProperty('date', null, modifyUrlProperty('range', 'day', window.location.href)));
         // @ts-ignore
         let viewToggle = document.getElementById('this-week').firstElementChild
-            .addEventListener("click", () => window.location.href = modifyUrlProperty("date", null, modifyUrlProperty("range", "week", window.location.href)));
+            .addEventListener('click', () => window.location.href = modifyUrlProperty('date', null, modifyUrlProperty('range', 'week', window.location.href)));
     }
 
     private static renderSchedule(range: ScheduleRange, schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
@@ -98,10 +98,7 @@ export default class ScheduleRenderer {
             );
             timeDataElement.setAttribute('class', `times mins${durationMins}`);
             timeDataElement.appendChild(
-                document.createTextNode(
-                    `${normalAllTimes[index].to12HourString()}-
-                    ${normalAllTimes[index + 1].to12HourString()}`
-                )
+                document.createTextNode(`${normalAllTimes[index].to12HourString()}-${normalAllTimes[index + 1].to12HourString()}`)
             );
 
             let tableRowElement = document.createElement('tr');
@@ -177,7 +174,8 @@ class InlineScheduleRenderer {
 
     private static instance: InlineScheduleRenderer;
 
-    private constructor() {}
+    private constructor() {
+    }
 
     appendSchedule(rawDay: any, compressionList: Array<string>, date: ScheduleDate): void {
         let blocks: Array<Array<any>> = rawDay.blocks;
@@ -210,7 +208,8 @@ class LateStartScheduleRenderer {
 
     private static instance: LateStartScheduleRenderer;
 
-    private constructor() {}
+    private constructor() {
+    }
 
     appendSchedule(rawDay: any, compressionList: Array<string>, date: ScheduleDate) {
         let blocks: Array<Array<any>> = rawDay.blocks;
@@ -351,7 +350,7 @@ abstract class ParsedBlock {
         // What data type is tableData?
         let tableData = document.createElement('td');
         tableData.setAttribute('rowspan', String(rowSpan));
-        let colorString = bgcolor.split("-");
+        let colorString = bgcolor.split('-');
         let number = parseInt(colorString[1]);
         let isClassBlock = !isNaN(number) && number <= 7 && number >= 1;
         tableData.setAttribute('class', `period mins${mins} ${specialPeriod ? 'specialperiod' : ''} ${bgcolor} ${isClassBlock ? 'classblock' : 'notclassblock'}`);
@@ -464,8 +463,7 @@ class LateStartParseBlock extends ParsedBlock {
             timeDataElement.setAttribute('class', `times mins${this.mins}`);
             timeDataElement.appendChild(
                 document.createTextNode(
-                    `${lateStartAllTimes[this.normalTimeIndex].to12HourString()}-
-                    ${lateStartAllTimes[this.normalTimeIndex + this.rowSpan].to12HourString()}`
+                    `${lateStartAllTimes[this.normalTimeIndex].to12HourString()}-${lateStartAllTimes[this.normalTimeIndex + this.rowSpan].to12HourString()}`
                 )
             );
             tableRowElement.appendChild(timeDataElement);
