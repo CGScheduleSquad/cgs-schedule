@@ -1,7 +1,7 @@
 import { ScheduleRange, ViewMode } from './scheduleRange';
 import ScheduleDate from '../time/scheduleDate';
 import scheduleDate from '../time/scheduleDate';
-import { lateStartAllTimes, ScheduleDayType } from '../structure/scheduleDay';
+import { normalTimes, normalAllTimes, lateStartAllTimes, ScheduleDayType } from '../structure/scheduleDay';
 import ScheduleTime from '../time/scheduleTime';
 import ScheduleParamUtils from '../utils/scheduleParamUtils';
 import { getClassAsArray } from '../../utils/queryUtils';
@@ -9,7 +9,7 @@ import { getClassAsArray } from '../../utils/queryUtils';
 function appendBlankSchedule(text: string, bgcolor: string, link: string = ''): void {
     let td = document.createElement('td');
     let a = document.createElement(link === '' ? 'span' : 'a');
-    td.setAttribute('rowspan', '12');
+    td.setAttribute('rowspan', String(normalTimes.length));
     td.setAttribute('class', `period specialday ${bgcolor}`);
     a.setAttribute('class', 'coursename');
     if (link !== '') a.setAttribute('href', link);
@@ -87,6 +87,31 @@ export default class ScheduleRenderer {
         let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         let dates = range.getDatesForWeek();
         let oneDay = dates.length === 1;
+        normalTimes.forEach((_, index) => {
+            let timeDataElement = document.createElement('td');
+            let durationMins = Math.min(
+                Math.max(
+                    normalAllTimes[index + 1].totalMinutes - normalAllTimes[index].totalMinutes,
+                    5
+                ),
+                90
+            );
+            timeDataElement.setAttribute('class', `times mins${durationMins}`);
+            timeDataElement.appendChild(
+                document.createTextNode(
+                    `${normalAllTimes[index].to12HourString()}-
+                    ${normalAllTimes[index + 1].to12HourString()}`
+                )
+            );
+
+            let tableRowElement = document.createElement('tr');
+            tableRowElement.appendChild(timeDataElement);
+            tableRowElement.classList.add(`mins${durationMins}`);
+            tableRowElement.id = `time-${index}`;
+            // @ts-ignore
+            document.getElementById('main-sched-body').appendChild(tableRowElement);
+
+        });
         dates.forEach((date: ScheduleDate) => {
             let rawDay = schedule.dayMap[date.toString()];
 
@@ -160,7 +185,7 @@ class InlineScheduleRenderer {
         if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
 
         let tableData = document.createElement('td');
-        tableData.setAttribute('rowspan', String(12));
+        tableData.setAttribute('rowspan', String(normalTimes.length));
         tableData.setAttribute('class', `period specialday`);
         let specialTable = document.createElement('table');
         specialTable.setAttribute('class', 'sched week special');
@@ -193,7 +218,7 @@ class LateStartScheduleRenderer {
         if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
 
         let tableData = document.createElement('td');
-        tableData.setAttribute('rowspan', String(12));
+        tableData.setAttribute('rowspan', String(normalTimes.length));
         tableData.setAttribute('class', `period specialday`);
         let specialTable = document.createElement('table');
         specialTable.setAttribute('class', 'sched week special');
@@ -217,12 +242,11 @@ class RegularScheduleRenderer {
     }
 
     private static instance: RegularScheduleRenderer;
-    private static readonly NUM_REGULAR_TIMES = 11;
 
     private mainTimeElements = new Array<HTMLElement>();
 
     private constructor() {
-        for (let i = 0; i <= RegularScheduleRenderer.NUM_REGULAR_TIMES; i++) {
+        for (let i = 0; i < normalTimes.length; i++) {
             let elementById = document.getElementById(`time-${i}`);
             if (elementById === null) throw new Error('Error rendering schedule: Time elements not found!');
             this.mainTimeElements.push(elementById);
@@ -298,7 +322,7 @@ abstract class ParsedBlock {
             blockLabel = 'Blk ' + blockLabel;
         }
 
-        let freeNames = ['Free', 'Late Start', 'Break', 'Lunch']; // TODO: get rid of this
+        let freeNames = ['Free', 'Late Start', 'Break', 'Lunch', 'Lunch (MS)']; // TODO: get rid of this
         if (this.free || freeNames.some(name => name === this.title)) {
             this.bgcolor = colorClasses.free;
         } else if (this.shouldBeColored) {
@@ -425,7 +449,7 @@ class LateStartParseBlock extends ParsedBlock {
     generateBlockElement() {
         let tableRowElement = document.createElement('tr');
         tableRowElement.setAttribute('class', `mins${this.mins}`);
-        let isLateStart = this.title === 'Late Start';
+        let isLateStartSpacerBlock = this.title === 'Late Start';
         let blockElement = ParsedBlock.generateBlockElement(
             1,
             this.mins,
@@ -435,7 +459,7 @@ class LateStartParseBlock extends ParsedBlock {
             this.addLineBreak,
             this.date
         );
-        if (!isLateStart) {
+        if (!isLateStartSpacerBlock) {
             let timeDataElement = document.createElement('td');
             timeDataElement.setAttribute('class', `times mins${this.mins}`);
             timeDataElement.appendChild(

@@ -75,3 +75,12 @@ html
                     footer.modal-card-foot
                         button.close-modal.button(aria-label = 'close') Cancel
                         button.button.is-success.generate-link Agree
+            #schoolSelectorModal.modal
+                .modal-background
+                .modal-card
+                    header.modal-card-head
+                        h5.modal-card-title Are you in the middle school or upper school?
+                        button.close-modal.delete(aria-label = 'close')
+                    footer.modal-card-foot
+                        button.button.is-info#ms-link Middle School
+                        button.button.is-primary#us-link Upper School

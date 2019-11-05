@@ -1,6 +1,7 @@
 import { RawBlock } from '../structure/scheduleBlock';
 import { ScheduleDay } from '../structure/scheduleDay';
 import { ScheduleAll } from '../structure/scheduleAll';
+import ScheduleParamUtils from '../utils/scheduleParamUtils';
 
 export interface RawBlockSource {
     getBlocksPromise(): Promise<RawBlock[]>;
@@ -34,7 +35,7 @@ export class ScheduleBuilder {
                 );
             });
 
-            return new ScheduleAll(id, dayMap);
+            return new ScheduleAll(id, dayMap, ScheduleParamUtils.getSchoolDivision());
         });
     }
 

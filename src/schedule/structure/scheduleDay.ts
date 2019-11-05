@@ -1,6 +1,7 @@
 import ScheduleTime from '../time/scheduleTime';
 import { InlineDayBlock, RawBlock, RegularDayBlock } from './scheduleBlock';
 import ScheduleDate from '../time/scheduleDate';
+import scheduleParamUtils from '../utils/scheduleParamUtils';
 
 export class ScheduleDayMeta {
     readonly letter: string;
@@ -14,36 +15,65 @@ export class ScheduleDayMeta {
     }
 }
 
-const normalTimes = [
-    new ScheduleTime(8, 0),
-    new ScheduleTime(8, 45),
-    new ScheduleTime(9, 20),
-    new ScheduleTime(9, 30),
-    new ScheduleTime(9, 45),
-    new ScheduleTime(10, 35),
-    new ScheduleTime(11, 20),
-    new ScheduleTime(11, 55),
-    new ScheduleTime(12, 30),
-    new ScheduleTime(13, 10),
-    new ScheduleTime(13, 40),
-    new ScheduleTime(14, 30)
-];
-const schoolEndTime = new ScheduleTime(15, 15);
-const normalAllTimes = normalTimes.concat([schoolEndTime]);
+export let normalTimes: ScheduleTime[];
+let lateStartTimes: ScheduleTime[];
 
-const lateStartTimes = [
-    new ScheduleTime(8, 0),
-    new ScheduleTime(9, 0),
-    new ScheduleTime(9, 45), // TODO: What time does morning flex start? I don't have any morning flex blocks
-    new ScheduleTime(10, 10),
-    new ScheduleTime(10, 30),
-    new ScheduleTime(11, 20),
-    new ScheduleTime(12, 5),
-    new ScheduleTime(12, 30),
-    new ScheduleTime(13, 15),
-    new ScheduleTime(13, 40),
-    new ScheduleTime(14, 30)
-];
+if (scheduleParamUtils.getSchoolDivision() == 'us') {
+    normalTimes = [
+        new ScheduleTime(8, 0),
+        new ScheduleTime(8, 45),
+        new ScheduleTime(9, 20),
+        new ScheduleTime(9, 30),
+        new ScheduleTime(9, 45),
+        new ScheduleTime(10, 35),
+        new ScheduleTime(11, 20),
+        new ScheduleTime(11, 55),
+        new ScheduleTime(12, 30),
+        new ScheduleTime(13, 10),
+        new ScheduleTime(13, 40),
+        new ScheduleTime(14, 30)
+    ];
+    lateStartTimes = [
+        new ScheduleTime(8, 0),
+        new ScheduleTime(9, 0),
+        new ScheduleTime(9, 45), // TODO: What time does morning flex start? I don't have any morning flex jsonBlocks
+        new ScheduleTime(10, 10),
+        new ScheduleTime(10, 30),
+        new ScheduleTime(11, 20),
+        new ScheduleTime(12, 5),
+        new ScheduleTime(12, 30),
+        new ScheduleTime(13, 15),
+        new ScheduleTime(13, 40),
+        new ScheduleTime(14, 30)
+    ];
+} else { // ms
+    normalTimes = [
+        new ScheduleTime(8, 0),
+        new ScheduleTime(9, 15),
+        new ScheduleTime(9, 30),
+        new ScheduleTime(9, 45),
+        new ScheduleTime(10, 35),
+        new ScheduleTime(11, 25),
+        new ScheduleTime(11, 55),
+        new ScheduleTime(12, 35),
+        new ScheduleTime(13, 10),
+        new ScheduleTime(14, 30)
+    ];
+    lateStartTimes = [
+        new ScheduleTime(8, 0),
+        new ScheduleTime(9, 0),
+        new ScheduleTime(10, 20),
+        new ScheduleTime(11, 10),
+        new ScheduleTime(11, 55),
+        new ScheduleTime(12, 30),
+        new ScheduleTime(13, 10),
+        new ScheduleTime(14, 30)
+    ];
+}
+
+const schoolEndTime = new ScheduleTime(15, 15);
+export const normalAllTimes = normalTimes.concat([schoolEndTime]);
+
 
 export const lateStartAllTimes = lateStartTimes.concat([schoolEndTime]);
 
@@ -68,13 +98,12 @@ export abstract class ScheduleDay {
     static createBlockDay(rawBlocks: RawBlock[]): ScheduleDay {
         let dayWithDate = rawBlocks.find(rawBlock => rawBlock.date !== null);
         if (dayWithDate === undefined) {
-            throw new Error('Assertion Failed: No blocks contain a date!');
+            throw new Error('Assertion Failed: No jsonBlocks contain a date!');
         }
         let dayDate = dayWithDate.date;
 
         let dayWithMeta = rawBlocks.find(rawBlock => rawBlock.dayMeta !== null);
-        let dayMeta = dayWithMeta !== undefined ? dayWithMeta.dayMeta : new ScheduleDayMeta(''); // default day meta if no blocks have info
-
+        let dayMeta = dayWithMeta !== undefined ? dayWithMeta.dayMeta : new ScheduleDayMeta(''); // default day meta if no jsonBlocks have info
         if (this.isRegularDay(rawBlocks)) {
             // @ts-ignore
             return RegularDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
@@ -136,7 +165,6 @@ class RegularDay extends ScheduleDay {
         );
         let regularDayBlocks = new Array<RegularDayBlock>();
         let timeIndex = 0;
-        // if (date.toString() === '2019-9-23') debugger;
 
         sortedRawBlocks.forEach((rawBlock: RawBlock) => {
             while (
@@ -179,7 +207,7 @@ class RegularDay extends ScheduleDay {
             let rowSpan = 1;
             if (
                 timeIndex < normalTimes.length - 1 &&
-                (rawBlock.label.match(/.L/) != null || rawBlock.title === 'Assembly')
+                (rawBlock.label.match(/.L/) != null || rawBlock.title === 'Assembly') && scheduleParamUtils.getSchoolDivision() === 'us'
             ) {
                 rowSpan++;
             }
@@ -201,7 +229,6 @@ class RegularDay extends ScheduleDay {
             timeIndex += rowSpan;
         });
 
-        // console.log(regularDayBlocks); debugger;
         return new RegularDay(date, dayMeta, regularDayBlocks);
     }
 
@@ -225,7 +252,6 @@ class LateStartDay extends ScheduleDay {
     ): LateStartDay | null {
         let regularDayBlocks = new Array<RegularDayBlock>();
         let timeIndex = 0;
-        // if (date.toString() === '2019-9-23') debugger;
 
         let result = sortedRawBlocks.every((rawBlock: RawBlock) => {
             while (
@@ -327,7 +353,6 @@ class LateStartDay extends ScheduleDay {
             return null;
         }
 
-        // console.log(regularDayBlocks); debugger;
         return new LateStartDay(date, dayMeta, regularDayBlocks);
     }
 
@@ -385,7 +410,6 @@ class InlineDay extends ScheduleDay {
             }
         });
 
-        // console.log(inlineDayBlocks); debugger;
         return new InlineDay(date, dayMeta, inlineDayBlocks, false); // TODO: remove lateStart
     }
 

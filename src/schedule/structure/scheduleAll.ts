@@ -6,13 +6,15 @@ export class ScheduleAll {
 
     readonly versionNumber: number;
     readonly id: string; // unique id
+    readonly schoolDivision: string; // unique id
     readonly creationTime: number;
     readonly dayMap: Map<string, ScheduleDay>; // maps date string "2020-1-2" to ScheduleDay
 
-    constructor(id: string, dayMap: Map<string, ScheduleDay>) {
+    constructor(id: string, dayMap: Map<string, ScheduleDay>, schoolDivision: string) {
         this.versionNumber = ScheduleAll.CURRENT_VERSION_NUMBER;
         this.creationTime = new Date().getTime();
         this.id = id;
+        this.schoolDivision = schoolDivision;
         this.dayMap = dayMap;
     }
 
