@@ -35,6 +35,8 @@ export class VeracrossICSRawBlockSource implements RawBlockSource {
 
                         return new RawBlock(title, location, label, date, new ScheduleDayMeta(letter), startTime, endTime);
                     } catch (e) {
+                        console.warn("Ignored event: ");
+                        console.warn(e);
                         return null;
                     }
                 })
