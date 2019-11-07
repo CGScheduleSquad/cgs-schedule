@@ -304,7 +304,7 @@ function applyClassLinks(linkObject: any) {
         let workingKey = courseName.innerText + blocklabel;
         let linkObjectElement = linkObject[workingKey];
         // @ts-ignore // TODO: Remove
-        if (courseName.innerText === 'Lunch') linkObjectElement = [['https://www.sagedining.com/menus/catlingabelschool/', '']];
+        if (courseName.innerText === 'Lunch' || courseName.innerText === 'Lunch (MS)') linkObjectElement = [['https://www.sagedining.com/menus/catlingabelschool/', '']];
         if (linkObjectElement === undefined) return;
         parentElement.classList.add('has-link');
         parentElement.classList.add('link-index-' + linkObjectKeys.indexOf(workingKey));

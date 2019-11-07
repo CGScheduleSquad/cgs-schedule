@@ -29,7 +29,7 @@ export class ScheduleBuilder {
                     key,
                     ScheduleDay.createBlockDay(
                         rawBlocks
-                            .filter(this.contextBlockFilter)
+                            .filter(this.duplicateOrOutOfRangeBlockRemover)
                             .sort((a: RawBlock, b: RawBlock) => a.startTime.compareTo(b.startTime))
                     )
                 );
@@ -39,11 +39,15 @@ export class ScheduleBuilder {
         });
     }
 
-    private static contextBlockFilter(rawBlock: RawBlock, index: number, otherRawBlocks: RawBlock[]): boolean {
+    private static duplicateOrOutOfRangeBlockRemover(rawBlock: RawBlock, index: number, otherRawBlocks: RawBlock[]): boolean {
         let startHours = rawBlock.startTime.hours;
-        if (isNaN(startHours) || startHours < 8 || startHours >= 12 + 3) return false; // TODO: 3:15 not 3
+        let outOfSchoolBounds = isNaN(startHours) || startHours < 8 || startHours >= 12 + 3; // TODO: 3:15 not 3 TIME COMPARE
 
         // TODO: Add block keeping preferences
-        return otherRawBlocks.findIndex((value: RawBlock) => rawBlock.startTime.equals(value.startTime)) >= index;
+        let duplicateBlock = otherRawBlocks.findIndex((value: RawBlock) => {
+            return rawBlock.startTime.equals(value.startTime)
+                // || (rawBlock.endTime !== null && value.endTime !== null && rawBlock.endTime.equals(value.endTime));
+        }) >= index;
+        return duplicateBlock || outOfSchoolBounds;
     }
 }
