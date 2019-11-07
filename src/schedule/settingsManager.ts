@@ -181,14 +181,23 @@ var urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9(
 var classNamePattern = /^[^<>\n\\=]+$/;
 var blockNumberPattern = /^[1-7]$/;
 function parseLinkObject(globalSettingsObject: any) {
-    var minLength = 3;
+    var numMeta = 2;
+    var numLinks = 5;
+    var minLength = numMeta + 1;
 
     let linkObject = {};
     globalSettingsObject.dayLinks.forEach((linkEntry: any) => {
         if (linkEntry.length < minLength) return;
         let className = linkEntry[0];
         let blockNumber = linkEntry[1];
-        let filteredLinks = linkEntry.slice(2).filter((link: string) => urlPattern.test(link));
+
+        var links = linkEntry.slice(numMeta, numMeta + numLinks);
+        var labels = linkEntry.slice(numMeta + numLinks, numMeta + numLinks * 2);
+
+        var zip = links.map(function(item: any, index: number) {
+            return [item, labels[index] === undefined ? '' : labels[index]];
+        });
+        let filteredLinks = zip.filter((link: string[]) => urlPattern.test(link[0]) && (link[1] === '' || classNamePattern.test(link[1])));
         if (classNamePattern.test(className) && blockNumberPattern.test(blockNumber) && filteredLinks.length >= 1) {
             // @ts-ignore
             linkObject[className + blockNumber] = filteredLinks;
@@ -295,23 +304,25 @@ function applyClassLinks(linkObject: any) {
         let workingKey = courseName.innerText + blocklabel;
         let linkObjectElement = linkObject[workingKey];
         // @ts-ignore // TODO: Remove
-        if (courseName.innerText === 'Lunch' || courseName.innerText === 'Lunch (MS)') linkObjectElement = ['https://www.sagedining.com/menus/catlingabelschool/'];
+        if (courseName.innerText === 'Lunch' || courseName.innerText === 'Lunch (MS)') linkObjectElement = [['https://www.sagedining.com/menus/catlingabelschool/', '']];
         if (linkObjectElement === undefined) return;
         parentElement.classList.add('has-link');
         parentElement.classList.add('link-index-' + linkObjectKeys.indexOf(workingKey));
-        $(parentElement).on('click.links', () => forceOpenTabIfSafari(linkObjectElement[0]));
+        $(parentElement).on('click.links', () => forceOpenTabIfSafari(linkObjectElement[0][0]));
     });
 
     linkObjectKeys.forEach((className, classNameIndex) => {
         let items: {} = {};
-        linkObject[className].forEach((link: string) => {
+        linkObject[className].forEach((link: string[]) => {
             // @ts-ignore
-            items[link] = { name: link.substring(0, 50).replace('https://', '').replace('http://', '') + (link.length > 50 ? '...' : '') };
+            let fallbackName = link[0].substring(0, 50).replace('https://', '').replace('http://', '') + (link.length > 50 ? '...' : '');
+            // @ts-ignore
+            items[link[0]] = { name: link[1] !== '' ? link[1] : fallbackName };
         });
         // @ts-ignore
         $.contextMenu({
             selector: '.link-index-' + classNameIndex,
-            callback: function(key: string | undefined) {
+            callback: (key: string) => {
                 window.open(key, '_blank');
             },
             items: items
