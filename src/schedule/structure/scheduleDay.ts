@@ -16,7 +16,9 @@ export class ScheduleDayMeta {
 }
 
 export let normalTimes: ScheduleTime[];
+export let normalPassingTimeAtEnd: boolean[];
 let lateStartTimes: ScheduleTime[];
+export let lateStartPassingTimeAtEnd: boolean[];
 
 if (scheduleParamUtils.getSchoolDivision() == 'us') {
     normalTimes = [
@@ -33,6 +35,20 @@ if (scheduleParamUtils.getSchoolDivision() == 'us') {
         new ScheduleTime(13, 40),
         new ScheduleTime(14, 30)
     ];
+    normalPassingTimeAtEnd = [
+        false,
+        true,//915
+        false,
+        true,//940
+        true,//1030
+        false,
+        true,//1150
+        false,
+        true,//105
+        false,
+        true,//225
+        false,
+    ];
     lateStartTimes = [
         new ScheduleTime(8, 0),
         new ScheduleTime(9, 0),
@@ -45,6 +61,20 @@ if (scheduleParamUtils.getSchoolDivision() == 'us') {
         new ScheduleTime(13, 15),
         new ScheduleTime(13, 40),
         new ScheduleTime(14, 30)
+    ];
+    lateStartPassingTimeAtEnd = [
+        false,
+        false,
+        false,
+        false,
+        true,//1030
+        true,//1120
+        false,
+        false,
+        true,//110
+        false,
+        true,//230
+        false,
     ];
 } else { // ms
     normalTimes = [
@@ -59,6 +89,18 @@ if (scheduleParamUtils.getSchoolDivision() == 'us') {
         new ScheduleTime(13, 10),
         new ScheduleTime(14, 30)
     ];
+    normalPassingTimeAtEnd = [
+        false,
+        false,
+        true,//945
+        true,//1035
+        true,//1125
+        false,
+        false,
+        true,//110
+        true,//230
+        false,
+    ];
     lateStartTimes = [
         new ScheduleTime(8, 0),
         new ScheduleTime(9, 0),
@@ -68,6 +110,17 @@ if (scheduleParamUtils.getSchoolDivision() == 'us') {
         new ScheduleTime(12, 30),
         new ScheduleTime(13, 10),
         new ScheduleTime(14, 30)
+    ];
+    lateStartPassingTimeAtEnd = [
+        false,
+        false,
+        true,//1020
+        true,//1110
+        false,
+        false,
+        true,//110
+        true,//230
+        false,
     ];
 }
 
