@@ -1,7 +1,7 @@
 import { ScheduleRange, ViewMode } from './scheduleRange';
 import ScheduleDate from '../time/scheduleDate';
 import scheduleDate from '../time/scheduleDate';
-import { lateStartAllTimes, normalAllTimes, normalTimes, ScheduleDayType } from '../structure/scheduleDay';
+import { lateStartAllTimes, lateStartPassingTimeAtEnd, normalAllTimes, normalPassingTimeAtEnd, normalTimes, ScheduleDayType } from '../structure/scheduleDay';
 import ScheduleTime from '../time/scheduleTime';
 import ScheduleParamUtils from '../utils/scheduleParamUtils';
 import { getClassAsArray } from '../../utils/queryUtils';
@@ -89,16 +89,22 @@ export default class ScheduleRenderer {
         let oneDay = dates.length === 1;
         normalTimes.forEach((_, index) => {
             let timeDataElement = document.createElement('td');
+            let endTime = normalAllTimes[index + 1];
+            if (normalPassingTimeAtEnd[index]) {
+                let endDate = endTime.toDate();
+                endDate.setMinutes(endDate.getMinutes()-5);
+                endTime = ScheduleTime.fromDate(endDate);
+            }
             let durationMins = Math.min(
                 Math.max(
-                    normalAllTimes[index + 1].totalMinutes - normalAllTimes[index].totalMinutes,
+                    endTime.totalMinutes - normalAllTimes[index].totalMinutes,
                     5
                 ),
                 90
             );
             timeDataElement.setAttribute('class', `times mins${durationMins}`);
             timeDataElement.appendChild(
-                document.createTextNode(`${normalAllTimes[index].to12HourString()}-${normalAllTimes[index + 1].to12HourString()}`)
+                document.createTextNode(`${normalAllTimes[index].to12HourString()}-${endTime.to12HourString()}`)
             );
 
             let tableRowElement = document.createElement('tr');
@@ -461,9 +467,15 @@ class LateStartParseBlock extends ParsedBlock {
         if (!isLateStartSpacerBlock) {
             let timeDataElement = document.createElement('td');
             timeDataElement.setAttribute('class', `times mins${this.mins}`);
+            let endTime = lateStartAllTimes[this.normalTimeIndex + this.rowSpan];
+            if (lateStartPassingTimeAtEnd[this.normalTimeIndex + this.rowSpan]) {
+                let endDate = endTime.toDate();
+                endDate.setMinutes(endDate.getMinutes()-5);
+                endTime = ScheduleTime.fromDate(endDate);
+            }
             timeDataElement.appendChild(
                 document.createTextNode(
-                    `${lateStartAllTimes[this.normalTimeIndex].to12HourString()}-${lateStartAllTimes[this.normalTimeIndex + this.rowSpan].to12HourString()}`
+                    `${lateStartAllTimes[this.normalTimeIndex].to12HourString()}-${endTime.to12HourString()}`
                 )
             );
             tableRowElement.appendChild(timeDataElement);
