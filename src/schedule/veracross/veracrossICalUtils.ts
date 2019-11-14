@@ -2,11 +2,13 @@ import ScheduleTime from '../time/scheduleTime';
 import ScheduleDate from '../time/scheduleDate';
 
 export class VeracrossICalUtils {
+    private static scheduleCalendarTimeZone = 'America/Los_Angeles'; // the ical calendar parsing compensates for time zones, which is not what we want
+
     static getVeracrossCalendarFromUUID = (calendarUUID: string): Promise<any> =>
         VeracrossICalUtils.corsGetPromise(`http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics`).then(
             icsFile => {
                 // @ts-ignore
-                return ICAL.parse(icsFile)[2].filter((a: any) => a[1].length === 8);
+                return ICAL.parse(icsFile)[2];
             }
         );
 
@@ -51,7 +53,10 @@ export class VeracrossICalUtils {
     }
 
     static getLocation(event: any): string {
-        let location = VeracrossICalUtils.getDescription(event)[2].Room;
+        let descriptionElement = VeracrossICalUtils.getDescription(event)[2];
+        if (descriptionElement === undefined) return '';
+        let location = descriptionElement.Room;
+        if (location === undefined) return '';
         let replacements = {
             'Math: ': '',
             'Science Lab ': '',
@@ -64,7 +69,9 @@ export class VeracrossICalUtils {
     }
 
     static getLetter(event: any): string {
-        let letter = VeracrossICalUtils.getDescription(event)[1].Day.match(/US Day [A-Z]/);
+        let descriptionElement = VeracrossICalUtils.getDescription(event)[1];
+        if (descriptionElement === undefined) return '';
+        let letter = descriptionElement.Day.match(/US Day [A-Z]/);
         letter = letter !== null ? letter[0].charAt(letter[0].length - 1) : '';
         return letter;
     }
@@ -73,7 +80,8 @@ export class VeracrossICalUtils {
 
     private static getDT(time: string, matrix: any): ScheduleTime | null {
         let i = VeracrossICalUtils.inMatrix(`dt${time}`, matrix);
-        return i > -1 ? ScheduleTime.fromDate(new Date(matrix[i][3])) : null;
+        let dateString = matrix[i][3];
+        return i > -1 ? ScheduleTime.fromDate(new Date(new Date(dateString).toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))) : null;
     }
 
     static getStartTime(matrix: any): ScheduleTime | null {
@@ -88,7 +96,7 @@ export class VeracrossICalUtils {
         let i = VeracrossICalUtils.inMatrix(`dtstart`, matrix);
         let dateString = matrix[i][3];
         if (/^\d\d\d\d-\d\d-\d\d$/.test(dateString)) dateString = dateString.concat("T00:00");
-        return i > -1 ? ScheduleDate.fromDate(new Date(dateString)) : null;
+        return i > -1 ? ScheduleDate.fromDate(new Date(new Date(dateString).toLocaleString('en-US', { timeZone: this.scheduleCalendarTimeZone }))) : null;
     }
 
     static getSummary(matrix: any): any {

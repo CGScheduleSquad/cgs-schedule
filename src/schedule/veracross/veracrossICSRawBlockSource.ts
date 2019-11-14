@@ -12,7 +12,7 @@ export class VeracrossICSRawBlockSource implements RawBlockSource {
 
     getBlocksPromise(): Promise<RawBlock[]> {
         return VeracrossICalUtils.getVeracrossCalendarFromUUID(this._calendarUUID).catch(() => {
-            return Promise.reject('Calendar link returned 404! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!');
+            return Promise.reject('Wrong calendar link! Make sure to copy your calendar link from the \'All Classes\' calendar, not the \'My Calendar\' link. (see step 2 of the setup instructions)');
         }).then(calendarEvents => {
             let filteredBlocks = calendarEvents
                 .map((event: any) => {
@@ -35,12 +35,14 @@ export class VeracrossICSRawBlockSource implements RawBlockSource {
 
                         return new RawBlock(title, location, label, date, new ScheduleDayMeta(letter), startTime, endTime);
                     } catch (e) {
+                        console.warn("Ignored event: ");
+                        console.warn(e);
                         return null;
                     }
                 })
                 .filter((rawBlock: any) => rawBlock !== null);
             if (filteredBlocks.length === 0) {
-                return Promise.reject('Found zero classes from the provided calendar link! Make sure to copy your calendar link from the correct \'Subscribe\' button in step 2!');
+                return Promise.reject('Wrong calendar link! Make sure to copy your calendar link from the \'All Classes\' calendar, not the \'My Calendar\' link. (see step 2 of the setup instructions)');
             }
             return filteredBlocks;
         });
