@@ -15,7 +15,7 @@ export class VeracrossICalUtils {
     public static corsGetPromise(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
             let request = new XMLHttpRequest();
-            request.open('GET', `https://cgs-schedule-cors.herokuapp.com/${url}`, true);
+            request.open('GET', `https://cors-anywhere.herokuapp.com/${url}`, true);
             request.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this.response);
