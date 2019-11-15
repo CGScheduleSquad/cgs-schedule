@@ -15,7 +15,7 @@ export class VeracrossICalUtils {
     public static corsGetPromise(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
             let request = new XMLHttpRequest();
-            request.open('GET', `https://cors-anywhere.herokuapp.com/${url}`, true);
+            request.open('GET', `https://cgs-schedule.herokuapp.com/${url}`, true);
             request.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this.response);
@@ -80,7 +80,9 @@ export class VeracrossICalUtils {
 
     private static getDT(time: string, matrix: any): ScheduleTime | null {
         let i = VeracrossICalUtils.inMatrix(`dt${time}`, matrix);
-        let dateString = matrix[i][3];
+        let matrix1 = matrix[i];
+        if (matrix1 === undefined) return null;
+        let dateString = matrix1[3];
         return i > -1 ? ScheduleTime.fromDate(new Date(new Date(dateString).toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }))) : null;
     }
 

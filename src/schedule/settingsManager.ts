@@ -347,7 +347,7 @@ function getAllClassIds() {
 let maxSheetItemLength = 30;
 function applyCanvasCalendar(calendarFeedObject: any) {
     var converter = new Converter();
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule-cors.herokuapp.com/' + calendarFeedObject[key][1]).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][1]).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
         return parsedPath[2];
@@ -455,7 +455,7 @@ function applyGoogleSheets(googleSheetsObject: any) {
 }
 
 function applyHaikuCalendar(calendarFeedObject: any) {
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', 'https://cgs-schedule-cors.herokuapp.com/' + calendarFeedObject[key][0]).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][0]).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
         return parsedPath[2];
