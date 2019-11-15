@@ -12,7 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/CGScheduleSquad/cgs-schedule"
   },
-  "license": "MIT",
+  "license": "GPL v3",
   "files": [
     "src/"
   ],
