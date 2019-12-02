@@ -380,11 +380,21 @@ function applyCanvasCalendar(calendarFeedObject: any) {
 
     let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
     Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        let canvasEventsMap: Map<string, Array<ClassHomeworkEvent>> = new Map<string, Array<ClassHomeworkEvent>>();
         calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<ClassHomeworkEvent>) => {
             calendarEvents.forEach((value: ClassHomeworkEvent) => {
-                value.apply();
+                let key = value.date.toString() + value.courseName;
+                if (canvasEventsMap.get(key) === undefined)
+                    canvasEventsMap.set(key, []);
+                // @ts-ignore
+                canvasEventsMap.get(key).push(value);
             })
         });
+
+        canvasEventsMap.forEach(((value) => {
+            ClassHomeworkEvent.apply(value);
+        }));
+
     });
 }
 
@@ -448,7 +458,7 @@ function applyGoogleSheets(googleSheetsObject: any) {
     Promise.all(allCalPromises).then((calendars: Array<any>) => {
         calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<ClassHomeworkEvent>) => {
             calendarEvents.forEach((value: ClassHomeworkEvent) => {
-                value.apply();
+                ClassHomeworkEvent.apply([value]);
             });
         });
     });
@@ -488,18 +498,26 @@ function applyHaikuCalendar(calendarFeedObject: any) {
     let allCalPromises = Object.keys(calendarFeedObject).map(feedKeyToCalendar);
 
     Promise.all(allCalPromises).then((calendars: Array<any>) => {
+        let canvasEventsMap: Map<string, Array<ClassHomeworkEvent>> = new Map<string, Array<ClassHomeworkEvent>>();
         calendars.filter((value => value !== undefined && value !== null)).forEach((calendarEvents: Array<ClassHomeworkEvent>) => {
             calendarEvents.forEach((value: ClassHomeworkEvent) => {
-                value.apply();
+                let key = value.date.toString() + value.courseName;
+                if (canvasEventsMap.get(key) === undefined)
+                    canvasEventsMap.set(key, []);
+                // @ts-ignore
+                canvasEventsMap.get(key).push(value);
             })
         });
+
+        canvasEventsMap.forEach(((value) => {
+            ClassHomeworkEvent.apply(value);
+        }));
     });
 }
 
-function openCalendarEventModal(value: ClassHomeworkEvent) {
-    $('#calendar-event-header').html(value.courseName + ' - Block ' + value.courseLabel + ' - ' + value.date.toHRStringLong());
-    $('#calendar-event-body').html(value.description);
-    $('#calendar-event-footer').html(value.courseName);
+function openCalendarEventModal(homeworkEvents: ClassHomeworkEvent[]) {
+    $('#calendar-event-header').html(homeworkEvents[0].courseName + ' - Block ' + homeworkEvents[0].courseLabel + ' - ' + homeworkEvents[0].date.toHRStringLong());
+    $('#calendar-event-body').html(homeworkEvents.map((value => value.description.trim())).reduce(((previousValue, currentValue) => previousValue + '<hr style="background-color: darkgray; margin: 0.5rem"/>' + currentValue)));
     $('#calendar-event-modal').addClass('is-active');
 }
 
@@ -553,11 +571,12 @@ class ClassHomeworkEvent {
         return this._description;
     }
 
-    apply() {
-        let htmlElements = $(`td[blocklabel="${this.courseLabel}"][classtitle="${this.courseName}"][date="${this.date}"]`);
-        htmlElements.children('.subtitle').text(this.shortTitle).addClass('calendar-feed-subtitle');
+    static apply(value: Array<ClassHomeworkEvent>) {
+        if (value.length === 0) return;
+        let htmlElements = $(`td[blocklabel="${value[0].courseLabel}"][classtitle="${value[0].courseName}"][date="${value[0].date}"]`);
+        htmlElements.children('.subtitle').html((value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle).addClass('calendar-feed-subtitle');
         htmlElements.addClass('has-link');
         htmlElements.off('click.links');
-        htmlElements.on('click',() => openCalendarEventModal(this));
+        htmlElements.on('click', () => openCalendarEventModal(value));
     }
 }
