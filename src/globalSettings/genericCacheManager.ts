@@ -1,11 +1,12 @@
 export default class GenericCacheManager {
 
     private static DEFAULT_VERSION_NUMBER = 2;
-    private static DEFAULT_EXPIRE_SECONDS = 1000 * 60 * 60 * 2;
+    private static DEFAULT_EXPIRE_MS = 1000 * 60 * 60 * 2;
 
     public static getCacheResults(localStorageKey: string,
                                   url: string,
-                                  expireTime: number = GenericCacheManager.DEFAULT_EXPIRE_SECONDS,
+                                  allowExpired: boolean = true,
+                                  expireTime: number = GenericCacheManager.DEFAULT_EXPIRE_MS,
                                   versionNumber: number = GenericCacheManager.DEFAULT_VERSION_NUMBER): Promise<any> {
         if (localStorage === undefined) {
             console.warn('Local storage is not supported! Loading ' + localStorageKey + '...');
@@ -31,7 +32,11 @@ export default class GenericCacheManager {
 
         if (globalSettingsObject.creationTime === undefined || new Date().getTime() - new Date(globalSettingsObject.creationTime).getTime() > expireTime) {
             console.log(localStorageKey + ' cache is outdated! Loading ' + localStorageKey + ' in the background...');
-            GenericCacheManager.reloadGenericCache(localStorageKey, url, versionNumber); // save in the background
+            if (allowExpired) {
+                GenericCacheManager.reloadGenericCache(localStorageKey, url, versionNumber); // save in the background
+            } else {
+                return GenericCacheManager.reloadGenericCache(localStorageKey, url, versionNumber);
+            }
         }
 
         console.log(localStorageKey + ' loaded successfully from cache!');
