@@ -475,7 +475,7 @@ function applyHaikuCalendar(calendarFeedObject: any) {
                 try {
                     let date = VeracrossICalUtils.getDate(event[1]);
                     let title = VeracrossICalUtils.getSummary(event[1]);
-                    let description = VeracrossICalUtils.getDescriptionAsText(event[1]);
+                    let description = '<span style="white-space: pre-wrap;">' + VeracrossICalUtils.getDescriptionAsText(event[1]) + '</span>';
 
                     if (date === null)
                         return null;
