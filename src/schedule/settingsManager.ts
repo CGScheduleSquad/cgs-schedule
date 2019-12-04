@@ -347,7 +347,7 @@ function getAllClassIds() {
 let maxSheetItemLength = 30;
 function applyCanvasCalendar(calendarFeedObject: any) {
     var converter = new Converter();
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][1]).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][1], false).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
         return parsedPath[2];
@@ -399,7 +399,7 @@ function applyCanvasCalendar(calendarFeedObject: any) {
 }
 
 function applyGoogleSheets(googleSheetsObject: any) {
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `https://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][2]}&range=${googleSheetsObject[key][0]}`).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', `https://cgs-schedule.herokuapp.com/get-sheet?sheetid=${googleSheetsObject[key][2]}&range=${googleSheetsObject[key][0]}`, false).then(icsString => {
         return JSON.parse(icsString);
     }).then(calendarEvents => {
         let labels = calendarEvents[0];
@@ -465,7 +465,7 @@ function applyGoogleSheets(googleSheetsObject: any) {
 }
 
 function applyHaikuCalendar(calendarFeedObject: any) {
-    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][0]).then(icsString => {
+    let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key + 'sheet', 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][0], false).then(icsString => {
         // @ts-ignore
         let parsedPath = ICAL.parse(icsString);
         return parsedPath[2];
