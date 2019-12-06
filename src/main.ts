@@ -22,9 +22,10 @@ let scheduleAndDomLoaded = new Promise<string>((resolve) => resolve(SchedulePara
 
 let scheduleRendered = scheduleAndDomLoaded.then((schedule: any) => {
     ScheduleRenderer.render(schedule);
+    return schedule;
 });
 
-scheduleRendered.then(() => {
+scheduleRendered.then((schedule: any) => {
     if (new URL(window.location.href).hash === '#new') {
         toast({
             message: 'Schedule generated. Please bookmark the link and/or text it to your phone.',
@@ -38,15 +39,16 @@ scheduleRendered.then(() => {
 
         window.location.hash = '';
     }
+    return schedule;
 });
 
 let scheduleAndGlobalSettingsLoaded = Promise.all([
     GlobalSettingsCacheManager.getGlobalSettings(),
     scheduleRendered
-]).then((globalSettings: any) => globalSettings[0]);
+]);
 
-scheduleAndGlobalSettingsLoaded.then((globalSettingsObject => {
-    loadAllSettings(globalSettingsObject);
+scheduleAndGlobalSettingsLoaded.then((globalSettingsAndSchedule => {
+    loadAllSettings(globalSettingsAndSchedule[0], globalSettingsAndSchedule[1]);
     if (CookieManager.isSettingsAdDismissed() || ScheduleParamUtils.areSettingsSet()) {
         let settingsAd = document.getElementById('settings-ad');
         if (settingsAd !== null) settingsAd.classList.add('hidden');

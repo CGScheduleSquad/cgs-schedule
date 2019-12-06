@@ -268,6 +268,8 @@ class RegularScheduleRenderer {
     }
 }
 
+export let freeNames = ['Free', 'Late Start', 'Break', 'Break (MS)', 'Lunch', 'Lunch (MS)']; // TODO: get rid of this
+
 abstract class ParsedBlock {
     // Maps block label content to: [replacement text, whether the block should be colored]
     private static readonly blockLabelMappings = {
@@ -277,21 +279,25 @@ abstract class ParsedBlock {
 
     // calculated values
     private shouldBeColored = true;
-    protected addLineBreak = true;
-    protected subtitle = '';
+    addLineBreak = true;
+    subtitle = '';
     protected bgcolor = 'white';
 
     // read values
-    protected readonly title: string;
+    readonly title: string;
+    readonly location: string;
+    readonly blockLabel: string;
     protected readonly mins: string;
-    private readonly free: boolean;
-    protected readonly date: ScheduleDate;
+    readonly free: boolean;
+    readonly date: ScheduleDate;
 
     protected constructor(title: string, location: string, blockLabel: string, mins: string, free: boolean, date: ScheduleDate) {
         this.title = title;
         this.mins = mins;
         this.free = free;
         this.date = date;
+        this.location = location;
+        this.blockLabel = blockLabel;
 
         this.generateBlockSubtitle(location, blockLabel);
     }
@@ -327,7 +333,6 @@ abstract class ParsedBlock {
             blockLabel = 'Blk ' + blockLabel;
         }
 
-        let freeNames = ['Free', 'Late Start', 'Break', 'Break (MS)', 'Lunch', 'Lunch (MS)']; // TODO: get rid of this
         if (this.free || freeNames.some(name => name === this.title)) {
             this.bgcolor = colorClasses.free;
         } else if (this.shouldBeColored) {
@@ -376,7 +381,7 @@ abstract class ParsedBlock {
     }
 }
 
-class RegularParseBlock extends ParsedBlock {
+export class RegularParseBlock extends ParsedBlock {
     public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate): RegularParseBlock {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
@@ -390,7 +395,7 @@ class RegularParseBlock extends ParsedBlock {
     }
 
     public readonly normalTimeIndex: number;
-    private readonly rowSpan: number;
+    readonly rowSpan: number;
 
     constructor(
         title: string,
@@ -420,7 +425,7 @@ class RegularParseBlock extends ParsedBlock {
     }
 }
 
-class LateStartParseBlock extends ParsedBlock {
+export class LateStartParseBlock extends ParsedBlock {
     public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate) {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
@@ -434,7 +439,7 @@ class LateStartParseBlock extends ParsedBlock {
     }
 
     public readonly normalTimeIndex: number;
-    private readonly rowSpan: number;
+    readonly rowSpan: number;
 
     constructor(
         title: string,
@@ -487,7 +492,7 @@ class LateStartParseBlock extends ParsedBlock {
     }
 }
 
-class InlineParseBlock extends ParsedBlock {
+export class InlineParseBlock extends ParsedBlock {
     public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate): InlineParseBlock {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
@@ -499,7 +504,7 @@ class InlineParseBlock extends ParsedBlock {
         return new InlineParseBlock(title, location, blockLabel, mins, free, startTime, endTime, date);
     }
 
-    private readonly startTime: ScheduleTime;
+    readonly startTime: ScheduleTime;
     private readonly endTime: ScheduleTime;
 
     constructor(

@@ -66,6 +66,11 @@ export default class ScheduleParamUtils {
         return linksString == null ? false : linksString !== 'false';
     }
 
+    static getNotificationsEnabled() {
+        let linksString = ScheduleParamUtils.getUrlParam('notifications');
+        return linksString == null ? false : linksString !== 'false';
+    }
+
     static getSchoolDivision() {
         let schoolDivision = ScheduleParamUtils.getUrlParam('schooldiv');
         return schoolDivision == null ? 'us' : schoolDivision;
