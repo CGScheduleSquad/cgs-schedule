@@ -88,7 +88,7 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                 if (block.free || freeNames.some(name => name === block.title)) return;
                 var now = new Date();
                 array.push(new NotificationData(
-                    new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 1, 0, 0),
+                    new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 5, 0, 0),
                     block.title + (block.addLineBreak ? '' : block.subtitle) + ' starts in 5 minutes!',
                     block.addLineBreak ? block.subtitle : ''
                 ));
