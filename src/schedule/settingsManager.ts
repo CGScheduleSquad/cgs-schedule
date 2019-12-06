@@ -7,6 +7,8 @@ import { VeracrossICalUtils } from './veracross/veracrossICalUtils';
 import GenericCacheManager from '../globalSettings/genericCacheManager';
 import ScheduleDate from './time/scheduleDate';
 import { Converter } from 'showdown';
+import { lateStartAllTimes, normalAllTimes, ScheduleDayType } from './structure/scheduleDay';
+import { InlineParseBlock, LateStartParseBlock, RegularParseBlock } from './rendering/scheduleRenderer';
 
 let themeCssVariables = [
     '--block-1',
@@ -48,7 +50,85 @@ function applyHighlight() {
     }
 }
 
-export function loadAllSettings(globalSettingsObject: any) {
+function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
+    Notification.requestPermission().then(() => {
+        if (Notification.permission === 'granted') {
+            let date = ScheduleDate.now();
+            let rawDay = schedule.dayMap[date.toString()];
+            let blocks: Array<Array<any>> = rawDay.blocks;
+            let compressionList: any = schedule.compressionList;
+            rawDay.notificationBlocks = new Array<InlineParseBlock>();
+            switch (rawDay.type) {
+                case ScheduleDayType.TEXT:
+                    break;
+                case ScheduleDayType.LATE_START:
+                    blocks.forEach((block: Array<any>) => {
+                        let parsedBlock: LateStartParseBlock = LateStartParseBlock.parseRawBlock(block, compressionList, date);
+                        let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.subtitle, '', '', parsedBlock.free, lateStartAllTimes[parsedBlock.normalTimeIndex], lateStartAllTimes[parsedBlock.normalTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
+                        rawDay.notificationBlocks.push(inlineParseBlock);
+                    });
+                    break;
+                case ScheduleDayType.INLINE:
+                    blocks.forEach((block: Array<any>) => {
+                        let inlineParseBlock = InlineParseBlock.parseRawBlock(block, compressionList, date);
+                        rawDay.notificationBlocks.push(inlineParseBlock);
+                    });
+                    break;
+                case ScheduleDayType.REGULAR:
+                    blocks.forEach((block: Array<any>) => {
+                        let parsedBlock: RegularParseBlock = RegularParseBlock.parseRawBlock(block, compressionList, date);
+                        let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.subtitle, '', '', parsedBlock.free, normalAllTimes[parsedBlock.normalTimeIndex], normalAllTimes[parsedBlock.normalTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
+                        rawDay.notificationBlocks.push(inlineParseBlock);
+                    });
+                    break;
+            }
+            let array = new Array<NotificationData>();
+            let input = new NotificationWorkerInput(array, 1);
+            rawDay.notificationBlocks.forEach((block: InlineParseBlock) => {
+                var now = new Date();
+                array.push(new NotificationData(
+                    new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 5, 0, 0),
+                    block.title + ' starts in 5 minutes!',
+                    block.subtitle
+                ));
+            });
+
+            navigator.serviceWorker.register('/notificationWorker.js').then(function(registration) {
+                // Registration was successful
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                let controller = navigator.serviceWorker.controller;
+                if (controller !== null) controller.postMessage(input);
+            }, function(err) {
+                // registration failed :(
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        }
+    });
+}
+
+class NotificationWorkerInput {
+    public readonly notifications: Array<NotificationData>;
+    public readonly version: number;
+
+    constructor(notifications: Array<NotificationData>, version: number) {
+        this.notifications = notifications;
+        this.version = version;
+    }
+}
+
+class NotificationData {
+    public readonly time: Date;
+    public readonly message: string;
+    public readonly body: string;
+
+    constructor(time: Date, message: string, body: string) {
+        this.time = time;
+        this.body = body;
+        this.message = message;
+    }
+}
+
+export function loadAllSettings(globalSettingsObject: any, schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
     if (new URL(window.location.href).hash === '#updated') {
 
         toast({
@@ -81,6 +161,9 @@ export function loadAllSettings(globalSettingsObject: any) {
         applyHaikuCalendar(haikuCalendarObject);
         setupCalendarEventModal();
     }
+    if (ScheduleParamUtils.getNotificationsEnabled()) {
+        setUpNotificationWorker(schedule);
+    }
 }
 
 function loadSettingsModal(themesObject: {}) {
@@ -104,6 +187,10 @@ function loadSettingsModal(themesObject: {}) {
     let highlightCheckbox = document.getElementById('day-highlight');
     // @ts-ignore
     highlightCheckbox.checked = ScheduleParamUtils.getHighlightEnabled();
+    // @ts-ignore
+    let notificationsCheckbox = document.getElementById('notifications');
+    // @ts-ignore
+    notificationsCheckbox.checked = ScheduleParamUtils.getNotificationsEnabled(); // TODO
 
     const openModal = () => {
         let settingsAd = document.getElementById('settings-ad');
@@ -118,6 +205,13 @@ function loadSettingsModal(themesObject: {}) {
     // @ts-ignore
     document.getElementById('settings').firstElementChild.addEventListener('click', () => openModal());
     // @ts-ignore
+    document.getElementById('notifications').addEventListener('click', () => {
+        // @ts-ignore
+        if (notificationsCheckbox.checked) {
+            Notification.requestPermission();
+        }
+    });
+    // @ts-ignore
     document.getElementById('save-settings').addEventListener('click', () => {
         if (
             // @ts-ignore
@@ -126,6 +220,8 @@ function loadSettingsModal(themesObject: {}) {
             || linksCheckbox.checked !== ScheduleParamUtils.getLinksEnabled()
             // @ts-ignore
             || calendarCheckbox.checked !== ScheduleParamUtils.getCalendarEventsEnabled()
+            // @ts-ignore
+            || notificationsCheckbox.checked !== ScheduleParamUtils.getNotificationsEnabled()
             // @ts-ignore
             || sel.value !== ScheduleParamUtils.getTheme()
         ) {
@@ -136,6 +232,8 @@ function loadSettingsModal(themesObject: {}) {
             newUrl.searchParams.set('links', linksCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('calendars', calendarCheckbox.checked);
+            // @ts-ignore
+            newUrl.searchParams.set('notifications', notificationsCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('theme', sel.value);
             newUrl.hash = '#updated';
@@ -180,6 +278,7 @@ function applyThemes(themesObject: { [x: string]: any; }) {
 var urlPattern = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 var classNamePattern = /^[^<>\n\\=]+$/;
 var blockNumberPattern = /^[1-7]$/;
+
 function parseLinkObject(globalSettingsObject: any) {
     var numMeta = 2;
     var numLinks = 5;
@@ -232,6 +331,7 @@ function parseCalendarFeedObject(globalSettingsObject: any) {
 }
 
 let googleSheetsMatcher = /[A-z0-9-_]{44}/;
+
 function parseGoogleSheetsObject(globalSettingsObject: any) {
     let length = 5;
 
@@ -254,6 +354,7 @@ function parseGoogleSheetsObject(globalSettingsObject: any) {
     });
     return googleSheetsObject;
 }
+
 function parseHaikuCalendarObject(globalSettingsObject: any) {
     let length = 3;
 
@@ -345,6 +446,7 @@ function getAllClassIds() {
 }
 
 let maxSheetItemLength = 30;
+
 function applyCanvasCalendar(calendarFeedObject: any) {
     var converter = new Converter();
     let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][1], false).then(icsString => {
@@ -388,7 +490,7 @@ function applyCanvasCalendar(calendarFeedObject: any) {
                     canvasEventsMap.set(key, []);
                 // @ts-ignore
                 canvasEventsMap.get(key).push(value);
-            })
+            });
         });
 
         canvasEventsMap.forEach(((value) => {
@@ -506,7 +608,7 @@ function applyHaikuCalendar(calendarFeedObject: any) {
                     canvasEventsMap.set(key, []);
                 // @ts-ignore
                 canvasEventsMap.get(key).push(value);
-            })
+            });
         });
 
         canvasEventsMap.forEach(((value) => {
