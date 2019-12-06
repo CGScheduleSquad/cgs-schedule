@@ -8,7 +8,7 @@ import GenericCacheManager from '../globalSettings/genericCacheManager';
 import ScheduleDate from './time/scheduleDate';
 import { Converter } from 'showdown';
 import { lateStartAllTimes, normalAllTimes, ScheduleDayType } from './structure/scheduleDay';
-import { InlineParseBlock, LateStartParseBlock, RegularParseBlock } from './rendering/scheduleRenderer';
+import { freeNames, InlineParseBlock, LateStartParseBlock, RegularParseBlock } from './rendering/scheduleRenderer';
 
 let themeCssVariables = [
     '--block-1',
@@ -64,7 +64,7 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                 case ScheduleDayType.LATE_START:
                     blocks.forEach((block: Array<any>) => {
                         let parsedBlock: LateStartParseBlock = LateStartParseBlock.parseRawBlock(block, compressionList, date);
-                        let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.subtitle, '', '', parsedBlock.free, lateStartAllTimes[parsedBlock.normalTimeIndex], lateStartAllTimes[parsedBlock.normalTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
+                        let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.location, parsedBlock.blockLabel, '', parsedBlock.free, lateStartAllTimes[parsedBlock.normalTimeIndex], lateStartAllTimes[parsedBlock.normalTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
                         rawDay.notificationBlocks.push(inlineParseBlock);
                     });
                     break;
@@ -77,7 +77,7 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                 case ScheduleDayType.REGULAR:
                     blocks.forEach((block: Array<any>) => {
                         let parsedBlock: RegularParseBlock = RegularParseBlock.parseRawBlock(block, compressionList, date);
-                        let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.subtitle, '', '', parsedBlock.free, normalAllTimes[parsedBlock.normalTimeIndex], normalAllTimes[parsedBlock.normalTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
+                        let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.location, parsedBlock.blockLabel, '', parsedBlock.free, normalAllTimes[parsedBlock.normalTimeIndex], normalAllTimes[parsedBlock.normalTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
                         rawDay.notificationBlocks.push(inlineParseBlock);
                     });
                     break;
@@ -85,22 +85,27 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
             let array = new Array<NotificationData>();
             let input = new NotificationWorkerInput(array, 1);
             rawDay.notificationBlocks.forEach((block: InlineParseBlock) => {
+                if (block.free || freeNames.some(name => name === block.title)) return;
                 var now = new Date();
                 array.push(new NotificationData(
-                    new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 5, 0, 0),
-                    block.title + ' starts in 5 minutes!',
-                    block.subtitle
+                    new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 1, 0, 0),
+                    block.title + (block.addLineBreak ? '' : block.subtitle) + ' starts in 5 minutes!',
+                    block.addLineBreak ? block.subtitle : ''
                 ));
             });
 
-            navigator.serviceWorker.register('/notificationWorker.js').then(function(registration) {
-                // Registration was successful
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                let controller = navigator.serviceWorker.controller;
-                if (controller !== null) controller.postMessage(input);
-            }, function(err) {
-                // registration failed :(
-                console.log('ServiceWorker registration failed: ', err);
+            input.notifications.forEach(notificationData => {
+                var now = new Date();
+                var millisRemaining = notificationData.time.getTime() - now.getTime();
+                if (millisRemaining > 0) {
+                    setTimeout(function() {
+                        const title = notificationData.message;
+                        const options = {
+                            body: notificationData.body
+                        };
+                        new Notification(title, options);
+                    }, millisRemaining);
+                }
             });
         }
     });

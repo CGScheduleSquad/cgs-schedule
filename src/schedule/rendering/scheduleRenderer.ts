@@ -268,6 +268,8 @@ class RegularScheduleRenderer {
     }
 }
 
+export let freeNames = ['Free', 'Late Start', 'Break', 'Break (MS)', 'Lunch', 'Lunch (MS)']; // TODO: get rid of this
+
 abstract class ParsedBlock {
     // Maps block label content to: [replacement text, whether the block should be colored]
     private static readonly blockLabelMappings = {
@@ -277,12 +279,14 @@ abstract class ParsedBlock {
 
     // calculated values
     private shouldBeColored = true;
-    protected addLineBreak = true;
+    addLineBreak = true;
     subtitle = '';
     protected bgcolor = 'white';
 
     // read values
     readonly title: string;
+    readonly location: string;
+    readonly blockLabel: string;
     protected readonly mins: string;
     readonly free: boolean;
     readonly date: ScheduleDate;
@@ -292,6 +296,8 @@ abstract class ParsedBlock {
         this.mins = mins;
         this.free = free;
         this.date = date;
+        this.location = location;
+        this.blockLabel = blockLabel;
 
         this.generateBlockSubtitle(location, blockLabel);
     }
@@ -327,7 +333,6 @@ abstract class ParsedBlock {
             blockLabel = 'Blk ' + blockLabel;
         }
 
-        let freeNames = ['Free', 'Late Start', 'Break', 'Break (MS)', 'Lunch', 'Lunch (MS)']; // TODO: get rid of this
         if (this.free || freeNames.some(name => name === this.title)) {
             this.bgcolor = colorClasses.free;
         } else if (this.shouldBeColored) {
