@@ -196,6 +196,10 @@ function loadSettingsModal(themesObject: {}) {
     let notificationsCheckbox = document.getElementById('notifications');
     // @ts-ignore
     notificationsCheckbox.checked = ScheduleParamUtils.getNotificationsEnabled(); // TODO
+    // @ts-ignore
+    let militaryCheckbox = document.getElementById('military');
+    // @ts-ignore
+    militaryCheckbox.checked = ScheduleParamUtils.getMilitaryTimeEnabled(); // TODO
 
     const openModal = () => {
         let settingsAd = document.getElementById('settings-ad');
@@ -228,6 +232,8 @@ function loadSettingsModal(themesObject: {}) {
             // @ts-ignore
             || notificationsCheckbox.checked !== ScheduleParamUtils.getNotificationsEnabled()
             // @ts-ignore
+            || militaryCheckbox.checked !== ScheduleParamUtils.getMilitaryTimeEnabled()
+            // @ts-ignore
             || sel.value !== ScheduleParamUtils.getTheme()
         ) {
             let newUrl = new URL(window.location.href);
@@ -239,6 +245,8 @@ function loadSettingsModal(themesObject: {}) {
             newUrl.searchParams.set('calendars', calendarCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('notifications', notificationsCheckbox.checked);
+            // @ts-ignore
+            newUrl.searchParams.set('military', militaryCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('theme', sel.value);
             newUrl.hash = '#updated';

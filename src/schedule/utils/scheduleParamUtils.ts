@@ -43,8 +43,8 @@ export default class ScheduleParamUtils {
     }
 
     static getTheme(): string {
-        let themeString = ScheduleParamUtils.getUrlParam('theme');
-        return themeString == null ? 'classic' : themeString;
+        let string = ScheduleParamUtils.getUrlParam('theme');
+        return string == null ? 'classic' : string;
     }
 
     private static getUrlParam(key: string) {
@@ -52,23 +52,28 @@ export default class ScheduleParamUtils {
     }
 
     static getLinksEnabled() {
-        let linksString = ScheduleParamUtils.getUrlParam('links');
-        return linksString == null ? true : linksString !== 'false';
+        let string = ScheduleParamUtils.getUrlParam('links');
+        return string == null ? true : string !== 'false';
     }
 
     static getCalendarEventsEnabled() {
-        let linksString = ScheduleParamUtils.getUrlParam('calendars');
-        return linksString == null ? false : linksString !== 'false';
+        let string = ScheduleParamUtils.getUrlParam('calendars');
+        return string == null ? false : string !== 'false';
     }
 
     static getHighlightEnabled() {
-        let linksString = ScheduleParamUtils.getUrlParam('highlight');
-        return linksString == null ? false : linksString !== 'false';
+        let string = ScheduleParamUtils.getUrlParam('highlight');
+        return string == null ? false : string !== 'false';
     }
 
     static getNotificationsEnabled() {
-        let linksString = ScheduleParamUtils.getUrlParam('notifications');
-        return linksString == null ? false : linksString !== 'false';
+        let string = ScheduleParamUtils.getUrlParam('notifications');
+        return string == null ? false : string !== 'false';
+    }
+
+    static getMilitaryTimeEnabled() {
+        let string = ScheduleParamUtils.getUrlParam('military');
+        return string == null ? false : string !== 'false';
     }
 
     static getSchoolDivision() {
