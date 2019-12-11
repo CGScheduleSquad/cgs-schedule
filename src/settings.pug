@@ -4,6 +4,10 @@
         .modal-card
             header.modal-card-head
                 p.modal-card-title CGS Schedule Settings
+                div(style="text-align: right; width: 100%")
+                    a(target="_blank" href="https://cgschedulesquad.github.io/cgs-schedule/")
+                        | Share
+                        i.fas.fa-share-square.p-l-sm
             section.modal-card-body
                 .field
                     label.label
@@ -77,6 +81,13 @@
                         | - On touchscreen devices, swipe left and right to navigate between days
                         br
                         | - The schedule is mobile-friendly, just click on the "Today" view and text the link to your phone
+                .field
+                    label.label
+                        | Tools
+                        i.fas.fa-wrench.p-l-sm
+                    .control
+                        a.button.m-r-xs( onclick='localStorage.clear();location.reload(true);' ) Reset Cache
+                        a.button.m-r-xs( onclick='window.open("./index.html", "_blank");' ) Return to Setup Page
 
             footer.modal-card-foot
                 button.button.is-info#save-settings Save changes
