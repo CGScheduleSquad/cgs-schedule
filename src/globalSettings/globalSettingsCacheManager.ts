@@ -38,7 +38,7 @@ export default class GlobalSettingsCacheManager {
             let substr = ScheduleParamUtils.getCalendarUUID().substr(0, 5);
             // @ts-ignore
             let id = md5(substr);
-            request.open('GET', `https://cgs-schedule.herokuapp.com/gs/` + id, true);
+            request.open('GET', `https://cgs-schedule.herokuapp.com/gs/` + id + ';' + ScheduleParamUtils.getTheme(), true);
             request.onload = function() {
                 if (this.status >= 200 && this.status < 400) {
                     resolve(this.response);
