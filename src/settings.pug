@@ -6,7 +6,7 @@
                 p.modal-card-title CGS Schedule Settings
                 div(style="text-align: right; width: 100%")
                     a(target="_blank" href="https://cgschedulesquad.github.io/cgs-schedule/")
-                        | Share
+                        | Share CGS Schedule
                         i.fas.fa-share-square.p-l-sm
             section.modal-card-body
                 .field
@@ -69,6 +69,13 @@
                         | Sends a notification to your computer five minutes before your next class starts.
                         br
                         | The schedule tab must be open and this site must have notification permissions.
+                .field
+                    label.label
+                        | 24-Hour Time
+                        i.fas.fa-clock.p-l-sm
+                    .control
+                        input#military.switch.is-rounded.is-medium.is-danger(type='checkbox' name='military' checked='checked')
+                        label(for='military')
                 .field
                     label.label
                         | Tips

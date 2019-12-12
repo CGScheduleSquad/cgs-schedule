@@ -32,6 +32,10 @@ export default class ScheduleTime {
         return ((this.hours - 1) % 12) + 1 + ':' + (this.minutes < 10 ? '0' : '') + this.minutes;
     }
 
+    to24HourString(): string {
+        return (this.hours - 1) + 1 + ':' + (this.minutes < 10 ? '0' : '') + this.minutes;
+    }
+
     toDate(): Date {
         return new Date(0,0,0,this.hours, this.minutes);
     }

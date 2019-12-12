@@ -103,9 +103,11 @@ export default class ScheduleRenderer {
                 90
             );
             timeDataElement.setAttribute('class', `times mins${durationMins}`);
-            timeDataElement.appendChild(
-                document.createTextNode(`${normalAllTimes[index].to12HourString()}-${endTime.to12HourString()}`)
-            );
+            if (ScheduleParamUtils.getMilitaryTimeEnabled()) {
+                timeDataElement.appendChild(document.createTextNode(`${normalAllTimes[index].to24HourString()}-${endTime.to24HourString()}`));
+            } else {
+                timeDataElement.appendChild(document.createTextNode(`${normalAllTimes[index].to12HourString()}-${endTime.to12HourString()}`));
+            }
 
             let tableRowElement = document.createElement('tr');
             tableRowElement.appendChild(timeDataElement);
