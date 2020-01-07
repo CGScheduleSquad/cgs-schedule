@@ -788,6 +788,11 @@
             "startTime": "9:30 am",
             "title": "Break"
         },
+      {
+        "startTime": "11:55 am",
+        "title": "Co-Curric",
+        "label": "Blk 6"
+        },
         {
             "startTime": "12:30 pm",
             "title": "Lunch"
