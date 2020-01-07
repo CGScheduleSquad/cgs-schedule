@@ -17,11 +17,12 @@ export default class JSONRawBlockSource implements RawBlockSource {
             let rawBlocks: RawBlock[] = [];
             for (let date in jsonBlocks) {
                 if (jsonBlocks.hasOwnProperty(date)) {
-                    jsonBlocks[date].forEach((block: { startTime: string; title: string }) => {
+                    jsonBlocks[date].forEach((block: { startTime: string; title: string; label: string | undefined }) => {
                         let startTime = ScheduleTime.fromDate(JSONRawBlockSource.parseVeracrossTime(block.startTime));
                         if (startTime.hours === 11 && startTime.minutes === 25) startTime = new ScheduleTime(11, 20); // TODO: get rid of this
+                        let label = block.label !== undefined ? block.label : '';
                         rawBlocks.push(
-                            new RawBlock(block.title, '', '', ScheduleDate.fromString(date), null, startTime, null)
+                            new RawBlock(block.title, '', label, ScheduleDate.fromString(date), null, startTime, null)
                         );
                     });
                 }
