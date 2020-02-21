@@ -58,7 +58,7 @@ export default class ScheduleParamUtils {
 
     static getCalendarEventsEnabled() {
         let string = ScheduleParamUtils.getUrlParam('calendars');
-        return string == null ? false : string !== 'false';
+        return string == null ? true : string !== 'false';
     }
 
     static getHighlightEnabled() {
