@@ -2,7 +2,7 @@ import { ScheduleDay } from './scheduleDay';
 import ScheduleCompressionManager from '../utils/scheduleCompressionManager';
 
 export class ScheduleAll {
-    public static readonly CURRENT_VERSION_NUMBER = 7;
+    public static readonly CURRENT_VERSION_NUMBER = 8;
 
     readonly versionNumber: number;
     readonly id: string; // unique id
