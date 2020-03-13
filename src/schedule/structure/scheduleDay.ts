@@ -16,6 +16,20 @@ export class ScheduleDayMeta {
 }
 
 export let normalTimes: ScheduleTime[];
+export let covidTimes: ScheduleTime[] = [
+    new ScheduleTime(8, 0),
+    new ScheduleTime(10, 30),
+    new ScheduleTime(11, 50),
+    new ScheduleTime(13, 0),
+    new ScheduleTime(14, 20)
+];
+export let covidPassingTimeAtEnd: boolean[] = [
+    false,
+    false,
+    false,
+    false,
+    false
+];
 export let normalPassingTimeAtEnd: boolean[];
 let lateStartTimes: ScheduleTime[];
 export let lateStartPassingTimeAtEnd: boolean[];
@@ -126,6 +140,7 @@ if (scheduleParamUtils.getSchoolDivision() == 'us') {
 
 const schoolEndTime = new ScheduleTime(15, 15);
 export const normalAllTimes = normalTimes.concat([schoolEndTime]);
+export const covidAllTimes = covidTimes.concat([schoolEndTime]);
 
 
 export const lateStartAllTimes = lateStartTimes.concat([schoolEndTime]);
@@ -134,7 +149,8 @@ export enum ScheduleDayType {
     REGULAR,
     INLINE,
     TEXT,
-    LATE_START
+    LATE_START,
+    COVID
 }
 
 export abstract class ScheduleDay {
@@ -157,7 +173,10 @@ export abstract class ScheduleDay {
 
         let dayWithMeta = rawBlocks.find(rawBlock => rawBlock.dayMeta !== null);
         let dayMeta = dayWithMeta !== undefined ? dayWithMeta.dayMeta : new ScheduleDayMeta(''); // default day meta if no jsonBlocks have info
-        if (this.isRegularDay(rawBlocks)) {
+        if (this.isCovidDay(rawBlocks)) {
+            // @ts-ignore
+            return CovidDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
+        } else if (this.isRegularDay(rawBlocks)) {
             // @ts-ignore
             return RegularDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
         } else if (this.isLateStartDay(rawBlocks)) {
@@ -171,6 +190,15 @@ export abstract class ScheduleDay {
             return InlineDay.fromRawBlocks(dayDate, dayMeta, rawBlocks);
         }
     }
+
+    private static isCovidDay = (rawBlocks: RawBlock[]): boolean => {
+        if (rawBlocks.length > 2) return false;
+        return rawBlocks.every(block => {
+            let startHours = block.startTime.hours;
+            let startMinutes = block.startTime.minutes;
+            return covidTimes.some(time => startHours === time.hours && startMinutes === time.minutes);
+        });
+    };
 
     private static isRegularDay = (rawBlocks: RawBlock[]): boolean =>
         rawBlocks.every(block => {
@@ -203,6 +231,67 @@ export abstract class ScheduleDay {
         });
     }
 }
+
+class CovidDay extends ScheduleDay {
+    blocks: RegularDayBlock[];
+
+    constructor(date: ScheduleDate, dayMeta: ScheduleDayMeta, blocks: RegularDayBlock[]) {
+        super(date, dayMeta);
+        this.blocks = blocks;
+    }
+
+    static fromRawBlocks(date: ScheduleDate, dayMeta: ScheduleDayMeta, sortedRawBlocks: RawBlock[]): RegularDay {
+        sortedRawBlocks.push(
+            new RawBlock('', '', '', ScheduleDate.now(), new ScheduleDayMeta(''), new ScheduleTime(24, 0), null)
+        );
+        let regularDayBlocks = new Array<RegularDayBlock>();
+        let timeIndex = 0;
+
+        sortedRawBlocks.forEach((rawBlock: RawBlock) => {
+            while (timeIndex < covidTimes.length && rawBlock.startTime.totalMinutes > covidTimes[timeIndex].totalMinutes) {
+                let title = '';
+                let label = '';
+                let rowSpan = 1; // TODO: free block merging
+                let durationMins = Math.min(
+                    Math.max(
+                        covidAllTimes[timeIndex + rowSpan].totalMinutes - covidAllTimes[timeIndex].totalMinutes,
+                        5
+                    ),
+                    90
+                ); // double sided constrain
+                regularDayBlocks.push(new RegularDayBlock(title, '', label, timeIndex, rowSpan, durationMins, true));
+                timeIndex++;
+            }
+
+            if (timeIndex >= covidTimes.length) return;
+
+            let rowSpan = 1;
+            let durationMins = Math.min(
+                Math.max(covidAllTimes[timeIndex + rowSpan].totalMinutes - covidAllTimes[timeIndex].totalMinutes, 5),
+                90
+            ); // double sided constrain
+            regularDayBlocks.push(
+                new RegularDayBlock(
+                    rawBlock.title,
+                    rawBlock.location,
+                    rawBlock.label,
+                    timeIndex,
+                    rowSpan,
+                    durationMins,
+                    false
+                )
+            );
+            timeIndex += rowSpan;
+        });
+
+        return new CovidDay(date, dayMeta, regularDayBlocks);
+    }
+
+    getType(): ScheduleDayType {
+        return ScheduleDayType.COVID;
+    }
+}
+
 
 class RegularDay extends ScheduleDay {
     blocks: RegularDayBlock[];

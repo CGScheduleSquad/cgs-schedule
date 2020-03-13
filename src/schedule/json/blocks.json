@@ -789,11 +789,6 @@
       "title": "Break"
     },
     {
-      "startTime": "11:55 am",
-      "title": "Co-Curric",
-      "label": "Blk 6"
-    },
-    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1168,6 +1163,16 @@
       "title": "Lunch"
     }
   ],
+  "2020-3-4": [
+    {
+      "startTime": "9:35 am",
+      "title": "Break"
+    },
+    {
+      "startTime": "12:35 pm",
+      "title": "Lunch"
+    }
+  ],
   "2020-3-6": [
     {
       "startTime": "9:30 am",
@@ -1224,109 +1229,7 @@
   ],
   "2020-3-13": [
     {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:25 am",
-      "title": "Assembly"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-3-16": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-3-17": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-3-18": [
-    {
-      "startTime": "10:10 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-3-19": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:55 am",
-      "title": "Community"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-3-20": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-3-30": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-3-31": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:25 am",
-      "title": "Assembly"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-1": [
-    {
-      "startTime": "10:10 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-2": [
-    {
-      "startTime": "9:30 am",
+      "startTime": "11:35 am",
       "title": "Break"
     },
     {
@@ -1337,16 +1240,6 @@
   "2020-4-7": [
     {
       "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-8": [
-    {
-      "startTime": "10:10 am",
       "title": "Break"
     },
     {
@@ -1400,7 +1293,7 @@
   ],
   "2020-4-15": [
     {
-      "startTime": "9:20 am",
+      "startTime": "9:30 am",
       "title": "Break"
     },
     {
@@ -1454,11 +1347,11 @@
   ],
   "2020-4-22": [
     {
-      "startTime": "10:10 am",
+      "startTime": "9:30 am",
       "title": "Break"
     },
     {
-      "startTime": "12:05 pm",
+      "startTime": "11:25 am",
       "title": "Assembly"
     },
     {
@@ -1467,6 +1360,16 @@
     }
   ],
   "2020-4-23": [
+    {
+      "startTime": "9:30 am",
+      "title": "Break"
+    },
+    {
+      "startTime": "12:30 pm",
+      "title": "Lunch"
+    }
+  ],
+  "2020-4-24": [
     {
       "startTime": "9:30 am",
       "title": "Break"
@@ -1492,13 +1395,17 @@
       "title": "Break"
     },
     {
+      "startTime": "11:55 am",
+      "title": "Community"
+    },
+    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
   ],
   "2020-4-29": [
     {
-      "startTime": "10:10 am",
+      "startTime": "9:30 am",
       "title": "Break"
     },
     {
@@ -1522,6 +1429,10 @@
       "title": "Break"
     },
     {
+      "startTime": "11:25 am",
+      "title": "Assembly"
+    },
+    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1530,10 +1441,6 @@
     {
       "startTime": "9:30 am",
       "title": "Break"
-    },
-    {
-      "startTime": "11:25 am",
-      "title": "Assembly"
     },
     {
       "startTime": "12:30 pm",
@@ -1552,7 +1459,7 @@
   ],
   "2020-5-6": [
     {
-      "startTime": "9:20 am",
+      "startTime": "9:30 am",
       "title": "Break"
     },
     {
@@ -1561,6 +1468,20 @@
     }
   ],
   "2020-5-7": [
+    {
+      "startTime": "9:30 am",
+      "title": "Break"
+    },
+    {
+      "startTime": "11:55 am",
+      "title": "Community"
+    },
+    {
+      "startTime": "12:30 pm",
+      "title": "Lunch"
+    }
+  ],
+  "2020-5-8": [
     {
       "startTime": "9:30 am",
       "title": "Break"
@@ -1576,10 +1497,6 @@
       "title": "Break"
     },
     {
-      "startTime": "11:55 am",
-      "title": "Community"
-    },
-    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1590,13 +1507,17 @@
       "title": "Break"
     },
     {
+      "startTime": "11:25 am",
+      "title": "Assembly"
+    },
+    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
   ],
   "2020-5-13": [
     {
-      "startTime": "10:10 am",
+      "startTime": "9:30 am",
       "title": "Break"
     },
     {
@@ -1608,10 +1529,6 @@
     {
       "startTime": "9:30 am",
       "title": "Break"
-    },
-    {
-      "startTime": "11:25 am",
-      "title": "Assembly"
     },
     {
       "startTime": "12:30 pm",
@@ -1634,6 +1551,10 @@
       "title": "Break"
     },
     {
+      "startTime": "11:55 am",
+      "title": "Community"
+    },
+    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1650,7 +1571,41 @@
   ],
   "2020-5-20": [
     {
-      "startTime": "10:10 am",
+      "startTime": "9:30 am",
+      "title": "Break"
+    },
+    {
+      "startTime": "12:30 pm",
+      "title": "Lunch"
+    }
+  ],
+  "2020-5-21": [
+    {
+      "startTime": "9:30 am",
+      "title": "Break"
+    },
+    {
+      "startTime": "11:25 am",
+      "title": "Assembly"
+    },
+    {
+      "startTime": "12:30 pm",
+      "title": "Lunch"
+    }
+  ],
+  "2020-5-22": [
+    {
+      "startTime": "9:30 am",
+      "title": "Break"
+    },
+    {
+      "startTime": "12:30 pm",
+      "title": "Lunch"
+    }
+  ],
+  "2020-5-26": [
+    {
+      "startTime": "9:30 am",
       "title": "Break"
     },
     {
