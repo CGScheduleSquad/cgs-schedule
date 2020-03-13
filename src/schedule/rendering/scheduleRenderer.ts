@@ -1,7 +1,7 @@
 import { ScheduleRange, ViewMode } from './scheduleRange';
 import ScheduleDate from '../time/scheduleDate';
 import scheduleDate from '../time/scheduleDate';
-import { lateStartAllTimes, lateStartPassingTimeAtEnd, normalAllTimes, normalPassingTimeAtEnd, normalTimes, ScheduleDayType } from '../structure/scheduleDay';
+import { covidAllTimes, covidPassingTimeAtEnd, lateStartAllTimes, lateStartPassingTimeAtEnd, normalAllTimes, normalPassingTimeAtEnd, normalTimes, ScheduleDayType } from '../structure/scheduleDay';
 import ScheduleTime from '../time/scheduleTime';
 import ScheduleParamUtils from '../utils/scheduleParamUtils';
 import { getClassAsArray } from '../../utils/queryUtils';
@@ -154,6 +154,13 @@ export default class ScheduleRenderer {
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => (el.style.width = '39%')); // TODO: Remove this
                     break;
+                case ScheduleDayType.COVID:
+                    // @ts-ignore
+                    oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
+                    CovidScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList, date);
+                    // @ts-ignore
+                    oneDay && getClassAsArray('times').forEach(el => (el.style.width = '39%')); // TODO: Remove this
+                    break;
                 case ScheduleDayType.INLINE:
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
@@ -238,6 +245,40 @@ class LateStartScheduleRenderer {
             let lateStartParseBlock = LateStartParseBlock.parseRawBlock(block, compressionList, date);
             // @ts-ignore
             tbody.appendChild(lateStartParseBlock.generateBlockElement());
+        });
+    }
+}
+
+class CovidScheduleRenderer {
+    public static getInstance() {
+        if (this.instance === undefined) this.instance = new CovidScheduleRenderer();
+        return this.instance;
+    }
+
+    private static instance: CovidScheduleRenderer;
+
+    private constructor() {
+    }
+
+    appendSchedule(rawDay: any, compressionList: Array<string>, date: ScheduleDate) {
+        let blocks: Array<Array<any>> = rawDay.blocks;
+        let trElement = document.getElementById(`time-0`);
+        if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
+
+        let tableData = document.createElement('td');
+        tableData.setAttribute('rowspan', String(normalTimes.length));
+        tableData.setAttribute('class', `period specialday`);
+        let specialTable = document.createElement('table');
+        specialTable.setAttribute('class', 'sched week special');
+        let tbody = document.createElement('tbody');
+        specialTable.appendChild(tbody);
+        tableData.appendChild(specialTable);
+        trElement.appendChild(tableData);
+
+        blocks.forEach((block: Array<any>) => {
+            let covidParseBlock = CovidParseBlock.parseRawBlock(block, compressionList, date);
+            // @ts-ignore
+            tbody.appendChild(covidParseBlock.generateBlockElement());
         });
     }
 }
@@ -382,6 +423,74 @@ abstract class ParsedBlock {
         return tableData;
     }
 }
+
+export class CovidParseBlock extends ParsedBlock {
+    public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate) {
+        let title = compressionList[block[0]];
+        let location = compressionList[block[1]];
+        let blockLabel = block[2];
+        let normalTimeIndex = block[3];
+        let rowSpan = block[4];
+        let mins = block[5];
+        let free = block[6];
+
+        return new CovidParseBlock(title, location, blockLabel, mins, free, normalTimeIndex, rowSpan, date);
+    }
+
+    public readonly covidTimeIndex: number;
+    readonly rowSpan: number;
+
+    constructor(
+        title: string,
+        location: string,
+        blockLabel: string,
+        mins: string,
+        free: boolean,
+        covidTimeIndex: number,
+        rowSpan: number,
+        date: ScheduleDate
+    ) {
+        super(title, location, blockLabel, mins, free, date);
+        this.covidTimeIndex = covidTimeIndex;
+        this.rowSpan = rowSpan;
+    }
+
+    generateBlockElement() {
+        let tableRowElement = document.createElement('tr');
+        tableRowElement.setAttribute('class', `mins${this.mins}`);
+        let iscovidSpacerBlock = this.title === '';
+        let blockElement = ParsedBlock.generateBlockElement(
+            1,
+            this.mins,
+            this.bgcolor,
+            this.title,
+            this.subtitle,
+            this.addLineBreak,
+            this.date
+        );
+        if (!iscovidSpacerBlock) {
+            let timeDataElement = document.createElement('td');
+            timeDataElement.setAttribute('class', `times mins${this.mins}`);
+            let endTime = covidAllTimes[this.covidTimeIndex + this.rowSpan];
+            if (covidPassingTimeAtEnd[this.covidTimeIndex + this.rowSpan]) {
+                let endDate = endTime.toDate();
+                endDate.setMinutes(endDate.getMinutes() - 5);
+                endTime = ScheduleTime.fromDate(endDate);
+            }
+            timeDataElement.appendChild(
+                document.createTextNode(
+                    `${covidAllTimes[this.covidTimeIndex].to12HourString()}-${endTime.to12HourString()}`
+                )
+            );
+            tableRowElement.appendChild(timeDataElement);
+        } else {
+            blockElement.setAttribute('colspan', '2');
+        }
+        tableRowElement.appendChild(blockElement);
+        return tableRowElement;
+    }
+}
+
 
 export class RegularParseBlock extends ParsedBlock {
     public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate): RegularParseBlock {
