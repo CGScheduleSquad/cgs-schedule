@@ -42,12 +42,13 @@ function modifyUrlProperty(key: string, value: string | null | undefined, url: s
 }
 
 export default class ScheduleRenderer {
-    static render(schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
+    static render(schedule: { dayMap: { [p: string]: any }; cycleMap: { [p: string]: any }; compressionList: any }) {
         let seedDate = ScheduleParamUtils.getSeedDate();
         let viewMode = ScheduleParamUtils.getViewMode();
         let range = new ScheduleRange(seedDate, viewMode);
 
         this.renderSchedule(range, schedule);
+        console.log(schedule.cycleMap);
 
         let loading = document.getElementById('loading');
         if (loading !== null) loading.style.display = 'none';
@@ -82,7 +83,7 @@ export default class ScheduleRenderer {
             .addEventListener('click', () => window.location.href = modifyUrlProperty('date', null, modifyUrlProperty('range', 'week', window.location.href)));
     }
 
-    private static renderSchedule(range: ScheduleRange, schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
+    private static renderSchedule(range: ScheduleRange, schedule: { dayMap: { [p: string]: any }; cycleMap: { [p: string]: any }; compressionList: any }) {
         let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         let dates = range.getDatesForWeek();
@@ -92,7 +93,7 @@ export default class ScheduleRenderer {
             let endTime = normalAllTimes[index + 1];
             if (normalPassingTimeAtEnd[index]) {
                 let endDate = endTime.toDate();
-                endDate.setMinutes(endDate.getMinutes()-5);
+                endDate.setMinutes(endDate.getMinutes() - 5);
                 endTime = ScheduleTime.fromDate(endDate);
             }
             let durationMins = Math.min(
@@ -157,7 +158,7 @@ export default class ScheduleRenderer {
                 case ScheduleDayType.COVID:
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => el.parentNode.removeChild(el));
-                    CovidScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList, date);
+                    CovidScheduleRenderer.getInstance().appendSchedule(rawDay, schedule.compressionList, schedule.cycleMap, date);
                     // @ts-ignore
                     oneDay && getClassAsArray('times').forEach(el => (el.style.width = '39%')); // TODO: Remove this
                     break;
@@ -260,7 +261,7 @@ class CovidScheduleRenderer {
     private constructor() {
     }
 
-    appendSchedule(rawDay: any, compressionList: Array<string>, date: ScheduleDate) {
+    appendSchedule(rawDay: any, compressionList: Array<string>, cycleMap: any, date: ScheduleDate) {
         let blocks: Array<Array<any>> = rawDay.blocks;
         let trElement = document.getElementById(`time-0`);
         if (trElement === null) throw new Error('Error rendering schedule: Time elements not found!');
@@ -275,10 +276,18 @@ class CovidScheduleRenderer {
         tableData.appendChild(specialTable);
         trElement.appendChild(tableData);
 
+        let homeworkDueList: RegularParseBlock[] = [];
+        let cycleMapElement = cycleMap[rawDay.dayMeta];
+        if (cycleMapElement !== undefined) {
+            homeworkDueList = cycleMapElement.blocks
+                .map((block: Array<any>) => RegularParseBlock.parseRawBlock(block, compressionList, date))
+                .filter((block: RegularParseBlock) => !block.free && /^blk-\d$/.test(block.bgcolor));
+        }
+
         blocks.forEach((block: Array<any>) => {
             let covidParseBlock = CovidParseBlock.parseRawBlock(block, compressionList, date);
             // @ts-ignore
-            tbody.appendChild(covidParseBlock.generateBlockElement());
+            tbody.appendChild(covidParseBlock.generateBlockElement(covidParseBlock.covidTimeIndex == 0 ? homeworkDueList : null, rawDay.dayMeta));
         });
     }
 }
@@ -324,7 +333,7 @@ abstract class ParsedBlock {
     private shouldBeColored = true;
     addLineBreak = true;
     subtitle = '';
-    protected bgcolor = 'white';
+    bgcolor = 'white';
 
     // read values
     readonly title: string;
@@ -359,6 +368,7 @@ abstract class ParsedBlock {
         } else {
             this.subtitle = location + ' - ' + blockLabel;
         }
+        if (location === '' && blockLabel === '') this.addLineBreak = false;
     }
 
     private expandBlockLabel(blockLabel: string): string {
@@ -411,15 +421,19 @@ abstract class ParsedBlock {
         if (colorString.length === 2) tableData.setAttribute('blocklabel', colorString[1]);
         tableData.setAttribute('classtitle', title);
         tableData.setAttribute('date', date.toString());
-        let titleSpan = document.createElement('span');
-        titleSpan.setAttribute('class', 'coursename');
-        titleSpan.appendChild(document.createTextNode(title));
-        let subtitleSpan = document.createElement('subtitle');
-        subtitleSpan.setAttribute('class', 'subtitle');
-        subtitleSpan.appendChild(document.createTextNode(subtitle));
-        tableData.appendChild(titleSpan);
+        if (title !== '') {
+            let titleSpan = document.createElement('span');
+            titleSpan.setAttribute('class', 'coursename');
+            titleSpan.appendChild(document.createTextNode(title));
+            tableData.appendChild(titleSpan);
+        }
         if (newLine) tableData.appendChild(document.createElement('br'));
-        tableData.appendChild(subtitleSpan);
+        if (subtitle !== '') {
+            let subtitleSpan = document.createElement('subtitle');
+            subtitleSpan.setAttribute('class', 'subtitle');
+            subtitleSpan.appendChild(document.createTextNode(subtitle));
+            tableData.appendChild(subtitleSpan);
+        }
         return tableData;
     }
 }
@@ -455,7 +469,7 @@ export class CovidParseBlock extends ParsedBlock {
         this.rowSpan = rowSpan;
     }
 
-    generateBlockElement() {
+    generateBlockElement(homeworkList: Array<RegularParseBlock> | null, dayMeta: string) {
         let tableRowElement = document.createElement('tr');
         tableRowElement.setAttribute('class', `mins${this.mins}`);
         let iscovidSpacerBlock = this.title === '';
@@ -485,6 +499,27 @@ export class CovidParseBlock extends ParsedBlock {
             tableRowElement.appendChild(timeDataElement);
         } else {
             blockElement.setAttribute('colspan', '2');
+            if (homeworkList !== null && homeworkList.length>0) {
+                let homeworkListElement = document.createElement('div');
+                let listHeader = document.createElement('b');
+                listHeader.textContent = dayMeta+' Day Classes:';
+                homeworkListElement.appendChild(listHeader);
+                homeworkList.forEach(block => {
+                    let listItem = document.createElement('p');
+                    listItem.textContent = block.title;
+                    homeworkListElement.appendChild(listItem);
+                    listItem.setAttribute("class", block.bgcolor);
+                    let dummyTitle = document.createElement('div');
+                    dummyTitle.textContent = block.title;
+                    dummyTitle.setAttribute('style', 'display:none');
+                    dummyTitle.setAttribute('class', 'coursename');
+                    listItem.setAttribute('blocklabel', block.bgcolor.split('-')[1]);
+                    listItem.append(dummyTitle)
+                });
+                homeworkListElement.setAttribute("class", "homework-list");
+                blockElement.setAttribute("style", "vertical-align:top");
+                blockElement.appendChild(homeworkListElement);
+            }
         }
         tableRowElement.appendChild(blockElement);
         return tableRowElement;
@@ -586,7 +621,7 @@ export class LateStartParseBlock extends ParsedBlock {
             let endTime = lateStartAllTimes[this.normalTimeIndex + this.rowSpan];
             if (lateStartPassingTimeAtEnd[this.normalTimeIndex + this.rowSpan]) {
                 let endDate = endTime.toDate();
-                endDate.setMinutes(endDate.getMinutes()-5);
+                endDate.setMinutes(endDate.getMinutes() - 5);
                 endTime = ScheduleTime.fromDate(endDate);
             }
             timeDataElement.appendChild(
