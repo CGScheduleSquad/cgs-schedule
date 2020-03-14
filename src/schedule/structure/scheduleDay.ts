@@ -293,7 +293,7 @@ class CovidDay extends ScheduleDay {
 }
 
 
-class RegularDay extends ScheduleDay {
+export class RegularDay extends ScheduleDay {
     blocks: RegularDayBlock[];
 
     constructor(date: ScheduleDate, dayMeta: ScheduleDayMeta, blocks: RegularDayBlock[]) {

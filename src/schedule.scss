@@ -69,6 +69,7 @@ td.period {
     border-style: solid;
     border-width: 2px;
     text-align: center;
+    overflow: hidden;
 }
 
 td.daylabel {
@@ -473,4 +474,16 @@ body {
     padding: 2px 5px;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
+}
+
+.homework-list {
+    & > p {
+        list-style-type: none;
+        margin: 0;
+        padding: 1px;
+        text-align: left;
+        font-size: 75%;
+    }
+    padding: 10px;
+    height: 0;
 }

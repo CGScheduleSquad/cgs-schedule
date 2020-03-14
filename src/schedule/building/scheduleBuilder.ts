@@ -1,5 +1,5 @@
 import { RawBlock } from '../structure/scheduleBlock';
-import { ScheduleDay } from '../structure/scheduleDay';
+import { RegularDay, ScheduleDay } from '../structure/scheduleDay';
 import { ScheduleAll } from '../structure/scheduleAll';
 import ScheduleParamUtils from '../utils/scheduleParamUtils';
 
@@ -7,11 +7,22 @@ export interface RawBlockSource {
     getBlocksPromise(): Promise<RawBlock[]>;
 }
 
+var cycleDayReference = new Map<string, string>([
+    ["2020-2-7", "A"],
+    ["2020-2-10", "B"],
+    ["2020-2-11", "C"],
+    ["2020-2-12", "D"],
+    ["2020-2-13", "E"],
+    ["2020-2-14", "F"],
+    ["2020-2-18", "G"]
+]);
+
 export class ScheduleBuilder {
     static generateScheduleFromBlockSources(id: string, ...sources: RawBlockSource[]): Promise<ScheduleAll> {
         return Promise.all(sources.map(source => source.getBlocksPromise())).then((nestedRwBlocks: RawBlock[][]) => {
             let rawBlocks: RawBlock[] = new Array<RawBlock>().concat(...nestedRwBlocks); // flatten 2d array
 
+            let cycleMap = new Map<string, RegularDay>();
             let blockMap = new Map<string, RawBlock[]>();
             rawBlocks.forEach(rawBlock => {
                 let key = rawBlock.date.toString();
@@ -25,17 +36,22 @@ export class ScheduleBuilder {
 
             let dayMap = new Map<string, ScheduleDay>();
             blockMap.forEach((rawBlocks: RawBlock[], key: string) => {
+                let value = ScheduleDay.createBlockDay(
+                    rawBlocks
+                        .filter(this.duplicateOrOutOfRangeBlockRemover)
+                        .sort((a: RawBlock, b: RawBlock) => a.startTime.compareTo(b.startTime))
+                );
+                let cycleLetter = cycleDayReference.get(key);
+                if (cycleLetter !== undefined && value instanceof RegularDay) {
+                    cycleMap.set(cycleLetter, value);
+                }
                 dayMap.set(
                     key,
-                    ScheduleDay.createBlockDay(
-                        rawBlocks
-                            .filter(this.duplicateOrOutOfRangeBlockRemover)
-                            .sort((a: RawBlock, b: RawBlock) => a.startTime.compareTo(b.startTime))
-                    )
+                    value
                 );
             });
 
-            return new ScheduleAll(id, dayMap, ScheduleParamUtils.getSchoolDivision());
+            return new ScheduleAll(id, dayMap, cycleMap, ScheduleParamUtils.getSchoolDivision());
         });
     }
 
