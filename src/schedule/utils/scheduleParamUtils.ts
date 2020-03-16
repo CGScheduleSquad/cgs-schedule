@@ -32,7 +32,7 @@ export default class ScheduleParamUtils {
         }
     }
 
-    private static isMobile(): boolean {
+    static isMobile(): boolean {
         var check = false;
         // @ts-ignore
         (function(a) {
