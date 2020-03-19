@@ -11,6 +11,10 @@ export default class ScheduleParamUtils {
         return calendarUUID;
     }
 
+    static getAltCalendarURL(): string | null {
+        return ScheduleParamUtils.getUrlParam('alturl');
+    }
+
     static getSeedDate(): ScheduleDate {
         const dateString = ScheduleParamUtils.getUrlParam('date');
         return dateString !== null && dateString !== "" ? ScheduleDate.fromString(dateString) : this.getCurrentDate();
