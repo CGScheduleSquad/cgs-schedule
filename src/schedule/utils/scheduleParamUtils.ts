@@ -3,16 +3,20 @@ import { ViewMode } from '../rendering/scheduleRange';
 import ScheduleTime from '../time/scheduleTime';
 
 export default class ScheduleParamUtils {
-    static getCalendarUUID(): string {
-        let calendarUUID = ScheduleParamUtils.getUrlParam('cal');
-        if (calendarUUID == null) {
-            throw new Error('No calendar link provided! Please double-check the instructions and try again.');
-        }
-        return calendarUUID;
+    static getCalendarUUID(): string | null {
+        return ScheduleParamUtils.getUrlParam('cal');
     }
 
     static getAltCalendarURL(): string | null {
         return ScheduleParamUtils.getUrlParam('alturl');
+    }
+
+    static getCalendarUrl() : string {
+        let url = ScheduleParamUtils.getAltCalendarURL() || `http://api.veracross.com/catlin/subscribe/${ScheduleParamUtils.getCalendarUUID()}.ics?uid`;
+        if (url == null) {
+            throw new Error('No calendar link provided! Please double-check the instructions and try again.');
+        }
+        return url;
     }
 
     static getSeedDate(): ScheduleDate {
