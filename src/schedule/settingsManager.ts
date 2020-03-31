@@ -458,8 +458,6 @@ function getAllClassIds() {
     return listOfClasses;
 }
 
-let maxSheetItemLength = 30;
-
 function applyCanvasCalendar(calendarFeedObject: any) {
     var converter = new Converter();
     let feedKeyToCalendar = (key: string) => GenericCacheManager.getCacheResults(key, 'https://cgs-schedule.herokuapp.com/' + calendarFeedObject[key][1], false).then(icsString => {
@@ -677,7 +675,7 @@ class ClassHomeworkEvent {
         return this._title;
     }
 
-    get shortTitle(): string {
+    shortTitle(maxSheetItemLength: any): string {
         return this._title.trim().substring(0, maxSheetItemLength)
             + (this._title.length > maxSheetItemLength ? '...' : '');
     }
@@ -688,10 +686,15 @@ class ClassHomeworkEvent {
 
     static apply(value: Array<ClassHomeworkEvent>) {
         if (value.length === 0) return;
-        let htmlElements = $(`td[blocklabel="${value[0].courseLabel}"][classtitle="${value[0].courseName}"][date="${value[0].date}"]`);
-        htmlElements.children('.subtitle').html((value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle).addClass('calendar-feed-subtitle');
-        htmlElements.addClass('has-link');
-        htmlElements.off('click.links');
-        htmlElements.on('click', () => openCalendarEventModal(value));
+        let regularBlocks = $(`td[blocklabel="${value[0].courseLabel}"][classtitle="${value[0].courseName}"][date="${value[0].date}"]`);
+        regularBlocks.children('.subtitle').html((value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle(30)).addClass('calendar-feed-subtitle');
+        regularBlocks.addClass('has-link');
+        regularBlocks.off('click.links');
+        regularBlocks.on('click', () => openCalendarEventModal(value));
+        let covidBlocks = $(`p[blocklabel="${value[0].courseLabel}"][classtitle="${value[0].courseName}"][date="${value[0].date}"]`);
+        covidBlocks.html('*<span>'+(value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle(30)+'</span>').addClass('calendar-feed-covid');
+        covidBlocks.addClass('has-link');
+        covidBlocks.off('click.links');
+        covidBlocks.on('click', () => openCalendarEventModal(value));
     }
 }
