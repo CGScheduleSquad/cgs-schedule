@@ -442,6 +442,7 @@ abstract class ParsedBlock {
 }
 
 export class CovidParseBlock extends ParsedBlock {
+    public static displayNormalClasses = false;
     public static parseRawBlock(block: any, compressionList: Array<string>, date: ScheduleDate) {
         let title = compressionList[block[0]];
         let location = compressionList[block[1]];
@@ -502,7 +503,7 @@ export class CovidParseBlock extends ParsedBlock {
             tableRowElement.appendChild(timeDataElement);
         } else {
             blockElement.setAttribute('colspan', '2');
-            if (homeworkList !== null && homeworkList.length>0) {
+            if (homeworkList !== null && homeworkList.length>0 && CovidParseBlock.displayNormalClasses) {
                 let homeworkListElement = document.createElement('div');
                 let listHeader = document.createElement('b');
                 listHeader.textContent = dayMeta+' Day Classes:';
