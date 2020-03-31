@@ -1237,216 +1237,6 @@
       "title": "Lunch"
     }
   ],
-  "2020-4-7": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-9": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-10": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-13": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:25 am",
-      "title": "Assembly"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-14": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-15": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-16": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-17": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:55 am",
-      "title": "Community"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-20": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-21": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-22": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:25 am",
-      "title": "Assembly"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-23": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-24": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-27": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-28": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:55 am",
-      "title": "Community"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-29": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-4-30": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-5-1": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "11:25 am",
-      "title": "Assembly"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
-  "2020-5-4": [
-    {
-      "startTime": "9:30 am",
-      "title": "Break"
-    },
-    {
-      "startTime": "12:30 pm",
-      "title": "Lunch"
-    }
-  ],
   "2020-5-5": [
     {
       "startTime": "9:30 am",
@@ -1473,10 +1263,6 @@
       "title": "Break"
     },
     {
-      "startTime": "11:55 am",
-      "title": "Community"
-    },
-    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1485,6 +1271,10 @@
     {
       "startTime": "9:30 am",
       "title": "Break"
+    },
+    {
+      "startTime": "11:55 am",
+      "title": "Community"
     },
     {
       "startTime": "12:30 pm",
@@ -1507,10 +1297,6 @@
       "title": "Break"
     },
     {
-      "startTime": "11:25 am",
-      "title": "Assembly"
-    },
-    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1519,6 +1305,10 @@
     {
       "startTime": "9:30 am",
       "title": "Break"
+    },
+    {
+      "startTime": "11:25 am",
+      "title": "Assembly"
     },
     {
       "startTime": "12:30 pm",
@@ -1551,10 +1341,6 @@
       "title": "Break"
     },
     {
-      "startTime": "11:55 am",
-      "title": "Community"
-    },
-    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1563,6 +1349,10 @@
     {
       "startTime": "9:30 am",
       "title": "Break"
+    },
+    {
+      "startTime": "11:55 am",
+      "title": "Community"
     },
     {
       "startTime": "12:30 pm",
@@ -1585,10 +1375,6 @@
       "title": "Break"
     },
     {
-      "startTime": "11:25 am",
-      "title": "Assembly"
-    },
-    {
       "startTime": "12:30 pm",
       "title": "Lunch"
     }
@@ -1597,6 +1383,10 @@
     {
       "startTime": "9:30 am",
       "title": "Break"
+    },
+    {
+      "startTime": "11:25 am",
+      "title": "Assembly"
     },
     {
       "startTime": "12:30 pm",
