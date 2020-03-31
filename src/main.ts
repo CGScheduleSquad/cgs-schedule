@@ -8,9 +8,11 @@ import ScheduleRenderer from './schedule/rendering/scheduleRenderer';
 import { CookieManager } from './cookieManager';
 
 // start loading schedule before dom content has loaded, but only draw when the dom has loaded and the schedule has also
-let scheduleAndDomLoaded = new Promise<string>((resolve) => resolve(ScheduleParamUtils.getCalendarUUID()))
-    .then((calendarUUID: string) => Promise.all([
-        ScheduleCacheManager.getSchedule(calendarUUID),
+let scheduleAndDomLoaded = new Promise<string>((resolve) => {
+    resolve(ScheduleParamUtils.getCalendarUrl());
+})
+    .then((calendarUrl: string) => Promise.all([
+        ScheduleCacheManager.getSchedule(calendarUrl),
         WindowUtils.waitForScheduleEvent('DOMContentLoaded')
     ]))
     .then((schedule: any) => schedule[0])

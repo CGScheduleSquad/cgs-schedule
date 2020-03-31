@@ -489,6 +489,18 @@ body {
     -webkit-box-decoration-break: clone;
 }
 
+.calendar-feed-covid {
+    padding: 2px 0 !important;
+    & > span{
+        background-color: var(--background-color);
+        border-radius: 3px;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+        padding: 0 2px;
+        margin: 0 2px;
+    }
+}
+
 .homework-list {
     & > p {
         list-style-type: none;
@@ -510,3 +522,4 @@ body {
         transform: scale(1.02);
     }
 }
+

@@ -50,7 +50,7 @@ export class GenericICalUtils {
     }
 
     static getLetter(event: any): string {
-        let letter = GenericICalUtils.getDescription(event)[1].Day.match(/US Day [A-Z]/);
+        let letter = GenericICalUtils.getDescription(event)[1].Day.match(/S Day [A-Z]/);
         letter = letter !== null ? letter[0].charAt(letter[0].length - 1) : '';
         return letter;
     }

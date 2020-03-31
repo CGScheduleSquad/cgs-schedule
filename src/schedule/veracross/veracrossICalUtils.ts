@@ -4,8 +4,8 @@ import ScheduleDate from '../time/scheduleDate';
 export class VeracrossICalUtils {
     private static scheduleCalendarTimeZone = 'America/Los_Angeles'; // the ical calendar parsing compensates for time zones, which is not what we want
 
-    static getVeracrossCalendarFromUUID = (calendarUUID: string): Promise<any> =>
-        VeracrossICalUtils.corsGetPromise(`http://api.veracross.com/catlin/subscribe/${calendarUUID}.ics?uid`).then(
+    static getVeracrossCalendarFromUUID = (calendarUrl: string): Promise<any> =>
+        VeracrossICalUtils.corsGetPromise(calendarUrl).then(
             icsFile => {
                 // @ts-ignore
                 return ICAL.parse(icsFile)[2];
@@ -71,7 +71,7 @@ export class VeracrossICalUtils {
     static getLetter(event: any): string {
         let descriptionElement = VeracrossICalUtils.getDescription(event)[1];
         if (descriptionElement === undefined) return '';
-        let letter = descriptionElement.Day.match(/US Day [A-Z]/);
+        let letter = descriptionElement.Day.match(/S Day [A-Z]/);
         letter = letter !== null ? letter[0].charAt(letter[0].length - 1) : '';
         return letter;
     }

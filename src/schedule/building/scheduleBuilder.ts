@@ -18,7 +18,7 @@ var cycleDayReference = new Map<string, string>([
 ]);
 
 export class ScheduleBuilder {
-    static generateScheduleFromBlockSources(id: string, ...sources: RawBlockSource[]): Promise<ScheduleAll> {
+    static generateScheduleFromBlockSources(calendarUrl: string, ...sources: RawBlockSource[]): Promise<ScheduleAll> {
         return Promise.all(sources.map(source => source.getBlocksPromise())).then((nestedRwBlocks: RawBlock[][]) => {
             let rawBlocks: RawBlock[] = new Array<RawBlock>().concat(...nestedRwBlocks); // flatten 2d array
 
@@ -51,7 +51,7 @@ export class ScheduleBuilder {
                 );
             });
 
-            return new ScheduleAll(id, dayMap, cycleMap, ScheduleParamUtils.getSchoolDivision());
+            return new ScheduleAll(calendarUrl, dayMap, cycleMap, ScheduleParamUtils.getSchoolDivision());
         });
     }
 

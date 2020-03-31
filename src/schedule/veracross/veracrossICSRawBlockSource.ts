@@ -4,14 +4,14 @@ import { ScheduleDayMeta } from '../structure/scheduleDay';
 import { VeracrossICalUtils } from './veracrossICalUtils';
 
 export class VeracrossICSRawBlockSource implements RawBlockSource {
-    private readonly _calendarUUID: string;
+    private readonly _calendarUrl: string;
 
-    constructor(calendarUUID: string) {
-        this._calendarUUID = calendarUUID;
+    constructor(calendarUrl: string) {
+        this._calendarUrl = calendarUrl;
     }
 
     getBlocksPromise(): Promise<RawBlock[]> {
-        return VeracrossICalUtils.getVeracrossCalendarFromUUID(this._calendarUUID).catch(() => {
+        return VeracrossICalUtils.getVeracrossCalendarFromUUID(this._calendarUrl).catch(() => {
             return Promise.reject('Wrong calendar link! Make sure to copy your calendar link from the \'All Classes\' calendar, not the \'My Calendar\' link. (see step 2 of the setup instructions)');
         }).then(calendarEvents => {
             let filteredBlocks = calendarEvents
