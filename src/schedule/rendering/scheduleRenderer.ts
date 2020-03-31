@@ -514,6 +514,8 @@ export class CovidParseBlock extends ParsedBlock {
                     dummyTitle.setAttribute('style', 'display:none');
                     dummyTitle.setAttribute('class', 'coursename');
                     listItem.setAttribute('blocklabel', block.bgcolor.split('-')[1]);
+                    listItem.setAttribute('classtitle', block.title);
+                    listItem.setAttribute('date', block.date.toString());
                     listItem.append(dummyTitle)
                 });
                 homeworkListElement.setAttribute("class", "homework-list");
