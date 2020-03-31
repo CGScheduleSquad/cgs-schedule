@@ -281,7 +281,10 @@ class CovidScheduleRenderer {
         if (cycleMapElement !== undefined) {
             homeworkDueList = cycleMapElement.blocks
                 .map((block: Array<any>) => RegularParseBlock.parseRawBlock(block, compressionList, date))
-                .filter((block: RegularParseBlock) => !block.free && /^blk-\d$/.test(block.bgcolor));
+                .filter((block: RegularParseBlock) => !block.free && /^blk-\d$/.test(block.bgcolor))
+                .filter((block: RegularParseBlock) => !blocks.some((rawBlock: Array<any>) => {
+                    return compressionList[rawBlock[0]] === block.title && rawBlock[2] === block.blockLabel;
+                }));
         }
 
         blocks.forEach((block: Array<any>) => {
