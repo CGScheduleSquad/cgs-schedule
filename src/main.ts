@@ -94,7 +94,7 @@ scheduleAndGlobalSettingsLoaded.then((globalSettingsAndSchedule => {
                 ad.setAttribute('style', ad.getAttribute('style') + ';display:block');
                 let listener = () => {
                     CookieManager.dismissAprilFoolsAd();
-                    return window.location.href = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+                    return window.location.href = 'https://www.youtube.com/watch?v=cvh0nX08nRw';
                 };
                 ad.addEventListener('click', listener);
                 let myTimeout: any;
