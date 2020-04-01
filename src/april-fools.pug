@@ -1,0 +1,70 @@
+.modal-wrapper.bulma
+    #aprilFoolsModal.modal
+        .modal-background
+        .modal-card
+            header.modal-card-head
+                h5.modal-card-title(style="text-align:center;font-weight:bold") CGS-Schedule Policy Change
+            //section.modal-card-body
+
+            footer.modal-card-foot(style="display:flex; flex-direction:column")
+                p Due to increasing server charges, we can no longer offer ad-free schedules at no cost.
+                p Please select one of the plans below to continue:
+                br
+                .pricing-table
+                    .pricing-plan
+                        .plan-header Free with Ads
+                        .plan-price
+                            span.plan-price-amount
+                                span.plan-price-currency $
+                                | 0
+                            | /month
+                        .plan-items
+                            .plan-item 2 Color Themes
+                            .plan-item -
+                            .plan-item -
+                            .plan-item -
+                        .plan-footer
+                            button.button.is-fullwidth#af-free Continue
+                    .pricing-plan.is-warning
+                        .plan-header Basic
+                        .plan-price
+                            span.plan-price-amount
+                                span.plan-price-currency $
+                                | 2.99
+                            | /month
+                        .plan-items
+                            .plan-item 10 Color Themes
+                            .plan-item 5 Homework Links
+                            .plan-item -
+                            .plan-item Ad-Free
+                        .plan-footer
+                            button.button.is-fullwidth#af-basic Choose
+                    .pricing-plan.is-active
+                        .plan-header Standard
+                        .plan-price
+                            span.plan-price-amount
+                                span.plan-price-currency $
+                                | 5.99
+                            | /month
+                        .plan-items
+                            .plan-item 30 Color Themes
+                            .plan-item 20 Homework Links
+                            .plan-item 5 Class Notifications
+                            .plan-item Ad-Free
+                        .plan-footer
+                            button.button.is-fullwidth#af-standard Choose
+                    .pricing-plan.is-danger
+                        .plan-header Enterprise
+                        .plan-price
+                            span.plan-price-amount
+                                span.plan-price-currency $
+                                | 12.99
+                            | /month
+                        .plan-items
+                            .plan-item Unlimited Color Themes
+                            .plan-item 100 Homework Links
+                            .plan-item 50 Class Notifications
+                            .plan-item Ad-Free
+                        .plan-footer
+                            button.button.is-fullwidth#af-enterprise Choose
+

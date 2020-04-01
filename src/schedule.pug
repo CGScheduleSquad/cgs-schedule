@@ -25,6 +25,7 @@ html
         //include new-link
         include settings
         include calendar-event
+        include april-fools
         #schedule
             table.controls
                 tbody
@@ -47,8 +48,24 @@ html
                     | Downloading calendar...
                     br
                     | (this only happens once and may take up to 10 seconds)
-            #schedarea(ontouchstart = 'touchStart(event, `schedarea`);', ontouchend = 'touchEnd(event);', ontouchmove = 'touchMove(event);', ontouchcancel = 'touchCancel(event);')
+            #schedarea(ontouchstart = 'touchStart(event, `schedarea`);', ontouchend = 'touchEnd(event);', ontouchmove = 'touchMove(event);', ontouchcancel = 'touchCancel(event);', style="display: flex;flex-direction: row")
+                img.april-fools(src='https://i.imgur.com/SUjATWv.png' style='\
+                height: fit-content;\
+                width: fit-content;\
+                margin-right: 10px;\
+                margin-top: 40px;\
+                cursor:pointer;\
+                display:none;\
+                ')
                 table.sched.main
                     tbody#main-sched-body
                         tr
                             td.mainlabel
+                img.april-fools(src='https://i.imgur.com/Z2S8sRK.png' style='\
+                height: fit-content;\
+                width: fit-content;\
+                margin-left: 10px;\
+                margin-top: 40px;\
+                cursor:pointer;\
+                display:none;\
+                ')

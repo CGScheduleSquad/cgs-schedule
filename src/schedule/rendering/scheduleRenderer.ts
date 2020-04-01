@@ -53,14 +53,14 @@ export default class ScheduleRenderer {
         let loading = document.getElementById('loading');
         if (loading !== null) loading.style.display = 'none';
         let schedArea = document.getElementById('schedarea');
-        if (schedArea !== null) schedArea.style.display = 'block';
+        if (schedArea !== null) schedArea.style.display = 'flex';
 
         ScheduleRenderer.updateLinks(range);
     }
 
     static updateLinks(range: ScheduleRange): void {
         // @ts-ignore
-        let schedarea = document.getElementById('schedarea').firstElementChild;
+        let schedarea = document.getElementById('schedarea').getElementsByClassName('sched')[0];
         // @ts-ignore
         schedarea.setAttribute(
             'class',
@@ -512,7 +512,7 @@ export class CovidParseBlock extends ParsedBlock {
                     let listItem = document.createElement('p');
                     listItem.textContent = block.title;
                     homeworkListElement.appendChild(listItem);
-                    listItem.setAttribute("class", block.bgcolor);
+                    listItem.setAttribute("class", block.bgcolor+" classblock");
                     let dummyTitle = document.createElement('div');
                     dummyTitle.textContent = block.title;
                     dummyTitle.setAttribute('style', 'display:none');
