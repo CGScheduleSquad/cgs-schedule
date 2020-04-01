@@ -2,7 +2,9 @@ import { CookieStorage } from 'cookie-storage';
 
 export class CookieManager {
 
-    private static storage: CookieStorage = new CookieStorage();
+    private static storage: CookieStorage = new CookieStorage({
+        expires: new Date(99999999999999),
+    });
 
     private static trueValue: string = 'true';
     private static settingsAdDismissedKey: string = 'settings-ad-dismissed';
