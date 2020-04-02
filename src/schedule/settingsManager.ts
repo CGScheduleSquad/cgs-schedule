@@ -7,8 +7,8 @@ import { VeracrossICalUtils } from './veracross/veracrossICalUtils';
 import GenericCacheManager from '../globalSettings/genericCacheManager';
 import ScheduleDate from './time/scheduleDate';
 import { Converter } from 'showdown';
-import { lateStartAllTimes, normalAllTimes, ScheduleDayType } from './structure/scheduleDay';
-import { freeNames, InlineParseBlock, LateStartParseBlock, RegularParseBlock } from './rendering/scheduleRenderer';
+import { covidAllTimes, lateStartAllTimes, normalAllTimes, ScheduleDayType } from './structure/scheduleDay';
+import { CovidParseBlock, freeNames, InlineParseBlock, LateStartParseBlock, RegularParseBlock } from './rendering/scheduleRenderer';
 
 let themeCssVariables = [
     '--block-1',
@@ -78,6 +78,13 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                     blocks.forEach((block: Array<any>) => {
                         let parsedBlock: RegularParseBlock = RegularParseBlock.parseRawBlock(block, compressionList, date);
                         let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.location, parsedBlock.blockLabel, '', parsedBlock.free, normalAllTimes[parsedBlock.normalTimeIndex], normalAllTimes[parsedBlock.normalTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
+                        rawDay.notificationBlocks.push(inlineParseBlock);
+                    });
+                    break;
+                case ScheduleDayType.COVID:
+                    blocks.forEach((block: Array<any>) => {
+                        let parsedBlock: CovidParseBlock = CovidParseBlock.parseRawBlock(block, compressionList, date);
+                        let inlineParseBlock = new InlineParseBlock(parsedBlock.title, parsedBlock.location, parsedBlock.blockLabel, '', parsedBlock.free, covidAllTimes[parsedBlock.covidTimeIndex], covidAllTimes[parsedBlock.covidTimeIndex + parsedBlock.rowSpan], parsedBlock.date);
                         rawDay.notificationBlocks.push(inlineParseBlock);
                     });
                     break;
