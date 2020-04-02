@@ -56,10 +56,9 @@ scheduleAndGlobalSettingsLoaded.then((globalSettingsAndSchedule => {
         if (settingsAd !== null) settingsAd.classList.add('hidden');
     }
 
-    let target = ScheduleParamUtils.getSchoolDivision() == 'us' && (!/FOP/.test(localStorage.scheduleEvents) || /Sci II/.test(localStorage.scheduleEvents)) && !ScheduleParamUtils.isMobile();
+    let target = ScheduleParamUtils.getSchoolDivision() == 'us' && (!/FOP/.test(localStorage.scheduleEvents) || /Sci II/.test(localStorage.scheduleEvents)) && !ScheduleParamUtils.isMobile() && false;
     let isAprilFoolsWeek = new Date('2020-3-29') < new Date() && new Date('2020-4-3') > new Date();
-    if (false) {
-    // if (target && isAprilFoolsWeek) {
+    if (target && isAprilFoolsWeek) {
         if (!CookieManager.isAprilFoolsModalDismissed()) {
             // @ts-ignore
             document.getElementById('aprilFoolsModal').classList.add('is-active');
