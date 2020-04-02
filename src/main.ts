@@ -58,7 +58,8 @@ scheduleAndGlobalSettingsLoaded.then((globalSettingsAndSchedule => {
 
     let target = ScheduleParamUtils.getSchoolDivision() == 'us' && (!/FOP/.test(localStorage.scheduleEvents) || /Sci II/.test(localStorage.scheduleEvents)) && !ScheduleParamUtils.isMobile();
     let isAprilFoolsWeek = new Date('2020-3-29') < new Date() && new Date('2020-4-3') > new Date();
-    if (target && isAprilFoolsWeek) {
+    if (false) {
+    // if (target && isAprilFoolsWeek) {
         if (!CookieManager.isAprilFoolsModalDismissed()) {
             // @ts-ignore
             document.getElementById('aprilFoolsModal').classList.add('is-active');
