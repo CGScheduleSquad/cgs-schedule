@@ -50,7 +50,7 @@ function applyHighlight() {
     }
 }
 
-function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compressionList: any }) {
+function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compressionList: any }, linkObject: any) {
     Notification.requestPermission().then(() => {
         if (Notification.permission === 'granted') {
             let date = ScheduleDate.now();
@@ -97,8 +97,25 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                 array.push(new NotificationData(
                     new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 5, 0, 0),
                     block.title + (block.addLineBreak ? '' : block.subtitle) + ' starts in 5 minutes!',
-                    block.addLineBreak ? block.subtitle : ''
+                    block.addLineBreak ? block.subtitle : '',
+                    [],
                 ));
+                if (rawDay.type === ScheduleDayType.COVID) {
+                    let linkObjectElement = linkObject[block.title + block.blockLabel];
+
+                    if (linkObjectElement !== undefined) {
+                        let zoomLinks = linkObjectElement.filter((link: string[]) => /^https:\/\/catlin\.zoom\.us/.test(link[0]));
+                        let title = 'Click here to join Zoom meeting for '+block.title;
+                        if (zoomLinks.length !== 0) {
+                            array.push(new NotificationData(
+                                new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 1, 0, 0),
+                                title,
+                                block.title+' is starting in one minute',
+                                zoomLinks
+                            ));
+                        }
+                    }
+                }
             });
 
             input.notifications.forEach(notificationData => {
@@ -110,7 +127,17 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                         const options = {
                             body: notificationData.body
                         };
-                        new Notification(title, options);
+
+                        let listener = () => {};
+                        if (notificationData.links.length > 0 && notificationData.links[0].length > 0) {
+                            listener = () => {
+                                window.open(notificationData.links[0][0], '_blank');
+                            };
+                        }
+                        let notification = new Notification(title, options);
+                        notification.addEventListener('click', listener);
+
+
                     }, millisRemaining);
                 }
             });
@@ -132,11 +159,13 @@ class NotificationData {
     public readonly time: Date;
     public readonly message: string;
     public readonly body: string;
+    public readonly links: string[][];
 
-    constructor(time: Date, message: string, body: string) {
+    constructor(time: Date, message: string, body: string, links: string[][]) {
         this.time = time;
         this.body = body;
         this.message = message;
+        this.links = links;
     }
 }
 
@@ -174,7 +203,7 @@ export function loadAllSettings(globalSettingsObject: any, schedule: { dayMap: {
         setupCalendarEventModal();
     }
     if (ScheduleParamUtils.getNotificationsEnabled()) {
-        setUpNotificationWorker(schedule);
+        setUpNotificationWorker(schedule, linkObject);
     }
 }
 
@@ -699,7 +728,7 @@ class ClassHomeworkEvent {
         regularBlocks.off('click.links');
         regularBlocks.on('click', () => openCalendarEventModal(value));
         let covidBlocks = $(`p[blocklabel="${value[0].courseLabel}"][classtitle="${value[0].courseName}"][date="${value[0].date}"]`);
-        covidBlocks.html('*<span>'+(value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle(30)+'</span>').addClass('calendar-feed-covid');
+        covidBlocks.html('*<span>' + (value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle(30) + '</span>').addClass('calendar-feed-covid');
         covidBlocks.addClass('has-link');
         covidBlocks.off('click.links');
         covidBlocks.on('click', () => openCalendarEventModal(value));
