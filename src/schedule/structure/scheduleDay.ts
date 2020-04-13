@@ -20,8 +20,8 @@ export let covidTimes: ScheduleTime[] = [
     new ScheduleTime(8, 0),
     new ScheduleTime(10, 0),
     new ScheduleTime(11, 0),
-    new ScheduleTime(11, 30),
-    new ScheduleTime(12, 30),
+    new ScheduleTime(11, 15),
+    new ScheduleTime(12, 15),
     new ScheduleTime(13, 0),
     new ScheduleTime(14, 0)
 ];
