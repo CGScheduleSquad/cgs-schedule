@@ -101,8 +101,8 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                     [],
                 ));
                 if (rawDay.type === ScheduleDayType.COVID) {
-                    let linkObjectElement = linkObject[block.title + block.blockLabel];
-
+                    let linkObjectKey = block.title + block.bgcolor.split('-')[1];
+                    let linkObjectElement = linkObject[linkObjectKey];
                     if (linkObjectElement !== undefined) {
                         let zoomLinks = linkObjectElement.filter((link: string[]) => /^https:\/\/catlin\.zoom\.us/.test(link[0]));
                         let title = 'Click here to join Zoom meeting for '+block.title;
