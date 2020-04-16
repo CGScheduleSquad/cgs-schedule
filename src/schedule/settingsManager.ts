@@ -99,6 +99,7 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                     block.title + (block.addLineBreak ? '' : block.subtitle) + ' starts in 5 minutes!',
                     block.addLineBreak ? block.subtitle : '',
                     [],
+                    block.title
                 ));
                 if (rawDay.type === ScheduleDayType.COVID) {
                     let linkObjectKey = block.title + block.bgcolor.split('-')[1];
@@ -111,13 +112,24 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                                 new Date(now.getFullYear(), now.getMonth(), now.getDate(), block.startTime.hours, block.startTime.minutes - 1, 0, 0),
                                 title,
                                 block.title+' is starting in one minute',
-                                zoomLinks
+                                zoomLinks,
+                                block.title
                             ));
                         }
                     }
                 }
             });
 
+            // @ts-ignore
+            document.getElementById('zoomModalExit').onclick = () => {
+                // @ts-ignore
+                document.getElementById('zoomModal').classList.remove('is-active');
+            };
+            // @ts-ignore
+            document.getElementById('zoomModalBackground').onclick = () => {
+                // @ts-ignore
+                document.getElementById('zoomModal').classList.remove('is-active');
+            };
             input.notifications.forEach(notificationData => {
                 var now = new Date();
                 var millisRemaining = notificationData.time.getTime() - now.getTime();
@@ -133,12 +145,43 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                             listener = () => {
                                 window.open(notificationData.links[0][0], '_blank');
                             };
+                            // @ts-ignore
+                            document.getElementById('zoomModalTitle').innerText = notificationData.classname + " is starting in one minute!";
+                            // @ts-ignore
+                            document.getElementById('zoomModalButton').onclick = () => {
+                                // @ts-ignore
+                                document.getElementById('zoomModal').classList.remove('is-active');
+                                window.open(notificationData.links[0][0], '_blank');
+                            };
+                            setTimeout(() => {
+                                // @ts-ignore
+                                document.getElementById('zoomModal').classList.remove('is-active');
+                            }, 1000*60*5);
+                            // @ts-ignore
+                            document.getElementById('zoomModal').classList.add('is-active');
                         }
                         let notification = new Notification(title, options);
                         notification.addEventListener('click', listener);
 
 
                     }, millisRemaining);
+                } else if (millisRemaining > -1000*60*3) {
+                    if (notificationData.links.length > 0 && notificationData.links[0].length > 0) {
+                        // @ts-ignore
+                        document.getElementById('zoomModalTitle').innerText = notificationData.classname + " is starting in one minute!";
+                        // @ts-ignore
+                        document.getElementById('zoomModalButton').onclick = () => {
+                            // @ts-ignore
+                            document.getElementById('zoomModal').classList.remove('is-active');
+                            window.open(notificationData.links[0][0], '_blank');
+                        };
+                        setTimeout(() => {
+                            // @ts-ignore
+                            document.getElementById('zoomModal').classList.remove('is-active');
+                        }, 1000*60*5);
+                        // @ts-ignore
+                        document.getElementById('zoomModal').classList.add('is-active');
+                    }
                 }
             });
         }
@@ -159,12 +202,14 @@ class NotificationData {
     public readonly time: Date;
     public readonly message: string;
     public readonly body: string;
+    public readonly classname: string;
     public readonly links: string[][];
 
-    constructor(time: Date, message: string, body: string, links: string[][]) {
+    constructor(time: Date, message: string, body: string, links: string[][], classname: string) {
         this.time = time;
         this.body = body;
         this.message = message;
+        this.classname = classname;
         this.links = links;
     }
 }
