@@ -99,7 +99,8 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                     block.title + (block.addLineBreak ? '' : block.subtitle) + ' starts in 5 minutes!',
                     block.addLineBreak ? block.subtitle : '',
                     [],
-                    block.title
+                    block.title,
+                    false
                 ));
                 if (rawDay.type === ScheduleDayType.COVID) {
                     let linkObjectKey = block.title + block.bgcolor.split('-')[1];
@@ -113,7 +114,8 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                                 title,
                                 block.title+' is starting in one minute',
                                 zoomLinks,
-                                block.title
+                                block.title,
+                                true
                             ));
                         }
                     }
@@ -137,7 +139,8 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                     setTimeout(function() {
                         const title = notificationData.message;
                         const options = {
-                            body: notificationData.body
+                            body: notificationData.body,
+                            requireInteraction: notificationData.requireInteraction
                         };
 
                         let listener = () => {};
@@ -203,13 +206,15 @@ class NotificationData {
     public readonly message: string;
     public readonly body: string;
     public readonly classname: string;
+    public readonly requireInteraction: boolean;
     public readonly links: string[][];
 
-    constructor(time: Date, message: string, body: string, links: string[][], classname: string) {
+    constructor(time: Date, message: string, body: string, links: string[][], classname: string, requireInteraction: boolean) {
         this.time = time;
         this.body = body;
         this.message = message;
         this.classname = classname;
+        this.requireInteraction = requireInteraction;
         this.links = links;
     }
 }
