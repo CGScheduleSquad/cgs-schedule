@@ -75,8 +75,8 @@ export default class ScheduleParamUtils {
     }
 
     static getNotificationsEnabled() {
-        let string = ScheduleParamUtils.getUrlParam('notifications');
-        return string == null ? false : string !== 'false';
+        let string = ScheduleParamUtils.getUrlParam('notify');
+        return string == null ? true : string !== 'false';
     }
 
     static getMilitaryTimeEnabled() {

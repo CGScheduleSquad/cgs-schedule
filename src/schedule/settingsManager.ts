@@ -330,11 +330,16 @@ function loadSettingsModal(themesObject: {}) {
             // @ts-ignore
             newUrl.searchParams.set('calendars', calendarCheckbox.checked);
             // @ts-ignore
-            newUrl.searchParams.set('notifications', notificationsCheckbox.checked);
+            newUrl.searchParams.set('notify', notificationsCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('military', militaryCheckbox.checked);
             // @ts-ignore
             newUrl.searchParams.set('theme', sel.value);
+
+            // Deprecated
+            // @ts-ignore
+            newUrl.searchParams.delete('notifications');
+
             newUrl.hash = '#updated';
             window.location.href = newUrl.href;
         }
