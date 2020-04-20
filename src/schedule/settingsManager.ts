@@ -115,7 +115,7 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
                                 block.title+' is starting in one minute',
                                 zoomLinks,
                                 block.title,
-                                true
+                                false
                             ));
                         }
                     }
