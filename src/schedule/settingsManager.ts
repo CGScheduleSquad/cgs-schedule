@@ -778,7 +778,7 @@ class ClassHomeworkEvent {
     static apply(value: Array<ClassHomeworkEvent>) {
         if (value.length === 0) return;
         let regularBlocks = $(`td[blocklabel="${value[0].courseLabel}"][classtitle="${value[0].courseName}"][date="${value[0].date}"]`);
-        regularBlocks.children('.subtitle').html((value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle(30)).addClass('calendar-feed-subtitle');
+        regularBlocks.children('.subtitle').html((value.length !== 1 ? `<b>(${value.length})</b> ` : '') + value[0].shortTitle(22)).addClass('calendar-feed-subtitle');
         regularBlocks.addClass('has-link');
         regularBlocks.off('click.links');
         regularBlocks.on('click', () => openCalendarEventModal(value));
