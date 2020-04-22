@@ -168,7 +168,7 @@ function setUpNotificationWorker(schedule: { dayMap: { [p: string]: any }; compr
 
 
                     }, millisRemaining);
-                } else if (millisRemaining > -1000*60*3) {
+                } else if (millisRemaining > -1000*60*6) {
                     if (notificationData.links.length > 0 && notificationData.links[0].length > 0) {
                         // @ts-ignore
                         document.getElementById('zoomModalTitle').innerText = notificationData.classname + " is starting in one minute!";
