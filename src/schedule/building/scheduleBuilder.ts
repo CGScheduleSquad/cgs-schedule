@@ -57,7 +57,7 @@ export class ScheduleBuilder {
 
     private static duplicateOrOutOfRangeBlockRemover(rawBlock: RawBlock, index: number, otherRawBlocks: RawBlock[]): boolean {
         let startHours = rawBlock.startTime.hours;
-        let outOfSchoolBounds = isNaN(startHours) || startHours < 8 || startHours >= 12 + 3; // TODO: 3:15 not 3 TIME COMPARE
+        let outOfSchoolBounds = isNaN(startHours) || startHours < 8 || startHours >= 12 + 4; // TODO: 3:15 not 3 TIME COMPARE
 
         // TODO: Add block keeping preferences
         let duplicateBlock = otherRawBlocks.findIndex((value: RawBlock) => {

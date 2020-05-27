@@ -19,11 +19,13 @@ export let normalTimes: ScheduleTime[];
 export let covidTimes: ScheduleTime[] = [
     new ScheduleTime(8, 0),
     new ScheduleTime(10, 0),
+    new ScheduleTime(10, 45),
     new ScheduleTime(11, 0),
-    new ScheduleTime(11, 15),
-    new ScheduleTime(12, 15),
-    new ScheduleTime(13, 0),
-    new ScheduleTime(14, 0)
+    new ScheduleTime(11, 45),
+    new ScheduleTime(12, 30),
+    new ScheduleTime(13, 15),
+    new ScheduleTime(13, 30),
+    new ScheduleTime(14, 15)
 ];
 export let covidPassingTimeAtEnd: boolean[] = [
     false,
@@ -194,7 +196,7 @@ export abstract class ScheduleDay {
     }
 
     private static isCovidDay = (rawBlocks: RawBlock[]): boolean => {
-        if (rawBlocks.length > 3) return false;
+        if (rawBlocks.length > 4) return false;
         return rawBlocks.every(block => {
             let startHours = block.startTime.hours;
             let startMinutes = block.startTime.minutes;
