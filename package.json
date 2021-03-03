@@ -27,7 +27,7 @@
     "gh-pages": "^1.2.0",
     "parcel-bundler": "^1.9.7",
     "prettier": "^1.18.2",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "pug-loader": "^2.4.0",
     "sass": "^1.23.0",
     "typescript": "^2.9.2"
